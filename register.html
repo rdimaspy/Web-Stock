@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | Stock</title>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="assets/js/app.js" defer></script>
+</head>
+
+<body style="margin: 0; background: #FAF7F2; font-family: Arial, Helvetica, sans-serif; color: #302921;">
+
+    <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 30px;">
+
+        <!-- REGISTER CARD -->
+        <div style="width: 100%; max-width: 420px; background: #FFFFFF; padding: 35px; border-radius: 18px; border: 1px solid #E9E1D7; box-shadow: 0 15px 40px rgba(92,69,48,0.08);">
+
+            <!-- LOGO -->
+            <div style="text-align: center; margin-bottom: 30px;">
+                <a href="index.html" style="text-decoration: none; color: #302921; font-size: 26px; font-weight: 700;">
+                    Stock<span style="color: #A77D5B;">.</span>
+                </a>
+
+                <p  data-id="Buat akun untuk mulai mengelola stok bisnis."
+                    data-en="Create an account to start managing your business inventory."
+                    style="margin-top: 12px; color: #81776D; font-size: 14px;">
+                    Buat akun untuk mulai mengelola stok bisnis.
+                </p>
+            </div>
+
+            <!-- FORM -->
+            <form action="api/register.php" method="POST">
+                <!-- NAME -->
+                <label data-id="Nama" data-en="Name" style="display:block; font-size:13px; margin-bottom:7px;">
+                    Nama
+                </label>
+
+                <input type="text" name="name" data-id-placeholder="Masukkan nama" data-en-placeholder="Enter your name" placeholder="Masukkan nama" style="width: 100%; padding: 12px; border: 1px solid #E9E1D7; border-radius: 9px; margin-bottom: 18px; box-sizing: border-box;">
+
+                <!-- EMAIL -->
+                <label data-id="Email" data-en="Email" style="display: block; font-size: 13px; margin-bottom: 7px;">
+                    Email
+                </label>
+
+                <input type="email" name="email" data-id-placeholder="Masukkan email" data-en-placeholder="Enter your email" style="width: 100%; padding: 12px; border: 1px solid #E9E1D7; border-radius: 9px; margin-bottom: 18px; box-sizing: border-box;">
+
+                <!-- PASSWORD -->
+                <label data-id="Password" data-en="Password" style="display: block; font-size: 13px; margin-bottom: 7px;">
+                    Password
+                </label>
+
+                <input type="password" name="password" data-id-placeholder="Buat password" data-en-placeholder="Create password" style="width: 100%; padding: 12px; border: 1px solid #E9E1D7; border-radius: 9px; margin-bottom: 25px; box-sizing: border-box;">
+
+                <!-- BUTTON -->
+                <button type="submit" data-id="Buat Akun" data-en="Create Account" style="width: 100%; padding: 13px; background: #76553D; color: #FFFFFF; border: none; border-radius: 9px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                    Buat Akun
+                </button>
+            </form>
+
+            <!-- LOGIN LINK -->
+            <p style="text-align:center; margin-top:28px; color:#81776D; font-size:13px;">
+                <span data-id="Sudah punya akun?" data-en="Already have an account?">Sudah punya akun?</span>
+                <a href="login.html" data-id="Masuk" data-en="Login" style="color:#76553D; text-decoration:none; font-weight:600; margin-left:4px;">
+                Masuk</a>
+            </p>
+        </div>
+
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+
+</body>
+
+</html>

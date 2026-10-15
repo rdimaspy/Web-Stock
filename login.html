@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Stock</title>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="assets/js/app.js" defer></script>
+</head>
+
+<body style="margin: 0; background: #FAF7F2; font-family: Arial, Helvetica, sans-serif; color: #302921;">
+
+    <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 30px;">
+
+        <!-- LOGIN CARD -->
+        <div style="width: 100%; max-width: 420px; background: #FFFFFF; padding: 35px; border-radius: 18px; border: 1px solid #E9E1D7; box-shadow: 0 15px 40px rgba(92,69,48,0.08);">
+
+            <!-- LOGO -->
+            <div style="text-align: center; margin-bottom: 30px;">
+                <a href="index.html" style="text-decoration: none; color: #302921; font-size: 26px; font-weight: 700;">
+                    Stock<span style="color: #A77D5B;">.</span>
+                </a>
+
+                <p data-id="Masuk untuk mengelola stok bisnismu." data-en="Login to manage your business inventory." style="margin-top:12px; color:#81776D; font-size:14px;">
+                    Masuk untuk mengelola stok bisnismu.
+                </p>
+            </div>
+
+            <!-- FORM -->
+            <form action="api/login.php" method="POST">
+                <!-- EMAIL -->
+                <label data-id="Email" data-en="Email" style="display:block; font-size:13px; margin-bottom:7px;">
+                    Email
+                </label>
+
+                <input type="email" name="email" data-id-placeholder="Masukkan email" data-en-placeholder="Enter your email" placeholder="Masukkan email" 
+                style="width:100%; padding:12px; border:1px solid #E9E1D7; border-radius:9px; margin-bottom:18px; box-sizing:border-box;">
+
+                <!-- PASSWORD -->
+                <label data-id="Password" data-en="Password" style="display:block; font-size:13px; margin-bottom:7px;">
+                    Password
+                </label>
+
+                <input type="password" name="password" data-id-placeholder="Masukkan password" data-en-placeholder="Enter your password" placeholder="Masukkan password" 
+                style="width:100%; padding:12px; border:1px solid #E9E1D7; border-radius:9px; margin-bottom:25px; box-sizing:border-box;">
+
+                <!-- BUTTON -->
+                <button type="submit" data-id="Masuk" data-en="Login" style="width:100%; padding:13px; background:#76553D; color:#FFFFFF; border:none; border-radius:9px; font-size:14px; font-weight:600; cursor:pointer;">
+                    Masuk
+                </button>
+            </form>
+
+            <!-- REGISTER LINK -->
+            <p style="text-align:center; margin-top:28px; color:#81776D; font-size:13px;">
+                <span data-id="Belum punya akun?" data-en="Don't have an account?">
+                    Belum punya akun?
+                </span>
+                <a href="register.html" data-id="Daftar" data-en="Sign Up" style="color:#76553D; text-decoration:none; font-weight:600; margin-left:4px;">
+                    Daftar
+                </a>
+            </p>
+        </div>
+    </div>
+
+</body>
+
+</html>
