@@ -1,5 +1,4 @@
 <?php
-
 session_start();
 
 if (!isset($_SESSION['user_id'])) {
@@ -160,6 +159,21 @@ while ($row = mysqli_fetch_assoc($reports)) {
     $total_stock_out += (int) $row['stock_out'];
     $total_profit += (float) $row['profit'];
 }
+
+// Buat menghitung Total Harga Modal
+$stmt_modal = mysqli_prepare(
+    $conn,
+    "SELECT COALESCE(SUM(current_stock * purchase_price), 0) AS total_modal 
+    FROM products 
+    WHERE business_id = ?"
+);
+
+mysqli_stmt_bind_param($stmt_modal, "i", $business_id);
+mysqli_stmt_execute($stmt_modal);
+$res_modal = mysqli_stmt_get_result($stmt_modal);
+$row_modal = mysqli_fetch_assoc($res_modal);
+
+$total_modal_value = (float)($row_modal['total_modal'] ?? 0);
 
 // Kembalikan pointer agar tabel tetap bisa membaca data
 mysqli_data_seek($reports, 0);
@@ -338,6 +352,16 @@ mysqli_data_seek($reports, 0);
                     </h2>
                 </div>
 
+                <!-- Total Harga Modal -->
+                <div style="background:white; border:1px solid #E9E1D7; border-radius:12px; padding:20px;">
+                    <p style="margin:0; color:#81776D; font-size:13px;">
+                        <?= htmlspecialchars(__('total_capital') ?? 'Total Harga Modal', ENT_QUOTES, 'UTF-8') ?>
+                    </p>
+                    <h2 style="margin:10px 0 0; color:#76553D;">
+                        <?= htmlspecialchars(formatMoneyPHP($total_modal_value, $business['currency']), ENT_QUOTES, 'UTF-8') ?>
+                    </h2>
+                </div>
+
                 <!-- Profit -->
                 <div style="background:white; border:1px solid #E9E1D7; border-radius:12px; padding:20px; grid-column:span 2;">
                     <p style="margin:0; color:#81776D; font-size:13px;">
@@ -355,15 +379,30 @@ mysqli_data_seek($reports, 0);
             <!-- Tabel laporan produk -->
             <div style="background:white; border:1px solid #E9E1D7; border-radius:12px; overflow:hidden;">
 
-                <div style=" padding:18px 20px; border-bottom:1px solid #E9E1D7; font-weight:bold;">
-                    <?= htmlspecialchars(__('product_report'), ENT_QUOTES, 'UTF-8') ?>
+                <!-- Header Table -->
+                <div style="padding:18px 20px; border-bottom:1px solid #E9E1D7; font-weight:bold; display:flex; justify-content:space-between; align-items:center;">
+                    <span><?= htmlspecialchars(__('product_report'), ENT_QUOTES, 'UTF-8') ?></span>
+
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <!-- Tombol Ekspor CSV -->
+                        <button type="button" onclick="exportTableToCSV('laporan_stok.csv')" style="padding:8px 16px; border:1px solid #E9E1D7; border-radius:8px; background:#76553D; color:white; font-weight:600; cursor:pointer; font-size:13px; display:inline-flex; align-items:center; gap:6px;">
+                            <i data-lucide="download" style="width:16px; height:16px;"></i>
+                            <?= htmlspecialchars(__('export_csv'), ENT_QUOTES, 'UTF-8') ?>
+                        </button>
+
+                        <!-- Tombol cetak PDF -->
+                        <button type="button" onclick="printPDF('export-pdf.php?business_id=<?= (int)$business_id ?>&date_from=<?= urlencode($date_from) ?>&date_to=<?= urlencode($date_to) ?>')" style="padding:8px 16px; border:0; border-radius:8px; background:#76553D; color:white; font-weight:600; cursor:pointer; font-size:13px; display:inline-flex; align-items:center; gap:6px;">
+                            <i data-lucide="file-text" style="width:16px; height:16px;"></i>
+                            <?= htmlspecialchars(__('export_pdf'), ENT_QUOTES, 'UTF-8') ?>
+                        </button>
+                    </div>
                 </div>
 
-                <div style="overflow:auto;">
-                    <table style="
-                        width:100%; border-collapse:collapse; text-align:left; white-space:nowrap;">
+                <!-- Table -->
+                <div style="max-height: 500px; overflow-y: auto; overflow-x: auto; border-top: 1px solid #E9E1D7;">
+                    <table id="reportTable" style="width:100%; border-collapse:collapse; text-align:left; white-space:nowrap;">
 
-                        <thead style="background:#F5EFE8;">
+                        <thead style="background:#F5EFE8; position: sticky; top: 0; z-index: 1;">
                             <tr>
                                 <?php foreach (
                                     [
@@ -423,9 +462,68 @@ mysqli_data_seek($reports, 0);
 
             </div>
 
+    <!-- Iframe tersembunyi untuk memuat file export-pdf.php tanpa pindah halaman -->
+    <iframe id="pdfFrame" style="display:none;"></iframe>
+
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>
         lucide.createIcons();
+    </script>
+
+
+    <script>
+        // mengonversi tabel laporan ke bentuk file CSV
+        async function exportTableToCSV(defaultFilename) {
+            const table = document.getElementById('reportTable');
+            let csv = [];
+            
+            // Ambil data dari baris tabel
+            for (let row of table.rows) {
+                let cols = Array.from(row.cells).map(cell => `"${cell.innerText.replace(/"/g, '""')}"`);
+                csv.push(cols.join(','));
+            }
+
+            const csvData = '\uFEFF' + csv.join('\n');
+
+            // Cek apakah browser mendukung fitur pemilih lokasi file (Save File Picker)
+            if ('showSaveFilePicker' in window) {
+                try {
+                    const handle = await window.showSaveFilePicker({
+                        suggestedName: defaultFilename,
+                        types: [{
+                            description: 'CSV File',
+                            accept: { 'text/csv': ['.csv'] },
+                        }],
+                    });
+                    const writable = await handle.createWritable();
+                    await writable.write(csvData);
+                    await writable.close();
+                } catch (err) {
+                    // Abaikan jika pengguna membatalkan dialog Save As
+                }
+            } else {
+                // Fallback otomatis untuk browser lama yang tidak mendukung
+                const csvFile = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+                const downloadLink = document.createElement('a');
+                downloadLink.download = defaultFilename;
+                downloadLink.href = window.URL.createObjectURL(csvFile);
+                downloadLink.style.display = 'none';
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+            }
+        }
+
+        // Fungsi JS untuk mengisi src iframe tanpa reload/pindah page
+        function printPDF(url) {
+            const iframe = document.getElementById('pdfFrame');
+            iframe.src = url;
+            iframe.onload = function() {
+                iframe.contentWindow.focus();
+                iframe.contentWindow.print();
+            };
+        }
+
     </script>
 
 </body>

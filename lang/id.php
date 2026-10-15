@@ -120,5 +120,20 @@ return [
     'profit' => 'Keuntungan',
     'product_report' => 'Laporan Produk',
     'no_data' => 'Tidak ada data laporan.',
-    'current_stock' => 'Stok sekarang '
+    'current_stock' => 'Stok sekarang ',
+    'total_capital' => 'Total Harga Modal',
+    'export_csv' => 'Ekspor CSV',
+    'export_pdf' => 'Ekspor PDF',
+
+    // Submenu laporan
+    'analytics_title' => 'Grafik & Analitik Stok',
+    'analytics_desc' => 'Visualisasi tren stok masuk, stok keluar, dan performa keuangan bisnis.',
+    'stock_movement_chart' => 'Grafik Pergerakan Stok',
+    'profit_trend_chart' => 'Grafik Tren Keuntungan',
+    'summary_report' => 'Ringkasan Laporan ',
+    'analytics_chart' => 'Grafik & Analitik',
+    'analytics_title' => 'Grafik & Analitik Stok',
+    'analytics_desc' => 'Visualisasi tren pergerakan stok dan performa keuntungan bisnis.',
+    'stock_movement_chart' => 'Grafik Pergerakan Stok',
+    'profit_trend_chart' => 'Grafik Tren Keuntungan',
 ];

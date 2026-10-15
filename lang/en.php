@@ -122,4 +122,19 @@ return [
     'product_report' => 'Product Report',
     'no_data' => 'No report data available.',
     'current_stock' => 'Current stock',
+    'total_capital' => 'Total Capital Value',
+    'export_csv' => 'Export CSV',
+    'export_pdf' => 'Export PDF',
+
+    // Submenu reports
+    'analytics_title' => 'Stock Analytics & Charts',
+    'analytics_desc' => 'Visualization of stock in, stock out trends, and financial business performance.',
+    'stock_movement_chart' => 'Stock Movement Chart',
+    'profit_trend_chart' => 'Profit Trend Chart',
+    'summary_report' => 'Summary Report',
+    'analytics_chart' => 'Analytics & Charts',
+    'analytics_title' => 'Stock Analytics & Charts',
+    'analytics_desc' => 'Visualization of stock movement trends and business profit performance.',
+    'stock_movement_chart' => 'Stock Movement Chart',
+    'profit_trend_chart' => 'Profit Trend Chart',
 ];
