@@ -1,30 +1,29 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <!-- Pengaturan karakter dan viewport halaman agar responsif di HP -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <!-- Deskripsi meta untuk SEO -->
     <meta
         name="description"
         content="Stock membantu pemilik bisnis mengelola produk, persediaan, penjualan, dan laporan stok."
     >
 
     <title>Stock | Stock Management</title>
-
-    <!-- CSS -->
-    <link rel="stylesheet" href="assets/css/style.css">
+    <!-- Library ikon Lucide -->
     <script src="https://unpkg.com/lucide@latest" defer></script>
     <script src="assets/js/app.js" defer></script>
+
 </head>
 
 <body>
-
-    
-    <!-- NAVBAR -->
+    <!-- Navigasi (Navbar) -->
     <header style="width: 100%; background: #FFFFFF; border-bottom: 2px solid #E9E1D7;">
-        <div style="max-width: 1160px; height: 64px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between;">
+        <div class="navbar-container" style="max-width: 1160px; height: 64px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
 
-            <!-- LOGO -->
+            <!-- Identitas dan logo aplikasi -->
             <a href="index.html"
             style="display: flex; align-items: center; gap: 9px; color: #302921; text-decoration: none; font-size: 22px; font-weight: 700;">
 
@@ -35,15 +34,12 @@
                 <span>
                     Stock<span style="color:#A77D5B;">.</span>
                 </span>
-
             </a>
 
+            <!-- Menu navigasi kanan -->
+            <div style="display: flex; align-items: center; gap: 16px;">
 
-            <!-- RIGHT MENU -->
-            <div style="display: flex; align-items: center; gap: 20px;">
-
-
-                <!-- LANGUAGE DROPDOWN -->
+                <!-- Pilihan dropdown bahasa -->
                 <div style="position: relative;">
 
                     <button id="languageButton" style="display:flex; align-items:center; gap:5px; border:none; background:none; cursor:pointer; color:#81776D; padding:4px;">
@@ -51,8 +47,8 @@
                         <i data-lucide="chevron-down" style="width:13px; height:13px;"></i>
                     </button>
 
-                    <!-- DROPDOWN -->
-                    <div id="languageMenu" style="display:none; position:absolute; right:0; top:32px; width:140px; padding:8px; background:#FFFFFF; border:1px solid #E9E1D7; border-radius:10px; box-shadow:0 10px 25px rgba(0,0,0,0.08);">
+                    <!-- Opsi pilihan bahasa -->
+                    <div id="languageMenu" style="display:none; position:absolute; right:0; top:32px; width:140px; padding:8px; background:#FFFFFF; border:1px solid #E9E1D7; border-radius:10px; box-shadow:0 10px 25px rgba(0,0,0,0.08); z-index: 100;">
 
                         <button id="langIndonesia" onclick="changeLanguage('id')" style="width:100%; padding:8px; border:none; background:#F5EEE5; border-radius:7px; text-align:left; cursor:pointer;">
                             Indonesia
@@ -64,13 +60,13 @@
                     </div>
                 </div>
 
-                <!-- LOGIN -->
+                <!-- Tombol navigasi masuk -->
                 <a href="login.html" data-id="Masuk" data-en="Login" style="color:#302921; text-decoration:none; font-size:13px; font-weight:600;">
                     Masuk
                 </a>
 
-                <!-- REGISTER -->
-                <a href="register.html" data-id="Daftar" data-en="Sign Up" style="padding:9px 17px; background:#76553D; color:#FFFFFF; border-radius:8px; text-decoration: none;">
+                <!-- Tombol registrasi akun baru -->
+                <a href="register.html" data-id="Daftar" data-en="Sign Up" style="padding:8px 15px; background:#76553D; color:#FFFFFF; border-radius:8px; text-decoration: none; font-size: 13px;">
                     Daftar
                 </a>
             </div>
@@ -78,15 +74,14 @@
         </div>
     </header>
 
-    <!-- HERO SECTION -->
-    <section id="hero" style="padding: 75px 24px; background: radial-gradient(ellipse at 85% 15%, #F5EBDD 0%, #FFFFFF 55%);">
-        <div style="max-width: 1160px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 45px;">
+    <!-- Bagian utama Hero Section -->
+    <section id="hero" class="hero-section" style="padding: 75px 24px; background: radial-gradient(ellipse at 85% 15%, #F5EBDD 0%, #FFFFFF 55%);">
+        <div class="hero-container" style="max-width: 1160px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 45px;">
 
-            
-            <!-- HERO TEXT -->
-            <div style="flex: 1 1 340px;">
+            <!-- Teks ajakan bertindak (Call to Action) -->
+            <div style="flex: 1 1 300px;">
 
-                <h1 style="margin: 0 0 22px; color: #302921; font-size: clamp(38px, 5vw, 58px); line-height: 1.15; letter-spacing: -2px;">
+                <h1 style="margin: 0 0 22px; color: #302921; font-size: clamp(32px, 5vw, 58px); line-height: 1.15; letter-spacing: -1.5px;">
                     <span data-id="Stok teratur."
                         data-en="Stock organized.">
                         Stok teratur.
@@ -101,7 +96,7 @@
 
                 <p data-id="Kelola produk, pantau pergerakan stok, dan pahami perkembangan bisnismu dalam satu tempat."
                 data-en="Manage products, track stock movements, and understand your business in one place."
-                style="max-width: 455px; color: #81776D; font-size: 15px; line-height: 1.9;">
+                style="max-width: 455px; color: #81776D; font-size: 15px; line-height: 1.8;">
                     Kelola produk, pantau pergerakan stok, dan pahami perkembangan bisnismu dalam satu tempat.
                 </p>
 
@@ -118,18 +113,18 @@
 
             </div>
 
-            <!-- DASHBOARD PREVIEW -->
-            <div style="flex: 1 1 330px; max-width: 475px; width: 100%; margin: 0 auto;">
-                <div style="padding: 23px; background: #FFFFFF; border: 1px solid #E9E1D7; border-radius: 18px; box-shadow: 0 20px 50px rgba(92, 69, 48, 0.12);">
+            <!-- Pratinjau visual kartu dashboard -->
+            <div style="flex: 1 1 300px; max-width: 475px; width: 100%; margin: 0 auto;">
+                <div style="padding: 20px; background: #FFFFFF; border: 1px solid #E9E1D7; border-radius: 18px; box-shadow: 0 20px 50px rgba(92, 69, 48, 0.12);">
 
-                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-bottom: 18px; border-bottom: 1px solid #E9E1D7;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-bottom: 16px; border-bottom: 1px solid #E9E1D7;">
                         <div>
                             <h2 data-id="Ringkasan bisnis" data-en="Business overview"
-                                style="color: #302921; font-size: 15px;">
+                                style="color: #302921; font-size: 15px; margin: 0;">
                                 Ringkasan bisnis
                             </h2>
                             <p data-id="Contoh tampilan dashboard" data-en="Dashboard preview"
-                                style="margin-top: 4px; color: #81776D; font-size: 11px;">
+                                style="margin: 4px 0 0; color: #81776D; font-size: 11px;">
                                 Contoh tampilan dashboard
                             </p>
                         </div>
@@ -140,74 +135,72 @@
                         </span>
                     </div>
 
+                    <!-- Grid ringkasan statistik dummy -->
+                    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 16px 0;">
 
-                    <!-- STATISTICS -->
-                    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 18px 0;">
-
-                        <div style="padding: 14px; border: 1px solid #E9E1D7; border-radius: 11px;">
+                        <div style="padding: 12px; border: 1px solid #E9E1D7; border-radius: 11px;">
                             <p data-id="Total produk" data-en="Total products"
-                                style="color: #81776D; font-size: 11px;">Total produk</p>
-                            <h3 style="margin-top: 7px; color: #302921; font-size: 25px;">128</h3>
+                                style="color: #81776D; font-size: 11px; margin: 0;">Total produk</p>
+                            <h3 style="margin: 6px 0 0; color: #302921; font-size: 22px;">128</h3>
                             <p data-id="Produk terdaftar" data-en="Registered products"
-                                style="color: #6F8966; font-size: 10px;">Produk terdaftar</p>
+                                style="color: #6F8966; font-size: 10px; margin: 4px 0 0;">Produk terdaftar</p>
                         </div>
 
-                        <div style="padding: 14px; border: 1px solid #E9E1D7; border-radius: 11px;">
+                        <div style="padding: 12px; border: 1px solid #E9E1D7; border-radius: 11px;">
                             <p data-id="Stok masuk" data-en="Stock in"
-                                style="color: #81776D; font-size: 11px;">Stok masuk</p>
-                            <h3 style="margin-top: 7px; color: #302921; font-size: 25px;">+24</h3>
+                                style="color: #81776D; font-size: 11px; margin: 0;">Stok masuk</p>
+                            <h3 style="margin: 6px 0 0; color: #302921; font-size: 22px;">+24</h3>
                             <p data-id="Unit masuk" data-en="Units received"
-                                style="color: #6F8966; font-size: 10px;">Unit masuk</p>
+                                style="color: #6F8966; font-size: 10px; margin: 4px 0 0;">Unit masuk</p>
                         </div>
 
-                        <div style="padding: 14px; border: 1px solid #E9E1D7; border-radius: 11px;">
+                        <div style="padding: 12px; border: 1px solid #E9E1D7; border-radius: 11px;">
                             <p data-id="Stok keluar" data-en="Stock out"
-                                style="color: #81776D; font-size: 11px;">Stok keluar</p>
-                            <h3 style="margin-top: 7px; color: #302921; font-size: 25px;">-12</h3>
+                                style="color: #81776D; font-size: 11px; margin: 0;">Stok keluar</p>
+                            <h3 style="margin: 6px 0 0; color: #302921; font-size: 22px;">-12</h3>
                             <p data-id="Unit terjual" data-en="Units sold"
-                                style="color: #6F8966; font-size: 10px;">Unit terjual</p>
+                                style="color: #6F8966; font-size: 10px; margin: 4px 0 0;">Unit terjual</p>
                         </div>
 
-                        <div style="padding: 14px; border: 1px solid #E9E1D7; border-radius: 11px;">
+                        <div style="padding: 12px; border: 1px solid #E9E1D7; border-radius: 11px;">
                             <p data-id="Omset" data-en="Revenue"
-                                style="color: #81776D; font-size: 11px;">Omset</p>
-                            <h3 style="margin-top: 7px; color: #302921; font-size: 22px;">Rp 2,4 jt</h3>
+                                style="color: #81776D; font-size: 11px; margin: 0;">Omset</p>
+                            <h3 style="margin: 6px 0 0; color: #302921; font-size: 20px;">Rp 2,4 jt</h3>
                             <p data-id="Penjualan hari ini" data-en="Today's sales"
-                                style="color: #6F8966; font-size: 10px;">Penjualan hari ini</p>
+                                style="color: #6F8966; font-size: 10px; margin: 4px 0 0;">Penjualan hari ini</p>
                         </div>
 
                     </div>
 
-
-                    <!-- SAMPLE PRODUCTS -->
+                    <!-- Daftar sampel produk pada pratinjau -->
                     <h3 data-id="Contoh produk" data-en="Sample products"
-                        style="margin-bottom: 10px; color: #302921; font-size: 13px;">
+                        style="margin: 10px 0 8px; color: #302921; font-size: 13px;">
                         Contoh produk
                     </h3>
 
-                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid #F1EBE4;">
-                        <div style="width: 38px; height: 38px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: #F3E8DC; color: #76553D; border-radius: 9px; font-weight: 700;">
+                    <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid #F1EBE4;">
+                        <div style="width: 36px; height: 36px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: #F3E8DC; color: #76553D; border-radius: 9px; font-weight: 700;">
                             K
                         </div>
 
                         <div style="flex: 1;">
-                            <p style="color: #302921; font-size: 12px; font-weight: 600;">Kemeja Basic</p>
+                            <p style="color: #302921; font-size: 12px; font-weight: 600; margin: 0;">Kemeja Basic</p>
                             <p data-id="Pakaian" data-en="Clothing"
-                                style="color: #81776D; font-size: 10px;">Pakaian</p>
+                                style="color: #81776D; font-size: 10px; margin: 2px 0 0;">Pakaian</p>
                         </div>
 
                         <strong style="color: #302921; font-size: 12px;">42 unit</strong>
                     </div>
 
-                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid #F1EBE4;">
-                        <div style="width: 38px; height: 38px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: #E8EDE3; color: #657B5F; border-radius: 9px; font-weight: 700;">
+                    <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid #F1EBE4;">
+                        <div style="width: 36px; height: 36px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: #E8EDE3; color: #657B5F; border-radius: 9px; font-weight: 700;">
                             T
                         </div>
 
                         <div style="flex: 1;">
-                            <p style="color: #302921; font-size: 12px; font-weight: 600;">Tote Bag Canvas</p>
+                            <p style="color: #302921; font-size: 12px; font-weight: 600; margin: 0;">Tote Bag Canvas</p>
                             <p data-id="Aksesori" data-en="Accessories"
-                                style="color: #81776D; font-size: 10px;">Aksesori</p>
+                                style="color: #81776D; font-size: 10px; margin: 2px 0 0;">Aksesori</p>
                         </div>
 
                         <strong style="color: #302921; font-size: 12px;">28 unit</strong>
@@ -219,194 +212,174 @@
         </div>
     </section>
 
+    <!-- Bagian keunggulan dan fitur utama aplikasi -->
+    <section id="features" style="padding: 60px 24px; background: #FAF7F2;">
 
+        <div style="max-width: 1160px; margin: 0 auto;">
 
-        <!-- FEATURES SECTION -->
-        <section id="features" style="padding: 70px 24px; background: #FAF7F2;">
+            <!-- Header judul bagian fitur -->
+            <div style="max-width: 600px; margin: 0 auto 38px; text-align: center;">
 
-            <div style="max-width: 1160px; margin: 0 auto;">
+                <p style="color: #A77D5B; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin: 0;">
+                    FITUR STOCK
+                </p>
 
-                <!-- Section Heading -->
-                <div style="max-width: 600px; margin: 0 auto 38px; text-align: center;">
+                <h2 data-id="Kelola stok tanpa ribet"
+                    data-en="Inventory management, made simple"
+                    style="margin-top: 10px; color: #302921; font-size: 28px; line-height: 1.3;">
+                    Kelola stok tanpa ribet
+                </h2>
 
-                    <p style="color: #A77D5B; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;">
-                        FITUR STOCK
-                    </p>
+                <p data-id="Semua yang kamu butuhkan untuk mengelola persediaan dan memantau bisnis dalam satu tempat."
+                data-en="Everything you need to manage inventory and monitor your business in one place."
+                style="margin-top: 10px; color: #81776D; font-size: 14px; line-height: 1.7;">
+                    Semua yang kamu butuhkan untuk mengelola persediaan dan memantau bisnis dalam satu tempat.
+                </p>
 
-                    <h2 data-id="Kelola stok tanpa ribet"
-                        data-en="Inventory management, made simple"
-                        style="margin-top: 10px; color: #302921; font-size: 32px; line-height: 1.3;">
-                        Kelola stok tanpa ribet
-                    </h2>
-
-                    <p data-id="Semua yang kamu butuhkan untuk mengelola persediaan dan memantau bisnis dalam satu tempat."
-                    data-en="Everything you need to manage inventory and monitor your business in one place."
-                    style="margin-top: 12px; color: #81776D; font-size: 14px; line-height: 1.8;">
-                        Semua yang kamu butuhkan untuk mengelola persediaan dan memantau bisnis dalam satu tempat.
-                    </p>
-
-                </div>
-
-
-                <!-- Feature Cards -->
-                <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px;">
-                    
-                    <!-- Feature 1 -->
-                    <div style="padding: 24px; background: #FFFFFF; border: 1px solid #E9E1D7; border-radius: 14px;">                       
-                        <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: #F3E8DC; color: #76553D; border-radius: 11px;">
-                            <i data-lucide="package" style="width: 23px; height: 23px;"></i>
-                        </div>
-
-                        <h3 data-id="Manajemen Produk"
-                            data-en="Product Management"
-                            style="margin-top: 18px; color: #302921; font-size: 16px;">
-                            Manajemen Produk
-                        </h3>
-
-                        <p data-id="Kelola nama produk, kategori, harga, dan stok awal dengan mudah."
-                        data-en="Manage product names, categories, prices, and opening stock with ease."
-                        style="margin-top: 8px; color: #81776D; font-size: 13px; line-height: 1.8;">
-                            Kelola nama produk, kategori, harga, dan stok awal dengan mudah.
-                        </p>
-                    </div>
-
-
-                    <!-- Feature 2 -->
-                    <div style="padding: 24px; background: #FFFFFF; border: 1px solid #E9E1D7; border-radius: 14px;">
-                        <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: #F3E8DC; color: #76553D; border-radius: 11px;">
-                            <i data-lucide="arrow-down-up" style="width: 23px; height: 23px;"></i>
-                        </div>
-
-                        <h3 data-id="Pergerakan Stok"
-                            data-en="Stock Movement"
-                            style="margin-top: 18px; color: #302921; font-size: 16px;">
-                            Pergerakan Stok
-                        </h3>
-
-                        <p data-id="Catat stok masuk, barang terjual, dan penyesuaian stok secara terpisah."
-                        data-en="Record incoming stock, sold items, and stock adjustments separately."
-                        style="margin-top: 8px; color: #81776D; font-size: 13px; line-height: 1.8;">
-                            Catat stok masuk, barang terjual, dan penyesuaian stok secara terpisah.
-                        </p>
-                    </div>
-
-
-                    <!-- Feature 3 -->
-                    <div style="padding: 24px; background: #FFFFFF; border: 1px solid #E9E1D7; border-radius: 14px;">        
-                        <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: #F3E8DC; color: #76553D; border-radius: 11px;">
-                            <i data-lucide="history" style="width: 23px; height: 23px;"></i>
-                        </div>
-
-                        <h3 data-id="Riwayat Aktivitas"
-                            data-en="Activity History"
-                            style="margin-top: 18px; color: #302921; font-size: 16px;">
-                            Riwayat Aktivitas
-                        </h3>
-
-                        <p data-id="Periksa riwayat stok awal, barang masuk, penjualan, dan audit stok."
-                        data-en="Review opening stock, incoming goods, sales, and stock audit history."
-                        style="margin-top: 8px; color: #81776D; font-size: 13px; line-height: 1.8;">
-                            Periksa riwayat stok awal, barang masuk, penjualan, dan audit stok.
-                        </p>
-                    </div>
-
-
-                    <!-- Feature 4 -->
-                    <div style="padding: 24px; background: #FFFFFF; border: 1px solid #E9E1D7; border-radius: 14px;">
-                        <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: #F3E8DC; color: #76553D; border-radius: 11px;">
-                            <i data-lucide="chart-no-axes-combined" style="width: 23px; height: 23px;"></i>
-                        </div>
-
-                        <h3 data-id="Statistik Bisnis"
-                            data-en="Business Statistics"
-                            style="margin-top: 18px; color: #302921; font-size: 16px;">
-                            Statistik Bisnis
-                        </h3>
-
-                        <p data-id="Pantau jumlah stok masuk, stok keluar, omset, dan keuntungan kotor."
-                        data-en="Monitor stock in, stock out, revenue, and gross profit."
-                        style="margin-top: 8px; color: #81776D; font-size: 13px; line-height: 1.8;">
-                            Pantau jumlah stok masuk, stok keluar, omset, dan keuntungan.
-                        </p>
-                    </div>
-
-
-                    <!-- Feature 5 -->
-                    <div style="padding: 24px; background: #FFFFFF; border: 1px solid #E9E1D7; border-radius: 14px;">
-                        <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: #F3E8DC; color: #76553D; border-radius: 11px;">
-                            <i data-lucide="file-spreadsheet" style="width: 23px; height: 23px;"></i>
-                        </div>
-
-                        <h3 data-id="Laporan dan CSV"
-                            data-en="Reports and CSV"
-                            style="margin-top: 18px; color: #302921; font-size: 16px;">
-                            Laporan Bisnis
-                        </h3>
-
-                        <p data-id="Pilih periode laporan, urutkan data, dan unduh laporan dalam format CSV."
-                        data-en="Choose reporting periods, sort data, and download reports in CSV format."
-                        style="margin-top: 8px; color: #81776D; font-size: 13px; line-height: 1.8;">
-                            Pantau perkembangan persediaan, penjualan, dan keuntungan melalui laporan yang terstruktur.
-                        </p>
-                    </div>
-
-
-                    <!-- Feature 6 -->
-                    <div style="padding: 24px; background: #FFFFFF; border: 1px solid #E9E1D7; border-radius: 14px;">
-                        <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: #F3E8DC; color: #76553D; border-radius: 11px;">
-                            <i data-lucide="store" style="width: 23px; height: 23px;"></i>
-                        </div>
-
-                        <h3 data-id="Banyak Bisnis"
-                            data-en="Multiple Businesses"
-                            style="margin-top: 18px; color: #302921; font-size: 16px;">
-                            Manajemen Multi-Toko
-                        </h3>
-
-                        <p data-id="Kelola beberapa toko dengan stok dan laporan masing-masing melalui satu akun."
-                        data-en="Manage multiple stores with separate inventory and reports under one account."
-                        style="margin-top: 8px; color: #81776D; font-size: 13px; line-height: 1.8;">
-                            Kelola setiap toko dengan persediaan dan laporan yang terorganisasi dalam satu akun.
-                        </p>
-                    </div>
-
-                </div>
             </div>
-        </section>
 
-    <!-- FOOTER -->
-    <footer style="background: #FFFFFF; border-top: 1px solid #E9E1D7; padding: 28px 24px;">
-        <div style="max-width: 1160px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+            <!-- Grid daftar kartu fitur unggulan (dengan efek hover & responsif HP) -->
+            <div class="features-grid" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px;">
+                
+                <!-- Kartu Fitur 1: Manajemen Produk -->
+                <div class="feature-card" style="padding: 22px; background: #FFFFFF; border: 1px solid #E9E1D7; border-radius: 14px;">                       
+                    <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: #F3E8DC; color: #76553D; border-radius: 11px;">
+                        <i data-lucide="package" style="width: 23px; height: 23px;"></i>
+                    </div>
 
-            <!-- BRAND -->
+                    <h3 data-id="Manajemen Produk"
+                        data-en="Product Management"
+                        style="margin-top: 16px; color: #302921; font-size: 16px;">
+                        Manajemen Produk
+                    </h3>
+
+                    <p data-id="Kelola nama produk, kategori, harga, dan stok awal dengan mudah."
+                    data-en="Manage product names, categories, prices, and opening stock with ease."
+                    style="margin-top: 8px; color: #81776D; font-size: 13px; line-height: 1.7;">
+                        Kelola nama produk, kategori, harga, dan stok awal dengan mudah.
+                    </p>
+                </div>
+
+                <!-- Kartu Fitur 2: Pergerakan Stok -->
+                <div class="feature-card" style="padding: 22px; background: #FFFFFF; border: 1px solid #E9E1D7; border-radius: 14px;">
+                    <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: #F3E8DC; color: #76553D; border-radius: 11px;">
+                        <i data-lucide="arrow-down-up" style="width: 23px; height: 23px;"></i>
+                    </div>
+
+                    <h3 data-id="Pergerakan Stok"
+                        data-en="Stock Movement"
+                        style="margin-top: 16px; color: #302921; font-size: 16px;">
+                        Pergerakan Stok
+                    </h3>
+
+                    <p data-id="Catat stok masuk, barang terjual, dan penyesuaian stok secara terpisah."
+                    data-en="Record incoming stock, sold items, and stock adjustments separately."
+                    style="margin-top: 8px; color: #81776D; font-size: 13px; line-height: 1.7;">
+                        Catat stok masuk, barang terjual, dan penyesuaian stok secara terpisah.
+                    </p>
+                </div>
+
+                <!-- Kartu Fitur 3: Riwayat Aktivitas -->
+                <div class="feature-card" style="padding: 22px; background: #FFFFFF; border: 1px solid #E9E1D7; border-radius: 14px;">        
+                    <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: #F3E8DC; color: #76553D; border-radius: 11px;">
+                        <i data-lucide="history" style="width: 23px; height: 23px;"></i>
+                    </div>
+
+                    <h3 data-id="Riwayat Aktivitas"
+                        data-en="Activity History"
+                        style="margin-top: 16px; color: #302921; font-size: 16px;">
+                        Riwayat Aktivitas
+                    </h3>
+
+                    <p data-id="Periksa riwayat stok awal, barang masuk, penjualan, dan audit stok."
+                    data-en="Review opening stock, incoming goods, sales, and stock audit history."
+                    style="margin-top: 8px; color: #81776D; font-size: 13px; line-height: 1.7;">
+                        Periksa riwayat stok awal, barang masuk, penjualan, dan audit stok.
+                    </p>
+                </div>
+
+                <!-- Kartu Fitur 4: Statistik Bisnis -->
+                <div class="feature-card" style="padding: 22px; background: #FFFFFF; border: 1px solid #E9E1D7; border-radius: 14px;">
+                    <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: #F3E8DC; color: #76553D; border-radius: 11px;">
+                        <i data-lucide="chart-no-axes-combined" style="width: 23px; height: 23px;"></i>
+                    </div>
+
+                    <h3 data-id="Statistik Bisnis"
+                        data-en="Business Statistics"
+                        style="margin-top: 16px; color: #302921; font-size: 16px;">
+                        Statistik Bisnis
+                    </h3>
+
+                    <p data-id="Pantau jumlah stok masuk, stok keluar, omset, dan keuntungan kotor."
+                    data-en="Monitor stock in, stock out, revenue, and gross profit."
+                    style="margin-top: 8px; color: #81776D; font-size: 13px; line-height: 1.7;">
+                        Pantau jumlah stok masuk, stok keluar, omset, dan keuntungan.
+                    </p>
+                </div>
+
+                <!-- Kartu Fitur 5: Laporan dan PDF/CSV -->
+                <div class="feature-card" style="padding: 22px; background: #FFFFFF; border: 1px solid #E9E1D7; border-radius: 14px;">
+                    <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: #F3E8DC; color: #76553D; border-radius: 11px;">
+                        <i data-lucide="file-spreadsheet" style="width: 23px; height: 23px;"></i>
+                    </div>
+
+                    <!-- Ubah data-id menjadi 'Laporan & Analitik' -->
+                    <h3 data-id="Laporan & Analitik"
+                        data-en="Reports & Analytics"
+                        style="margin-top: 16px; color: #302921; font-size: 16px;">
+                        Laporan & Analitik
+                    </h3>
+
+                    <!-- Ubah data-id paragraf agar sesuai teks baru -->
+                    <p data-id="Pantau perkembangan persediaan, penjualan, dan keuntungan melalui laporan yang terstruktur."
+                    data-en="Track inventory, sales, and profit growth through structured reports."
+                    style="margin-top: 8px; color: #81776D; font-size: 13px; line-height: 1.7;">
+                        Pantau perkembangan persediaan, penjualan, dan keuntungan melalui laporan yang terstruktur.
+                    </p>
+                </div>
+
+                <!-- Kartu Fitur 6: Multi-Toko -->
+                <div class="feature-card" style="padding: 22px; background: #FFFFFF; border: 1px solid #E9E1D7; border-radius: 14px;">
+                    <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: #F3E8DC; color: #76553D; border-radius: 11px;">
+                        <i data-lucide="store" style="width: 23px; height: 23px;"></i>
+                    </div>
+
+                    <!-- Ubah data-id menjadi 'Manajemen Multi-Toko' -->
+                    <h3 data-id="Manajemen Multi-Toko"
+                        data-en="Multi-Store Management"
+                        style="margin-top: 16px; color: #302921; font-size: 16px;">
+                        Manajemen Multi-Toko
+                    </h3>
+
+                    <!-- Ubah data-id paragraf agar sesuai teks baru -->
+                    <p data-id="Kelola setiap toko dengan persediaan dan laporan yang terorganisasi dalam satu akun."
+                    data-en="Manage each store with organized inventory and reports under one account."
+                    style="margin-top: 8px; color: #81776D; font-size: 13px; line-height: 1.7;">
+                        Kelola setiap toko dengan persediaan dan laporan yang terorganisasi dalam satu akun.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Bagian Footer (Hak Cipta & Informasi) -->
+    <footer style="background: #FFFFFF; border-top: 1px solid #E9E1D7; padding: 24px 16px;">
+        <div class="footer-container" style="max-width: 1160px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+
+            <!-- Logo brand pada footer -->
             <a href="index.html"
             style="color: #302921; text-decoration: none; font-size: 22px; font-weight: 750;">
                 Stock<span style="color: #A77D5B;">.</span>
             </a>
 
-            <!-- DESCRIPTION -->
-            <p data-id="Pengelolaan stok yang lebih mudah untuk bisnismu."
-            data-en="Simpler inventory management for your business."
-            style="color: #81776D; font-size: 12px; margin: 0;">
-                Pengelolaan stok yang lebih mudah untuk bisnismu.
-            </p>
-
-            <!-- COPYRIGHT -->
+            <!-- Informasi hak cipta -->
             <p style="color: #A0988E; font-size: 11px; margin: 0;">
                 © 2026 Stock. All rights reserved.
             </p>
 
         </div>
     </footer>
-
-    <!-- JavaScript -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-
-    <script src="assets/js/app.js"></script>
-
-    <script>
-        lucide.createIcons();
-    </script>
 
 </body>
 </html>

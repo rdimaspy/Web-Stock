@@ -1,51 +1,12 @@
 <?php
-session_start();
+// Validasi autentikasi user dan akses bisnis aktif
+require_once __DIR__ . '/../includes/auth_business.php';
 
-// Pastikan user sudah login
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../login.html");
-    exit;
-}
-
-require_once __DIR__ . '/../config/database.php';
+// Pengaturan bahasa
 require_once __DIR__ . '/../includes/language.php';
+
+// Formatter mata uang
 require_once __DIR__ . '/../includes/currency.php';
-
-// Ambil business aktif dari URL
-$business_id = filter_input(INPUT_GET, 'business_id', FILTER_VALIDATE_INT);
-
-if (!$business_id || $business_id < 1) {
-    header("Location: ../businesses.php");
-    exit;
-}
-
-// Pastikan bisnis memang milik user yang login
-$stmt = mysqli_prepare(
-    $conn,
-    "SELECT id, business_name, currency
-    FROM businesses
-    WHERE id = ? AND user_id = ?
-    LIMIT 1"
-);
-
-mysqli_stmt_bind_param(
-    $stmt,
-    "ii",
-    $business_id,
-    $_SESSION['user_id']
-);
-
-mysqli_stmt_execute($stmt);
-
-$business = mysqli_fetch_assoc(
-    mysqli_stmt_get_result($stmt)
-);
-
-
-if (!$business) {
-    http_response_code(404);
-    exit("Bisnis tidak ditemukan atau tidak memiliki akses.");
-}
 
 // Ambil produk aktif untuk pilihan Stock Out
 $stmt = mysqli_prepare(
@@ -56,19 +17,23 @@ $stmt = mysqli_prepare(
     ORDER BY product_name ASC"
 );
 
+// Mengikat parameter ID bisnis ke statement query
 mysqli_stmt_bind_param(
     $stmt,
     "i",
     $business_id
 );
 
+// Mengeksekusi query yang telah disiapkan dan Mengambil hasil query produk
 mysqli_stmt_execute($stmt);
-
 $products = mysqli_stmt_get_result($stmt);
 
 ?>
 
+
+
 <!DOCTYPE html>
+<!-- Set bahasa -->
 <html lang="<?= htmlspecialchars($lang, ENT_QUOTES, 'UTF-8') ?>">
 
 <head>
@@ -79,24 +44,25 @@ $products = mysqli_stmt_get_result($stmt);
     </title>
 </head>
 
+<!-- Styling utama layout dan warna latar halaman -->
 <body style="margin:0; min-height:100vh; background:#FAF7F2; font-family:Arial,sans-serif; color:#49382D;">
 
 <!-- Menentukan halaman aktif untuk sidebar -->
 <?php $currentPage = 'stock-out.php';?>
 
-<!-- Layout utama -->
+<!-- Layout utama halaman Produk -->
 <div style="display:flex; min-height:100vh;">
 
-    <!-- Sidebar -->
+    <!-- SIDEBAR -->
     <?php require __DIR__ . '/components/sidebar.php'; ?>
 
-    <!-- Konten utama -->
+    <!-- KONTEN UTAMA -->
     <main style="margin-left:230px; flex:1; min-width:0;">
 
-        <!-- Header -->
+        <!-- HEADER -->
         <?php require __DIR__ . '/components/header.php'; ?>
 
-        <!-- HALAMAN STOCK OUT -->
+        <!-- HALAMAN STOK KELUAR -->
         <section style="padding:32px;">
             <div style="margin-bottom:25px;">
                 <h1 style="margin:0; font-size:29px;">
@@ -108,7 +74,8 @@ $products = mysqli_stmt_get_result($stmt);
                 </p>
             </div>
 
-            <!-- Form Stock Out -->
+            <!-- FORM STOK KELUAR -->
+            <!-- Container form utama pencatatan stok keluar -->
             <div style="background:white; border:1px solid #E9E1D7; border-radius:12px; padding:28px; max-width:900px;">
 
                 <!-- Header form -->
@@ -117,11 +84,13 @@ $products = mysqli_stmt_get_result($stmt);
                         <i data-lucide="package-minus" style="width:28px;"></i>
                     </div>
 
+                    <!-- Judul -->
                     <div>
                         <h2 style="margin:0; font-size:22px;">
                             <?= htmlspecialchars(__('record_stock_out'), ENT_QUOTES, 'UTF-8') ?>
                         </h2>
 
+                        <!-- Deskripsi -->
                         <p style="margin:5px 0 0; color:#81776D;">
                             <?= htmlspecialchars(__('record_stock_out_description'), ENT_QUOTES, 'UTF-8') ?>
                         </p>
@@ -133,11 +102,13 @@ $products = mysqli_stmt_get_result($stmt);
                     <?= htmlspecialchars(__('product_name'), ENT_QUOTES, 'UTF-8') ?>
                 </label>
 
+                <!-- Elemen dropdown pilihan produk -->
                 <select id="product_id" style="width:100%; padding:14px; border:1px solid #E9E1D7; border-radius:10px; font-size:15px;">
                     <option value="">
                         <?= htmlspecialchars(__('select_product'), ENT_QUOTES, 'UTF-8') ?>
                     </option>
 
+                    <!-- Looping untuk menampilkan daftar opsi produk beserta data atribut stok dan harga -->
                     <?php while ($product = mysqli_fetch_assoc($products)): ?>
                         <option 
                             value="<?= (int)$product['id'] ?>"
@@ -172,10 +143,12 @@ $products = mysqli_stmt_get_result($stmt);
                         <?= htmlspecialchars(__('quantity_out'), ENT_QUOTES, 'UTF-8') ?>
                     </label>
 
+                    <!-- Jumlah barang keluar -->
                     <input type="number" id="quantity" name="quantity" min="1" placeholder="<?= htmlspecialchars(__('quantity_out_placeholder'), ENT_QUOTES, 'UTF-8') ?>"
                         style="width:100%; padding:14px; border:1px solid #E9E1D7; border-radius:10px; font-size:15px;">
                 </div>
 
+                <!-- Total (harga) barang keluar -->
                 <div style="margin-top:22px;">
                     <label style="display:block; font-weight:bold; margin-bottom:8px;">
                         <?= htmlspecialchars(__('total_amount'), ENT_QUOTES, 'UTF-8') ?>
@@ -198,7 +171,7 @@ $products = mysqli_stmt_get_result($stmt);
                     </textarea>
                 </div>
 
-                <!-- Tombol -->
+                <!-- Tombol Save-->
                 <div style="padding-top:20px; border-top:1px solid #E9E1D7; display:flex; justify-content:flex-end;">
                     <button type="submit" id="saveStockOut" style="display:flex; align-items:center; gap:8px; padding:12px 19px; border:0; border-radius:9px; background:#76553D; color:white; font-weight:600; cursor:pointer;">
                         <i data-lucide="save" style="width:18px;height:18px;"></i>
@@ -209,34 +182,63 @@ $products = mysqli_stmt_get_result($stmt);
             </div>
 
         </section>
-
     </main>
-
 </div>
 
 
-
+<!-- Ikon -->
 <script src="https://unpkg.com/lucide@latest"></script>
 <script>
     lucide.createIcons();
 </script>
 
 <script>
-/*Stock Out Calculation*/
+// Mengambil data mata uang bisnis aktif dari PHP
+const businessCurrency = <?= json_encode($businessCurrency ?? $business['currency'] ?? 'USD') ?>;
 
+/* Stock Out Calculation */
+// Mengambil elemen dropdown produk, stok tersedia, harga jual, jumlah barang keluar, dan total harga
 const productSelect = document.getElementById('product_id');
 const availableStock = document.getElementById('availableStock');
 const sellingPrice = document.getElementById('sellingPrice');
 const quantityInput = document.getElementById('quantity');
 const totalAmount = document.getElementById('totalAmount');
 
+// Menyimpan nilai harga satuan produk aktif (default: 0)
 let currentPrice = 0;
 
-// Update informasi saat produk dipilih
-productSelect.addEventListener('change', function () {
+// Format mata uang dinamis sesuai jenis currency bisnis aktif
+function formatCurrency(value) {
+    try {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: businessCurrency,
+            minimumFractionDigits: 0
+        }).format(value);
+    } catch (e) {
+        // Fallback jika format currency mengalami kendala pada browser
+        return businessCurrency + ' ' + Number(value).toLocaleString('en-US');
+    }
+}
 
+// Rumus menghitung total transaksi (jumlah keluar × harga jual)
+function calculateTotal() {
+    const quantity = parseInt(quantityInput.value) || 0;
+    const total = quantity * currentPrice;
+
+    // Menampilkan hasil format mata uang jika total lebih dari 0
+    if (total > 0) {
+        totalAmount.value = formatCurrency(total);
+    } else {
+        totalAmount.value = '-';
+    }
+}
+
+// Menyesuaikan informasi harga dan stok saat produk pada dropdown dipilih
+productSelect.addEventListener('change', function () {
     const selectedOption = this.options[this.selectedIndex];
 
+    // Reset bidang tampilan jika tidak ada produk yang dipilih
     if (!selectedOption.value) {
         availableStock.textContent = '-';
         sellingPrice.textContent = '-';
@@ -245,74 +247,27 @@ productSelect.addEventListener('change', function () {
         return;
     }
 
-    const stock = parseInt(selectedOption.dataset.stock);
-    const price = parseFloat(selectedOption.dataset.price);
+    // Mengambil nilai stok dan harga dari atribut dataset opsi produk terpilih
+    const stock = parseInt(selectedOption.dataset.stock) || 0;
+    const price = parseFloat(selectedOption.dataset.price) || 0;
 
+    // Memperbarui nilai harga satuan aktif
     currentPrice = price;
 
-    // Menampilkan stok tersedia
+    // Menampilkan stok tersedia dan harga jual berformat mata uang bisnis
     availableStock.textContent = stock.toLocaleString('id-ID');
-
-    // Menampilkan harga jual
     sellingPrice.textContent = formatCurrency(price);
 
+    // Menghitung ulang total harga transaksi
     calculateTotal();
 });
 
-// Menghitung total ketika jumlah berubah
+// Menghitung ulang total harga secara real-time saat jumlah keluar diubah
 quantityInput.addEventListener('input', function () {
     calculateTotal();
 });
 
-// Rumus total = jumlah keluar × harga jual
-function calculateTotal() {
-    const quantity = parseInt(quantityInput.value) || 0;
-    const total = quantity * currentPrice;
-
-    totalAmount.value = total > 0
-        ? formatCurrency(total)
-        : '-';
-
-}
-
-// Format mata uang
-function formatCurrency(value) {
-    return new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        minimumFractionDigits: 0
-    }).format(value);
-
-}
-
-// Saat jumlah berubah
-quantityInput.addEventListener('input', function () {
-    calculateTotal();
-});
-
-// Menghitung total penjualan
-function calculateTotal() {
-    const quantity = parseInt(quantityInput.value) || 0;
-    const total = quantity * currentPrice;
-
-    if (total > 0) {
-        totalAmount.value = formatCurrency(total);
-    } else {
-        totalAmount.value = '-';
-    }
-}
-
-// Format Rupiah
-function formatCurrency(value) {
-    return new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        minimumFractionDigits: 0
-    }).format(value);
-}
-
-/* Menyimpan transaksi Stock Out*/
-
+/* Menyimpan Transaksi Stock Out */
 const saveButton = document.getElementById('saveStockOut');
 
 saveButton.addEventListener('click', function () {
@@ -320,56 +275,38 @@ saveButton.addEventListener('click', function () {
     const quantity = quantityInput.value;
     const notes = document.getElementById('notes').value;
 
-    // Validasi sederhana sebelum kirim
+    // Validasi input pemilihan produk
     if (!productId) {
         alert('Pilih produk terlebih dahulu.');
         return;
     }
 
+    // Validasi input jumlah barang keluar
     if (!quantity || quantity < 1) {
         alert('Masukkan jumlah barang keluar.');
         return;
     }
 
-    // Cek stok sebelum mengirim transaksi
-    const stockAvailable = parseInt(availableStock.textContent.replace(/\./g, ''));
-    if (quantity > stockAvailable) {
-        alert(
-            'Stok tidak mencukupi. Stok tersedia: ' 
-            + stockAvailable
-        );
+    // Validasi ketersediaan stok produk
+    const stockAvailable = parseInt(availableStock.textContent.replace(/\./g, '')) || 0;
+    if (parseInt(quantity) > stockAvailable) {
+        alert('Stok tidak mencukupi. Stok tersedia: ' + stockAvailable);
         return;
     }
 
+    // Menyusun payload FormData untuk dikirimkan ke server
     const formData = new FormData();
+    formData.append('business_id', <?= (int)$business_id ?>);
+    formData.append('product_id', productId);
+    formData.append('quantity', quantity);
+    formData.append('notes', notes);
 
-    formData.append(
-        'business_id',
-        <?= (int)$business_id ?>
-    );
-
-    formData.append(
-        'product_id',
-        productId
-    );
-
-    formData.append(
-        'quantity',
-        quantity
-    );
-
-    formData.append(
-        'notes',
-        notes
-    );
-
+    // Mengirimkan data transaksi stok keluar melalui API
     fetch('../api/create-stock-out.php', {
         method: 'POST',
         body: formData
     })
-
     .then(response => response.json())
-
     .then(result => {
         if (result.success) {
             alert(result.message);
@@ -378,13 +315,11 @@ saveButton.addEventListener('click', function () {
             alert(result.message);
         }
     })
-
     .catch(error => {
         console.error(error);
         alert('Terjadi kesalahan sistem.');
     });
 });
-
 </script>
 
 </body>

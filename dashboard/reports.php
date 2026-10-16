@@ -1,52 +1,12 @@
 <?php
-session_start();
+// Validasi autentikasi user dan akses bisnis aktif
+require_once __DIR__ . '/../includes/auth_business.php';
 
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../login.html");
-    exit;
-}
-
-require_once __DIR__ . '/../config/database.php';
+// Pengaturan bahasa
 require_once __DIR__ . '/../includes/language.php';
+
+// Formatter mata uang
 require_once __DIR__ . '/../includes/currency.php';
-
-$currentPage = 'reports.php';
-
-// Validasi business aktif
-$business_id = filter_input(INPUT_GET, 'business_id', FILTER_VALIDATE_INT);
-
-if (!$business_id || $business_id < 1) {
-    header("Location: ../businesses.php");
-    exit;
-}
-
-// Pastikan bisnis milik user
-$stmt = mysqli_prepare(
-    $conn,
-    "SELECT id, business_name, currency
-    FROM businesses
-    WHERE id = ?
-    AND user_id = ?
-    LIMIT 1"
-);
-
-mysqli_stmt_bind_param(
-    $stmt,
-    "ii",
-    $business_id,
-    $_SESSION['user_id']
-);
-
-mysqli_stmt_execute($stmt);
-
-$business = mysqli_fetch_assoc(
-    mysqli_stmt_get_result($stmt)
-);
-
-if (!$business) {
-    http_response_code(404);
-    exit("Bisnis tidak ditemukan atau tidak memiliki akses.");
-}
 
 // Filter tanggal laporan
 $date_from = $_GET['date_from'] ?? date('Y-m-01');
