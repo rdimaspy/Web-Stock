@@ -1,14 +1,23 @@
+<?php
+// Memulai sesi dan menentukan bahasa yang sedang aktif
+session_start();
+$lang = $_SESSION['language'] ?? 'id';
+
+// Memuat kamus bahasa berdasarkan file PHP di folder lang/
+$langFile = __DIR__ . "/lang/{$lang}.php";
+$trans = file_exists($langFile) ? require $langFile : require __DIR__ . "/lang/id.php";
+?>
 <!DOCTYPE html>
-<html lang="id">
+<html lang="<?= htmlspecialchars($lang); ?>">
 
 <head>
+    <!-- Pengaturan karakter dan viewport halaman agar responsif di HP -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | Stock</title>
 
     <!-- Library ikon Lucide -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="assets/js/app.js" defer></script>
 
     <!-- CSS background login -->
     <style>
@@ -61,12 +70,12 @@
 
             <!-- Identitas Logo dan Judul -->
             <div style="text-align: center; margin-bottom: 30px;">
-                <a href="index.html" style="text-decoration: none; color: #302921; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;">
+                <a href="index.php" style="text-decoration: none; color: #302921; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;">
                     Stock<span style="color: #A77D5B;">.</span>
                 </a>
 
-                <p data-id="Masuk untuk mengelola stok bisnismu." data-en="Login to manage your business inventory." style="margin-top:10px; color:#81776D; font-size:14px; line-height:1.5;">
-                    Masuk untuk mengelola stok bisnismu.
+                <p style="margin-top:10px; color:#81776D; font-size:14px; line-height:1.5;">
+                    <?= htmlspecialchars($trans['login_subtitle'] ?? 'Masuk untuk mengelola stok bisnismu.'); ?>
                 </p>
             </div>
 
@@ -74,45 +83,47 @@
             <form action="api/login.php" method="POST">
                 <!-- Email -->
                 <div style="margin-bottom: 18px;">
-                    <label data-id="Email" data-en="Email" style="display:block; font-size:13px; font-weight:600; margin-bottom:7px; color:#49382D;">
-                        Email
+                    <label style="display:block; font-size:13px; font-weight:600; margin-bottom:7px; color:#49382D;">
+                        <?= htmlspecialchars($trans['email_label'] ?? 'Email'); ?>
                     </label>
 
-                    <input type="email" name="email" class="input-field" data-id-placeholder="Masukkan email" data-en-placeholder="Enter your email" placeholder="Masukkan email" 
-                    style="width:100%; padding:12px 14px; border:1px solid #E9E1D7; border-radius:10px; box-sizing:border-box; font-size:14px; color:#302921;">
+                    <input type="email" name="email" class="input-field" 
+                           placeholder="<?= htmlspecialchars($trans['email_placeholder'] ?? 'Masukkan email'); ?>" 
+                           style="width:100%; padding:12px 14px; border:1px solid #E9E1D7; border-radius:10px; box-sizing:border-box; font-size:14px; color:#302921;">
                 </div>
 
                 <!-- Password -->
                 <div style="margin-bottom: 24px;">
-                    <label data-id="Password" data-en="Password" style="display:block; font-size:13px; font-weight:600; margin-bottom:7px; color:#49382D;">
-                        Password
+                    <label style="display:block; font-size:13px; font-weight:600; margin-bottom:7px; color:#49382D;">
+                        <?= htmlspecialchars($trans['password_label'] ?? 'Password'); ?>
                     </label>
 
-                    <input type="password" name="password" class="input-field" data-id-placeholder="Masukkan password" data-en-placeholder="Enter your password" placeholder="Masukkan password" 
-                    style="width:100%; padding:12px 14px; border:1px solid #E9E1D7; border-radius:10px; box-sizing:border-box; font-size:14px; color:#302921;">
+                    <input type="password" name="password" class="input-field" 
+                           placeholder="<?= htmlspecialchars($trans['password_placeholder'] ?? 'Masukkan password'); ?>" 
+                           style="width:100%; padding:12px 14px; border:1px solid #E9E1D7; border-radius:10px; box-sizing:border-box; font-size:14px; color:#302921;">
                 </div>
 
                 <!-- Tombol Submit -->
-                <button type="submit" data-id="Masuk" data-en="Login" style="width:100%; padding:13px; background:#76553D; color:#FFFFFF; border:none; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; transition: background 0.2s;">
-                    Masuk
+                <button type="submit" style="width:100%; padding:13px; background:#76553D; color:#FFFFFF; border:none; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; transition: background 0.2s;">
+                    <?= htmlspecialchars($trans['login'] ?? 'Masuk'); ?>
                 </button>
             </form>
 
             <!-- Tautan navigasi pendaftaran akun baru -->
             <p style="text-align:center; margin-top:28px; color:#81776D; font-size:13px;">
-                <span data-id="Belum punya akun?" data-en="Don't have an account?">
-                    Belum punya akun?
+                <span>
+                    <?= htmlspecialchars($trans['no_account'] ?? 'Belum punya akun?'); ?>
                 </span>
-                <a href="register.html" data-id="Daftar" data-en="Sign Up" style="color:#76553D; text-decoration:none; font-weight:600; margin-left:4px;">
-                    Daftar
+                <a href="register.php" style="color:#76553D; text-decoration:none; font-weight:600; margin-left:4px;">
+                    <?= htmlspecialchars($trans['signup'] ?? 'Daftar'); ?>
                 </a>
             </p>
 
             <!-- Tombol Kembali -->
             <div style="margin-top: 20px; padding-top: 16px; border-top: 1px dashed #E9E1D7; text-align: center;">
-                <a href="index.html" style="display: inline-flex; align-items: center; gap: 6px; color: #81776D; text-decoration: none; font-size: 13px; font-weight: 500;">
+                <a href="index.php" style="display: inline-flex; align-items: center; gap: 6px; color: #81776D; text-decoration: none; font-size: 13px; font-weight: 500;">
                     <i data-lucide="arrow-left" style="width: 14px; height: 14px;"></i>
-                    <span data-id="Kembali ke Beranda" data-en="Back to Home">Kembali ke Beranda</span>
+                    <span><?= htmlspecialchars($trans['back_to_home'] ?? 'Kembali ke Beranda'); ?></span>
                 </a>
             </div>
         </div>

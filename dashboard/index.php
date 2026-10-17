@@ -243,7 +243,7 @@ $topProducts = mysqli_stmt_get_result($stmtTopProducts);
                             $productId = (int) $prod['product_id'];
                             $photoName = $prod['photo'] ?? '';
 
-                            // Jalur sistem absolut & jalur web relatif untuk gambar
+                            // Jalur sistem & jalur web relatif untuk gambar
                             $photoPathSystem = __DIR__ . '/../uploads/products/' . $productId . '/' . $photoName;
                             $photoPathWeb = '../uploads/products/' . $productId . '/' . $photoName;
                             ?>

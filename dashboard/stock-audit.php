@@ -33,49 +33,51 @@ $products = mysqli_stmt_get_result($stmt);
 
 
 <!DOCTYPE html>
+<!-- Set bahasa -->
 <html lang="<?= htmlspecialchars($lang, ENT_QUOTES, 'UTF-8') ?>">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>
-        <?= htmlspecialchars(__('stock_audit_title'), ENT_QUOTES, 'UTF-8') ?>
-    </title>
+    <title><?= htmlspecialchars(__('stock_audit_title'), ENT_QUOTES, 'UTF-8') ?> - Stock</title>
 </head>
 
+<!-- Styling utama layout dan warna latar halaman -->
 <body style="margin:0; min-height:100vh; background:#FAF7F2; font-family:Arial,sans-serif; color:#49382D;">
 
 <!-- Menentukan halaman aktif untuk sidebar -->
 <?php $currentPage = 'stock-audit.php';?>
 
+<!-- Layout utama halaman Produk -->
 <div style="display:flex; min-height:100vh;">
 
-    <!-- Sidebar -->
+    <!-- SIDEBAR -->
     <?php require __DIR__ . '/components/sidebar.php'; ?>
 
-    <!-- Konten utama -->
+    <!-- KONTEN UTAMA -->
     <main style="margin-left:230px; flex:1; min-width:0;">
 
-        <!-- Header -->
+        <!-- HEADER -->
         <?php require __DIR__ . '/components/header.php'; ?>
 
-        <!-- Halaman stock auditt -->
+        <!-- HALAMAN STOK KELUAR -->
         <section style="padding:32px;">
             <div style="margin-bottom:25px;">
-
+                <!-- Judul -->
                 <h1 style="margin:0; font-size:29px;">
                     <?= htmlspecialchars(__('stock_audit_title'), ENT_QUOTES, 'UTF-8') ?>
                 </h1>
 
+                <!-- Deskripsi -->
                 <p style="color:#81776D; margin-top:10px;">
                     <?= htmlspecialchars(__('stock_audit_description'), ENT_QUOTES, 'UTF-8') ?>
                 </p>
-
             </div>
 
-            <!-- Form Audit Stok -->
+            <!-- FORM STOK AUDIT -->
+            <!-- Container form utama pencatatan stok audit -->
             <div style="background:white; border:1px solid #E9E1D7; border-radius:12px; padding:28px; max-width:900px;">
+
                 <!-- Header form -->
                 <div style="display:flex; align-items:center; gap:14px; margin-bottom:25px;">
                     <div style="width:55px; height:55px; border-radius:12px; background:#F5EFE8; display:flex; align-items:center; justify-content:center; color:#76553D;">
@@ -83,16 +85,16 @@ $products = mysqli_stmt_get_result($stmt);
                     </div>
 
                     <div>
+                        <!-- Judul form -->
                         <h2 style="margin:0; font-size:22px;">
                             <?= htmlspecialchars(__('stock_audit_form_title'), ENT_QUOTES, 'UTF-8') ?>
                         </h2>
 
+                        <!-- Deskripsi form -->
                         <p style="margin:5px 0 0; color:#81776D;">
                             <?= htmlspecialchars(__('stock_audit_form_description'), ENT_QUOTES, 'UTF-8') ?>
                         </p>
-
                     </div>
-
                 </div>
 
                 <!-- Pilih produk -->
@@ -100,11 +102,13 @@ $products = mysqli_stmt_get_result($stmt);
                     <?= htmlspecialchars(__('product_name'), ENT_QUOTES, 'UTF-8') ?>
                 </label>
 
+                <!-- Elemen dropdown pilihan produk -->
                 <select id="product_id" onchange="updateAuditStock()" style="width:100%; height:54px; padding:0 16px; border:1px solid #E9E1D7; border-radius:12px; font-size:16px; background:white;">
                     <option value="">
                         <?= htmlspecialchars(__('select_product'), ENT_QUOTES, 'UTF-8') ?>
                     </option>
 
+                    <!-- Looping untuk menampilkan daftar opsi produk beserta data atribut stok dan harga -->
                     <?php while ($product = mysqli_fetch_assoc($products)): ?>
                         <option value="<?= (int)$product['id'] ?>" data-stock="<?= (int)$product['current_stock'] ?>">
                             <?= htmlspecialchars($product['product_name'], ENT_QUOTES, 'UTF-8') ?>
@@ -163,120 +167,122 @@ $products = mysqli_stmt_get_result($stmt);
             </div>
 
         </section>
-
     </main>
-
 </div>
+
 
 <script src="https://unpkg.com/lucide@latest"></script>
 
 <script>
 lucide.createIcons();
-</script>
 
-<script>
-// Menampilkan stok sistem saat produk dipilih
+// Memperbarui tampilan stok sistem sesuai produk yang dipilih
 function updateAuditStock() {
+    // Ambil elemen dropdown produk dan opsi yang sedang dipilih
     const select = document.getElementById('product_id');
     const option = select.options[select.selectedIndex];
+    
+    // Ambil nilai stok dan gunakan karakter '-' jika kosong
     const stock = option.dataset.stock || '-';
 
+    // Tampilkan nilai stok
     document.getElementById('system_stock').textContent = stock;
 
+    // Hitung ulang selisih stok secara otomatis
     calculateDifference();
 }
 
-// Menghitung selisih stok fisik dan stok sistem
+// Menghitung selisih antara stok fisik dan stok sistem
 function calculateDifference() {
+    // Ambil nilai stok sistem dari teks elemen UI
     const systemStock = parseInt(
         document.getElementById('system_stock').textContent
     );
 
+    // Ambil nilai stok fisik yang diinputkan oleh pengguna
     const physicalStock = parseInt(
         document.getElementById('physical_stock').value
     );
 
+    // Ambil elemen penampung hasil selisih
     const result = document.getElementById('difference');
 
+    // Kembalikan ke tampilan default jika input stok belum berupa angka
     if (isNaN(systemStock) || isNaN(physicalStock)) {
         result.textContent = '-';
         return;
     }
 
+    // Hitung hasil pengurangan stok fisik dengan stok sistem
     const difference = physicalStock - systemStock;
 
+    // Tampilkan angka selisih beserta tanda plus (+) jika bernilai positif
     result.textContent = difference > 0 
         ? '+' + difference 
         : difference;
 }
 
-// Simpan audit stok ke API
-function saveAudit() {
+// Menangani proses penyimpanan data audit stok ke API
+async function saveAudit() {
+    // Ambil elemen dan nilai input dari formulir
     const productId = document.getElementById('product_id').value;
     const physicalStock = document.getElementById('physical_stock').value;
-    const notes = document.getElementById('notes').value;
+    const notes = document.getElementById('notes').value.trim();
+    const saveButton = document.querySelector('button[onclick="saveAudit()"]');
 
-    // Validasi produk
+    // Validasi pemilihan produk sebelum dikirimkan
     if (!productId) {
         alert('Pilih produk terlebih dahulu.');
         return;
     }
 
-    // Validasi stok fisik
-    if (physicalStock === '' || physicalStock < 0) {
+    // Validasi input angka stok fisik agar tidak kosong atau bernilai negatif
+    if (physicalStock === '' || parseInt(physicalStock) < 0) {
         alert('Masukkan stok fisik yang valid.');
         return;
     }
 
+    // Ubah status tombol untuk mencegah pengiriman ganda saat proses simpan berlangsung
+    const originalButtonHTML = saveButton.innerHTML;
+    saveButton.disabled = true;
+    saveButton.style.opacity = '0.7';
+
+    // Susun payload data formulir untuk dikirim ke API
     const formData = new FormData();
+    formData.append('business_id', <?= (int)$business_id ?>);
+    formData.append('product_id', productId);
+    formData.append('physical_stock', physicalStock);
+    formData.append('notes', notes);
 
-    formData.append(
-        'business_id',
-        <?= (int)$business_id ?>
-    );
+    try {
+        // Kirim permintaan pembuatan audit stok via Fetch API
+        const response = await fetch('../api/create-stock-audit.php', {
+            method: 'POST',
+            body: formData
+        });
 
-    formData.append(
-        'product_id',
-        productId
-    );
+        // Konversi respons server ke format JSON
+        const result = await response.json();
 
-    formData.append(
-        'physical_stock',
-        physicalStock
-    );
+        alert(result.message);
 
-    formData.append(
-        'notes',
-        notes
-    );
-
-    fetch('../api/create-stock-audit.php', {
-        method: 'POST',
-        body: formData
-    })
-
-    .then(response => response.json())
-
-    .then(result => {
+        // Jika transaksi berhasil, muat ulang halaman untuk memperbarui data stok
         if (result.success) {
-            alert(result.message);
-
-            // Refresh agar stok terbaru terlihat
             window.location.reload();
-
-        } else {
-            alert(result.message);
         }
-    })
-
-    .catch(error => {
+    } catch (error) {
+        // Tangani jika terjadi kendala koneksi atau error pada server
         alert('Terjadi kesalahan sistem.');
         console.error(error);
-    });
+    } finally {
+        // Kembalikan status tombol simpan ke kondisi semula
+        saveButton.disabled = false;
+        saveButton.style.opacity = '1';
+        saveButton.innerHTML = originalButtonHTML;
+    }
 }
 
 </script>
 
 </body>
-
 </html>

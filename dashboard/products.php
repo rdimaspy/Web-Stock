@@ -167,21 +167,29 @@ $products = mysqli_stmt_get_result($stmt);
                                             <span style="font-weight:600; display:block; max-width:180px; word-break:break-word; overflow-wrap:anywhere;"><?= htmlspecialchars($product['product_name'], ENT_QUOTES, 'UTF-8') ?></span>
                                         </div>
                                     </td>
+                                    <!-- Kategori-->
                                     <td style="padding:10px 12px; color:#81776D; font-size:13px"><?= htmlspecialchars($product['category_name'] ?? __('uncategorized'), ENT_QUOTES, 'UTF-8') ?></td>
+                                    <!-- Catatam -->
                                     <td title="<?= htmlspecialchars($product['notes'] ?? '', ENT_QUOTES, 'UTF-8') ?>" style="padding:10px 12px; color:#81776D; font-size:13px; overflow-wrap:anywhere;"><?php if (!empty(trim($product['notes'] ?? ''))): ?>
                                         <div style="display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden;"><?= htmlspecialchars($product['notes'], ENT_QUOTES, 'UTF-8') ?></div>
                                         <?php else: ?>—<?php endif; ?>
                                     </td>
+                                    <!-- Harga beli -->
                                     <td style="padding:10px 12px; white-space:nowrap;"><?= htmlspecialchars(formatMoneyPHP($product['purchase_price'], $business['currency']), ENT_QUOTES, 'UTF-8') ?></td>
+                                    <!-- Harga Jual -->
                                     <td style="padding:10px 12px; white-space:nowrap;"><?= htmlspecialchars(formatMoneyPHP($product['selling_price'], $business['currency']), ENT_QUOTES, 'UTF-8') ?></td>
+                                    <!-- Stok sekarang -->
                                     <td style="padding:10px 12px;"><?= number_format((int) $product['current_stock']) ?></td>
+                                    <!-- Expired -->
                                     <td style="padding:10px 12px; color:#81776D;"><?= $product['expiration_date'] ? htmlspecialchars(date('d/m/Y', strtotime($product['expiration_date']))) : '-' ?></td>
+                                    <!-- Tombol edit & hapus -->
                                     <td style="padding:10px 12px;">
                                         <div style="display:flex; gap:8px; align-items:center;">
-                                            <!-- Tombol edit & hapus -->
+                                            <!-- Tombol edit -->
                                             <button type="button" onclick="openEditProduct(<?= $product['id'] ?>)" style="width:32px; height:32px; border:none; background:#F5EFE8; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#76553D;" title="Edit">
                                                 <i data-lucide="pencil" style="width:16px;height:16px;"></i>
-                                            </button>                                            
+                                            </button>
+                                            <!-- Tombol hapus -->
                                             <button type="button" onclick="deleteProduct(<?= (int) $product['id'] ?>)" style="width:32px; height:32px; border:none; background:#FBECEC; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#B45F5F;" title="<?= $lang === 'en' ? 'Delete' : 'Hapus' ?>" aria-label="<?= $lang === 'en' ? 'Delete product' : 'Hapus produk' ?>">
                                                 <i data-lucide="trash-2" style="width:16px;height:16px;"></i>
                                             </button>

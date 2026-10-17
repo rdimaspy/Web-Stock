@@ -12,78 +12,91 @@ mysqli_stmt_execute($stmtUser);
 $userProfile = mysqli_fetch_assoc(mysqli_stmt_get_result($stmtUser));
 ?>
 
+
+
 <!DOCTYPE html>
+<!-- Set bahasa -->
 <html lang="<?= htmlspecialchars($lang, ENT_QUOTES, 'UTF-8') ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $lang === 'en' ? 'Settings' : 'Pengaturan' ?> - Stock</title>
 </head>
+
+<!-- Styling utama layout dan warna latar halaman -->
 <body style="margin:0; min-height:100vh; background:#FAF7F2; font-family:Arial,sans-serif; color:#49382D;">
 
+<!-- Menentukan halaman aktif untuk sidebar -->
 <?php $currentPage = 'settings.php'; ?>
 
+<!-- Layout utama halaman pengaturan-->
 <div style="display:flex; min-height:100vh;">
-    <!-- Sidebar Navigasi -->
+
+    <!-- SIDEBAR -->
     <?php require __DIR__ . '/components/sidebar.php'; ?>
 
+    <!-- KONTEN UTAMA -->
     <main style="margin-left:230px; flex:1; min-width:0;">
-        <!-- Header Utama -->
+        
+        <!-- HEADER -->
         <?php require __DIR__ . '/components/header.php'; ?>
 
+        <!-- HALAMAN SETTING -->
         <section style="padding:32px; max-width:650px;">
             <div style="margin-bottom:20px;">
+                <!-- Judul halaman -->
                 <h1 style="margin:0; font-size:26px;"><?= $lang === 'en' ? 'Settings' : 'Pengaturan' ?></h1>
+                <!-- Deskripsi -->
                 <p style="color:#81776D; margin-top:6px; font-size:14px;">
                     <?= $lang === 'en' ? 'Update your business details and profile.' : 'Ubah detail bisnis dan profil akun kamu.' ?>
                 </p>
             </div>
 
-            <!-- Form Pengaturan Simpel dalam 1 Kartu -->
+            <!-- Form Pengaturan -->
             <div style="background:white; border:1px solid #E9E1D7; border-radius:12px; padding:24px;">
                 <form id="settingsForm">
+                    <!-- ID bisnis tersembunyi sebagai parameter acuan update data -->
                     <input type="hidden" name="business_id" value="<?= (int)$business_id ?>">
 
-                    <!-- Nama Bisnis -->
+                    <!-- Input Nama Bisnis -->
                     <div style="margin-bottom:16px;">
                         <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;"><?= $lang === 'en' ? 'Business Name' : 'Nama Bisnis' ?></label>
                         <input type="text" name="business_name" value="<?= htmlspecialchars($business['business_name'], ENT_QUOTES, 'UTF-8') ?>" required style="width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
                     </div>
 
-                    <!-- Mata Uang Utama -->
+                    <!-- Input Catatan Bisnis (Notes) -->
                     <div style="margin-bottom:16px;">
-                        <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;"><?= $lang === 'en' ? 'Default Currency' : 'Mata Uang Utama' ?></label>
-                        <select name="currency" style="width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #E9E1D7; border-radius:8px; background:white; color:#49382D;">
-                            <option value="IDR" <?= $business['currency'] === 'IDR' ? 'selected' : '' ?>>IDR (Rupiah - Rp)</option>
-                            <option value="USD" <?= $business['currency'] === 'USD' ? 'selected' : '' ?>>USD (Dollar - $)</option>
-                            <option value="EUR" <?= $business['currency'] === 'EUR' ? 'selected' : '' ?>>EUR (Euro - €)</option>
-                            <option value="SGD" <?= $business['currency'] === 'SGD' ? 'selected' : '' ?>>SGD (Singapore Dollar - S$)</option>
-                        </select>
+                        <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;">
+                            <?= $lang === 'en' ? 'Business Notes (Max 20 chars)' : 'Catatan Bisnis (Maks 20 karakter)' ?>
+                        </label>
+                        <input type="text" name="notes" maxlength="20" 
+                            value="<?= htmlspecialchars($business['notes'] ?? '', ENT_QUOTES, 'UTF-8') ?>" 
+                            placeholder="<?= $lang === 'en' ? 'Brief note (max 20 chars)...' : 'Catatan singkat (maks 20 karakter)...' ?>" 
+                            style="width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
                     </div>
 
                     <hr style="border:0; border-top:1px dashed #E9E1D7; margin:20px 0;">
 
-                    <!-- Nama Pengguna -->
+                    <!-- Input Nama Pengguna -->
                     <div style="margin-bottom:16px;">
-                        <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;"><?= $lang === 'en' ? 'Full Name' : 'Nama Lengkap' ?></label>
+                        <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;"><?= $lang === 'en' ? 'Account Name' : 'Nama Akun' ?></label>
                         <input type="text" name="name" value="<?= htmlspecialchars($userProfile['name'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required style="width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
                     </div>
 
-                    <!-- Email (Readonly) -->
+                    <!-- Email Pengguna (Hanya baca / disabled) -->
                     <div style="margin-bottom:20px;">
                         <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;"><?= $lang === 'en' ? 'Email Address' : 'Alamat Email' ?></label>
                         <input type="email" value="<?= htmlspecialchars($userProfile['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>" disabled style="width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #E9E1D7; border-radius:8px; background:#F5EFE8; color:#81776D;">
                     </div>
 
-                    <!-- Tombol Simpan -->
+                    <!-- Tombol Simpan Perubahan Pengaturan -->
                     <button type="submit" style="padding:11px 22px; background:#76553D; color:white; border:none; border-radius:8px; font-weight:600; cursor:pointer;">
                         <?= $lang === 'en' ? 'Save Changes' : 'Simpan Perubahan' ?>
                     </button>
                 </form>
             </div>
 
-        <!-- Hapus Akun -->
-            <!-- Line pemisah -->
+            <!-- Bagian Zona Berbahaya / Hapus Toko -->
             <hr style="border:0; border-top:1px dashed #E9E1D7; margin:24px 0;">
             <div>
                 <!-- Judul -->
@@ -91,7 +104,7 @@ $userProfile = mysqli_fetch_assoc(mysqli_stmt_get_result($stmtUser));
                     <?= $lang === 'en' ? 'Danger Zone' : 'Zona Berbahaya' ?>
                 </h3>
 
-                <!-- Deskripsi penghapusan toko -->
+                <!-- Deskripsi -->
                 <p style="margin:0 0 14px; font-size:13px; color:#81776D;">
                     <?= $lang === 'en' ? 'Deleting this business will permanently erase all associated products, categories, and transaction history.' : 'Menghapus toko ini akan menghapus seluruh produk, kategori, dan riwayat transaksi di dalamnya secara permanen.' ?>
                 </p>
@@ -99,12 +112,13 @@ $userProfile = mysqli_fetch_assoc(mysqli_stmt_get_result($stmtUser));
                 <!-- Tombol hapus toko -->
                 <button type="button" id="btnDeleteBusiness" style="padding:10px 18px; background:#FBECEC; color:#B45F5F; border:1px solid #F3C6C6; border-radius:8px; font-weight:600; cursor:pointer; font-size:13px;">
                     <?= $lang === 'en' ? 'Delete Business' : 'Hapus Toko Ini' ?>
-                    </button>
+                </button>
             </div>
         </section>
     </main>
 </div>
 
+<!-- Ikon -->
 <script src="https://unpkg.com/lucide@latest"></script>
 
 <script>
@@ -115,11 +129,11 @@ document.getElementById('settingsForm').addEventListener('submit', async functio
     e.preventDefault();
     const formData = new FormData(this);
     
-    // Ambil business_id dari form
+    // Ambil ID bisnis dari form data
     const businessId = formData.get('business_id');
 
     try {
-        // Tambahkan ?business_id= di URL fetch
+        // Kirim data pembaruan pengaturan ke backend API
         const response = await fetch('../api/update-settings.php?business_id=' + businessId, {
             method: 'POST',
             body: formData
@@ -127,7 +141,7 @@ document.getElementById('settingsForm').addEventListener('submit', async functio
         
         const result = await response.json();
         
-        // Memunculkan pesan respons dan memuat ulang halaman jika sukses
+        // Memunculkan pesan respons dan memuat ulang halaman jika pembaruan sukses
         alert(result.message);
         if (result.status === 'success') {
             location.reload();
@@ -140,7 +154,7 @@ document.getElementById('settingsForm').addEventListener('submit', async functio
 
 // Menangani proses penghapusan toko saat tombol hapus toko diklik
 document.getElementById('btnDeleteBusiness').addEventListener('click', async function() {
-    // Tampilkan kotak dialog konfirmasi penghapusan toko
+    // Tampilkan dialog konfirmasi penghapusan toko
     const confirmDelete = confirm(
         <?= json_encode($lang === 'en' 
             ? 'Are you sure you want to permanently delete this business? All data will be lost!' 
@@ -150,21 +164,20 @@ document.getElementById('btnDeleteBusiness').addEventListener('click', async fun
     // Batalkan proses jika pengguna memilih batal
     if (!confirmDelete) return;
 
-    // Siapkan data ID bisnis untuk dikirim ke API
+    // Siapkan parameter ID bisnis yang akan dihapus
     const formData = new FormData();
     formData.append('business_id', '<?= (int)$business_id ?>');
 
     try {
-        // Kirim permintaan penghapusan toko via Fetch API
+        // Kirim permintaan penghapusan toko ke API
         const response = await fetch('../api/delete-business.php', {
             method: 'POST',
             body: formData
         });
 
-        // Ambil teks mentah dari respons server
         const textText = await response.text();
         
-        // Coba parsing respon ke format JSON
+        // Parsing hasil respon JSON dari server
         let result;
         try {
             result = JSON.parse(textText);
@@ -176,17 +189,15 @@ document.getElementById('btnDeleteBusiness').addEventListener('click', async fun
 
         alert(result.message);
 
-        // Jika penghapusan sukses, alihkan pengguna ke halaman daftar bisnis
+        // Jika penghapusan berhasil, alihkan pengguna kembali ke halaman daftar bisnis
         if (result.status === 'success') {
             window.location.href = '../businesses.php';
         }
     } catch (err) {
-        // Tangani jika terjadi kesalahan koneksi
         console.error(err);
         alert('Terjadi kesalahan koneksi saat menghapus toko.');
     }
 });
-
 </script>
 
 </body>

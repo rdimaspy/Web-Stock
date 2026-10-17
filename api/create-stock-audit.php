@@ -1,12 +1,12 @@
 <?php
-
+// Memulai sesi login dan memuat konfigurasi koneksi database
 session_start();
-
 require_once __DIR__ . '/../config/database.php';
 
+// Menentukan format respons berupa JSON
 header('Content-Type: application/json');
 
-// Pastikan user login
+// Memeriksa autentikasi pengguna; kembalikan pesan error jika belum login
 if (!isset($_SESSION['user_id'])) {
     echo json_encode([
         'success' => false,
@@ -15,13 +15,13 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-// Ambil data dari form
-$business_id  = filter_input(INPUT_POST, 'business_id', FILTER_VALIDATE_INT);
-$product_id   = filter_input(INPUT_POST, 'product_id', FILTER_VALIDATE_INT);
+// Menangkap dan memvalidasi input parameter dari form audit
+$business_id    = filter_input(INPUT_POST, 'business_id', FILTER_VALIDATE_INT);
+$product_id     = filter_input(INPUT_POST, 'product_id', FILTER_VALIDATE_INT);
 $physical_stock = filter_input(INPUT_POST, 'physical_stock', FILTER_VALIDATE_INT);
-$notes = trim($_POST['notes'] ?? '');
+$notes          = trim($_POST['notes'] ?? '');
 
-// Validasi input
+// Memvalidasi agar nilai ID bisnis, ID produk, dan jumlah stok fisik valid
 if (
     !$business_id ||
     !$product_id ||
@@ -37,10 +37,10 @@ if (
 }
 
 try {
-    // Semua perubahan database harus berhasil bersama
+    // Memulai transaksi database agar perubahan stok dan riwayat tersimpan secara sinkron
     mysqli_begin_transaction($conn);
 
-    // Ambil stok terbaru dari database
+    // Menyiapkan query untuk mengambil data produk dan stok terkini
     $stmt = mysqli_prepare(
         $conn,
         "SELECT id, product_name, current_stock
@@ -50,32 +50,25 @@ try {
         LIMIT 1"
     );
 
-    mysqli_stmt_bind_param(
-        $stmt,
-        "ii",
-        $product_id,
-        $business_id
-    );
-
+    // Eksekusi prepared statement pencarian produk
+    mysqli_stmt_bind_param($stmt, "ii", $product_id, $business_id);
     mysqli_stmt_execute($stmt);
 
-    $product = mysqli_fetch_assoc(
-        mysqli_stmt_get_result($stmt)
-    );
+    $product = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
 
+    // Menangani kondisi jika data produk tidak ditemukan
     if (!$product) {
         throw new Exception('Produk tidak ditemukan');
     }
 
-    // Stok sebelum audit
+    // Mengambil nilai stok sebelum proses audit dilakukan
     $stock_before = (int)$product['current_stock'];
 
-    // Hitung perbedaan stok
+    // Menghitung selisih antara stok hasil perhitungan fisik dan stok sistem
     $difference = $physical_stock - $stock_before;
 
-    // kalau tidak ada perbedaan, stok ga berubah
+    // Jika tidak terdapat selisih angka, batalkan perubahan transaksi database
     if ($difference === 0) {
-
         mysqli_commit($conn);
 
         echo json_encode([
@@ -85,7 +78,7 @@ try {
         exit;
     }
 
-    // Update stok produk
+    // Menyiapkan query untuk memperbarui stok produk sesuai jumlah fisik terkini
     $stmt = mysqli_prepare(
         $conn,
         "UPDATE products
@@ -94,19 +87,14 @@ try {
         AND business_id = ?"
     );
 
-    mysqli_stmt_bind_param(
-        $stmt,
-        "iii",
-        $physical_stock,
-        $product_id,
-        $business_id
-    );
+    // Eksekusi pembaruan jumlah stok produk
+    mysqli_stmt_bind_param($stmt, "iii", $physical_stock, $product_id, $business_id);
 
     if (!mysqli_stmt_execute($stmt)) {
         throw new Exception('Gagal update stok');
     }
 
-    // Simpan audit ke history
+    // Menyiapkan query untuk mencatat transaksi penyesuaian audit ke riwayat
     $stmt = mysqli_prepare(
         $conn,
         "INSERT INTO inventory_transactions
@@ -124,6 +112,7 @@ try {
         (?, ?, ?, 'stock_audit', ?, ?, ?, ?)"
     );
 
+    // Eksekusi penyimpanan catatan riwayat transaksi audit
     mysqli_stmt_bind_param(
         $stmt,
         "iisiiis",
@@ -140,7 +129,7 @@ try {
         throw new Exception('Gagal menyimpan audit');
     }
 
-    // Simpan semua perubahan
+    // Konfirmasi dan simpan seluruh perubahan transaksi database jika berhasil
     mysqli_commit($conn);
 
     echo json_encode([
@@ -149,12 +138,11 @@ try {
     ]);
 
 } catch (Exception $e) {
-    // Batalkan semua perubahan jika gagal
+    // Batalkan seluruh perubahan database (rollback) jika terjadi kesalahan/error
     mysqli_rollback($conn);
 
     echo json_encode([
         'success' => false,
         'message' => $e->getMessage()
     ]);
-
 }

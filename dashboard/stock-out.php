@@ -39,9 +39,7 @@ $products = mysqli_stmt_get_result($stmt);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>
-        <?= htmlspecialchars(__('stock_out_title'), ENT_QUOTES, 'UTF-8') ?> - Stock
-    </title>
+    <title><?= htmlspecialchars(__('stock_out_title'), ENT_QUOTES, 'UTF-8') ?> - Stock</title>
 </head>
 
 <!-- Styling utama layout dan warna latar halaman -->
@@ -65,10 +63,12 @@ $products = mysqli_stmt_get_result($stmt);
         <!-- HALAMAN STOK KELUAR -->
         <section style="padding:32px;">
             <div style="margin-bottom:25px;">
+                <!-- Judul -->
                 <h1 style="margin:0; font-size:29px;">
                     <?= htmlspecialchars(__('stock_out_title'), ENT_QUOTES, 'UTF-8') ?>
                 </h1>
 
+                <!-- Deskripsi -->
                 <p style="color:#81776D; margin-top:10px;">
                     <?= htmlspecialchars(__('stock_out_description'), ENT_QUOTES, 'UTF-8') ?>
                 </p>
@@ -84,13 +84,13 @@ $products = mysqli_stmt_get_result($stmt);
                         <i data-lucide="package-minus" style="width:28px;"></i>
                     </div>
 
-                    <!-- Judul -->
                     <div>
+                        <!-- Judul form -->
                         <h2 style="margin:0; font-size:22px;">
                             <?= htmlspecialchars(__('record_stock_out'), ENT_QUOTES, 'UTF-8') ?>
                         </h2>
 
-                        <!-- Deskripsi -->
+                        <!-- Deskripsi form -->
                         <p style="margin:5px 0 0; color:#81776D;">
                             <?= htmlspecialchars(__('record_stock_out_description'), ENT_QUOTES, 'UTF-8') ?>
                         </p>
@@ -103,38 +103,28 @@ $products = mysqli_stmt_get_result($stmt);
                 </label>
 
                 <!-- Elemen dropdown pilihan produk -->
-                <select id="product_id" style="width:100%; padding:14px; border:1px solid #E9E1D7; border-radius:10px; font-size:15px;">
+                <select id="product_id" name="product_id" required
+                        style="width:100%; box-sizing:border-box; padding:13px; border:1px solid #E9E1D7; border-radius:9px; background:white; color:#49382D;">
+
+                    <!-- Opsi default untuk memilih produk -->
                     <option value="">
-                        <?= htmlspecialchars(__('select_product'), ENT_QUOTES, 'UTF-8') ?>
+                        <?= $lang === 'en' ? 'Select a product' : 'Pilih produk' ?>
                     </option>
 
-                    <!-- Looping untuk menampilkan daftar opsi produk beserta data atribut stok dan harga -->
+                    <!-- Looping opsi daftar produk beserta atribut data stok dan harga -->
                     <?php while ($product = mysqli_fetch_assoc($products)): ?>
-                        <option 
-                            value="<?= (int)$product['id'] ?>"
-                            data-stock="<?= (int)$product['current_stock'] ?>"
-                            data-price="<?= (float)$product['selling_price'] ?>">
-
+                        <option value="<?= (int) $product['id'] ?>"
+                                data-stock="<?= (int) $product['current_stock'] ?>"
+                                data-price="<?= (float) $product['selling_price'] ?>">
                             <?= htmlspecialchars($product['product_name'], ENT_QUOTES, 'UTF-8') ?>
-                            — <?= $lang === 'en' ? 'Current stock:' : 'Stok saat ini:' ?>
-                            <?= number_format((int)$product['current_stock']) ?>
                         </option>
                     <?php endwhile; ?>
                 </select>
 
-                <!-- Informasi stok -->
-                <div style="margin-top:10px; color:#81776D; font-size:14px;">
-                    <?= htmlspecialchars(__('available_stock'), ENT_QUOTES, 'UTF-8') ?>:
-                    <strong id="availableStock">
-                        -
-                    </strong>
-                </div>
-
-                <div style="margin-top:8px; color:#81776D; font-size:14px;">
-                    <?= htmlspecialchars(__('selling_price'), ENT_QUOTES, 'UTF-8') ?>:
-                    <strong id="sellingPrice">
-                        -
-                    </strong>
+                <!-- Teks informasi stok dan harga jual di bawah pilihan produk -->
+                <div style="margin-top:8px; font-size:13px; color:#81776D; line-height:1.5;">
+                    <div><?= $lang === 'en' ? 'Available stock:' : 'Stok tersedia:' ?> <span id="stockDisplay">-</span></div>
+                    <div><?= $lang === 'en' ? 'Selling price:' : 'Harga Jual:' ?> <span id="priceDisplay">-</span></div>
                 </div>
 
                 <!-- Jumlah keluar -->
@@ -199,8 +189,8 @@ const businessCurrency = <?= json_encode($businessCurrency ?? $business['currenc
 /* Stock Out Calculation */
 // Mengambil elemen dropdown produk, stok tersedia, harga jual, jumlah barang keluar, dan total harga
 const productSelect = document.getElementById('product_id');
-const availableStock = document.getElementById('availableStock');
-const sellingPrice = document.getElementById('sellingPrice');
+const stockDisplay = document.getElementById('stockDisplay');
+const priceDisplay = document.getElementById('priceDisplay');
 const quantityInput = document.getElementById('quantity');
 const totalAmount = document.getElementById('totalAmount');
 
@@ -221,7 +211,7 @@ function formatCurrency(value) {
     }
 }
 
-// Rumus menghitung total transaksi (jumlah keluar × harga jual)
+// Rumus menghitung total transaksi
 function calculateTotal() {
     const quantity = parseInt(quantityInput.value) || 0;
     const total = quantity * currentPrice;
@@ -240,8 +230,8 @@ productSelect.addEventListener('change', function () {
 
     // Reset bidang tampilan jika tidak ada produk yang dipilih
     if (!selectedOption.value) {
-        availableStock.textContent = '-';
-        sellingPrice.textContent = '-';
+        if (stockDisplay) stockDisplay.textContent = '-';
+        if (priceDisplay) priceDisplay.textContent = '-';
         totalAmount.value = '-';
         currentPrice = 0;
         return;
@@ -255,8 +245,8 @@ productSelect.addEventListener('change', function () {
     currentPrice = price;
 
     // Menampilkan stok tersedia dan harga jual berformat mata uang bisnis
-    availableStock.textContent = stock.toLocaleString('id-ID');
-    sellingPrice.textContent = formatCurrency(price);
+    if (stockDisplay) stockDisplay.textContent = new Intl.NumberFormat().format(stock);
+    if (priceDisplay) priceDisplay.textContent = formatCurrency(price);
 
     // Menghitung ulang total harga transaksi
     calculateTotal();
@@ -287,8 +277,11 @@ saveButton.addEventListener('click', function () {
         return;
     }
 
+    // Ambil stok tersedia langsung dari dataset produk yang terpilih
+    const selectedOption = productSelect.options[productSelect.selectedIndex];
+    const stockAvailable = parseInt(selectedOption.dataset.stock) || 0;
+
     // Validasi ketersediaan stok produk
-    const stockAvailable = parseInt(availableStock.textContent.replace(/\./g, '')) || 0;
     if (parseInt(quantity) > stockAvailable) {
         alert('Stok tidak mencukupi. Stok tersedia: ' + stockAvailable);
         return;

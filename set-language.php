@@ -1,25 +1,28 @@
 <?php
-
+// Memulai sesi untuk menyimpan pilihan bahasa pengguna
 session_start();
 
+// Memastikan permintaan dikirim khusus menggunakan metode POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header("Location: index.html");
     exit;
 }
 
+// Menangkap input pilihan bahasa dengan default bahasa Indonesia ('id')
 $lang = $_POST['language'] ?? 'id';
 
-// Hanya izinkan bahasa yang tersedia
+// Memvalidasi agar kode bahasa yang masuk hanya 'id' atau 'en'
 if (!in_array($lang, ['id', 'en'], true)) {
     $lang = 'id';
 }
 
+// Menyimpan pilihan bahasa pengguna ke dalam variabel sesi
 $_SESSION['language'] = $lang;
 
-// Kembali ke halaman sebelumnya
+// Menangkap URL halaman asal untuk proses pengalihan kembali
 $redirect = $_POST['redirect'] ?? 'index.html';
 
-// Tolak redirect ke URL eksternal
+// Memvalidasi URL redirect untuk mencegah serangan Open Redirect ke situs luar
 if (
     !is_string($redirect) ||
     str_starts_with($redirect, '//') ||
@@ -30,5 +33,6 @@ if (
     $redirect = 'index.html';
 }
 
+// Mengalihkan kembali pengguna ke halaman sebelumnya
 header("Location: " . $redirect);
 exit;

@@ -1,6 +1,4 @@
-
 <?php
-
 // Gunakan bahasa yang tersimpan di session
 $lang = $_SESSION['language'] ?? 'id';
 

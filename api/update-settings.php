@@ -17,9 +17,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// Membersihkan input nama bisnis, mata uang, dan nama pengguna
+// Membersihkan input nama bisnis, catatan bisnis, dan nama pengguna
 $business_name = trim($_POST['business_name'] ?? '');
-$currency      = trim($_POST['currency'] ?? 'IDR');
+$notes         = trim($_POST['notes'] ?? '');
 $name          = trim($_POST['name'] ?? '');
 
 // Memvalidasi agar kolom wajib tidak dikirim dalam kondisi kosong
@@ -28,9 +28,9 @@ if (empty($business_name) || empty($name)) {
     exit;
 }
 
-// Memperbarui informasi nama bisnis dan mata uang pada database
-$stmtBusiness = mysqli_prepare($conn, "UPDATE businesses SET business_name = ?, currency = ? WHERE id = ? AND user_id = ?");
-mysqli_stmt_bind_param($stmtBusiness, "ssii", $business_name, $currency, $business_id, $_SESSION['user_id']);
+// Memperbarui informasi nama bisnis dan catatan bisnis pada database
+$stmtBusiness = mysqli_prepare($conn, "UPDATE businesses SET business_name = ?, notes = ? WHERE id = ? AND user_id = ?");
+mysqli_stmt_bind_param($stmtBusiness, "ssii", $business_name, $notes, $business_id, $_SESSION['user_id']);
 $updateBusinessSuccess = mysqli_stmt_execute($stmtBusiness);
 
 // Memperbarui nama lengkap profil pengguna pada database

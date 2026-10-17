@@ -79,12 +79,12 @@ $productCount = mysqli_num_rows($products);
                         <i data-lucide="package-plus" style="width:28px;"></i>
                     </div>
 
-                    <!-- Judul -->
+                    <!-- Judul form -->
                     <div>
                         <h2 style="font-size:22px; margin:0;">
                             <?= $lang === 'en' ? 'New Stock In' : 'Catat Stok Masuk' ?>
                         </h2>
-                        <!-- Deskripsi -->
+                        <!-- Deskripsi form -->
                         <p style="font-size:13px; color:#81776D; margin:5px 0 0;">
                             <?= $lang === 'en'
                                 ? 'Select a product and enter the quantity received.'
@@ -110,7 +110,6 @@ $productCount = mysqli_num_rows($products);
 
                 <!-- Tampilkan form input stok jika produk sudah tersedia -->
                 <?php else: ?>
-
                     <form id="stockInForm" method="POST">
                         <!-- ID bisnis tersembunyi sebagai parameter form -->
                         <input type="hidden" name="business_id" value="<?= (int) $business_id ?>">
@@ -132,8 +131,6 @@ $productCount = mysqli_num_rows($products);
                                     <option value="<?= (int) $product['id'] ?>"
                                             data-stock="<?= (int) $product['current_stock'] ?>">
                                         <?= htmlspecialchars($product['product_name'], ENT_QUOTES, 'UTF-8') ?>
-                                        — <?= $lang === 'en' ? 'Current stock:' : 'Stok saat ini:' ?>
-                                        <?= number_format((int) $product['current_stock']) ?>
                                     </option>
                                 <?php endwhile; ?>
                             </select>
@@ -167,6 +164,7 @@ $productCount = mysqli_num_rows($products);
                                 </span>
                             </label>
 
+                            <!-- Catatan -->
                             <textarea id="notes" name="notes" rows="4"
                                     placeholder="<?= $lang === 'en'
                                         ? 'For example: supplier delivery or restock notes'

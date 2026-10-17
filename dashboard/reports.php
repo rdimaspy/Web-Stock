@@ -12,16 +12,17 @@ require_once __DIR__ . '/../includes/currency.php';
 $date_from = $_GET['date_from'] ?? date('Y-m-01');
 $date_to   = $_GET['date_to'] ?? date('Y-m-d');
 
-// Validasi format tanggal
+// Validasi format tanggal awal, set default ke hari pertama bulan ini jika tidak valid
 if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date_from)) {
     $date_from = date('Y-m-01');
 }
 
+// Validasi format tanggal akhir, set default ke tanggal hari ini jika tidak valid
 if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date_to)) {
     $date_to = date('Y-m-d');
 }
 
-// Sorting laporan
+// Daftar kolom laporan yang diizinkan untuk pengurutan data
 $allowedSort = [
     'product_name',
     'stock_in',
@@ -30,19 +31,23 @@ $allowedSort = [
     'current_stock'
 ];
 
+// Ambil parameter opsi urutan dari URL, atur default ke 'profit' jika kosong
 $sort = $_GET['sort'] ?? 'profit';
 
+// Validasi kolom pengurutan agar hanya menggunakan kolom yang diizinkan
 if (!in_array($sort, $allowedSort, true)) {
     $sort = 'profit';
 }
 
+// Ambil arah pengurutan (ASC/DESC)
 $order = strtoupper($_GET['order'] ?? 'DESC');
 
+// Validasi arah pengurutan agar hanya bernilai ASC atau DESC 
 if (!in_array($order, ['ASC', 'DESC'], true)) {
     $order = 'DESC';
 }
 
-// query utama laporan
+// Menyiapkan query SQL utama untuk akumulasi laporan barang dan keuntungan
 $sql = "
 SELECT
     p.id,
@@ -87,9 +92,10 @@ GROUP BY p.id
 ORDER BY $sort $order
 ";
 
-
+// Menyiapkan prepared statement untuk query utama laporan
 $stmt = mysqli_prepare($conn, $sql);
 
+// Mengikat parameter filter tanggal awal, tanggal akhir, dan ID bisnis ke query
 mysqli_stmt_bind_param(
     $stmt,
     "ssi",
@@ -98,8 +104,8 @@ mysqli_stmt_bind_param(
     $business_id
 );
 
+// Mengeksekusi statement query dan mengambil hasil data laporan
 mysqli_stmt_execute($stmt);
-
 $reports = mysqli_stmt_get_result($stmt);
 
 // Summary laporan
@@ -112,6 +118,7 @@ $total_profit = 0;
 // Ambil ulang data laporan untuk summary
 mysqli_data_seek($reports, 0);
 
+// Looping akumulasi untuk menghitung total statistik keseluruhan produk
 while ($row = mysqli_fetch_assoc($reports)) {
     $total_products++;
     $total_stock += (int) $row['current_stock'];
@@ -128,39 +135,41 @@ $stmt_modal = mysqli_prepare(
     WHERE business_id = ?"
 );
 
+// Mengikat parameter ID bisnis, eksekusi query, dan ambil total aset modal
 mysqli_stmt_bind_param($stmt_modal, "i", $business_id);
 mysqli_stmt_execute($stmt_modal);
 $res_modal = mysqli_stmt_get_result($stmt_modal);
 $row_modal = mysqli_fetch_assoc($res_modal);
 
+// Ambil nilai total modal barang (isi angka 0 jika belum ada data modal)
 $total_modal_value = (float)($row_modal['total_modal'] ?? 0);
 
-// Kembalikan pointer agar tabel tetap bisa membaca data
+// Kembalikan ulsng data agar tabel HTML bisa menampilkan semua data dari awal
 mysqli_data_seek($reports, 0);
 
 ?>
 
 
-<!DOCTYPE html>
-<html lang="<?= htmlspecialchars($lang, ENT_QUOTES, 'UTF-8') ?>">
 
+<!DOCTYPE html>
+<!-- Set bahasa -->
+<html lang="<?= htmlspecialchars($lang, ENT_QUOTES, 'UTF-8') ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>
-        <?= htmlspecialchars(__('reports'), ENT_QUOTES, 'UTF-8') ?> - Stock
-    </title>
+    <title><?= htmlspecialchars(__('reports'), ENT_QUOTES, 'UTF-8') ?> - Stock</title>
 </head>
 
+<!-- Styling utama layout dan warna latar halaman -->
 <body style="margin:0; min-height:100vh; background:#FAF7F2; font-family:Arial,sans-serif; color:#49382D;">
 
 <!-- Menentukan halaman aktif untuk sidebar -->
 <?php $currentPage = 'reports.php';?>
 
+<!-- Layout utama halaman laporan-->
 <div style="display:flex; min-height:100vh;">
 
-    <!-- Sidebar -->
+    <!-- SIDEBAR -->
     <?php require __DIR__ . '/components/sidebar.php'; ?>
 
     <!-- KONTEN UTAMA -->
@@ -169,15 +178,15 @@ mysqli_data_seek($reports, 0);
         <!-- HEADER -->
         <?php require __DIR__ . '/components/header.php'; ?>
 
-        <!-- AREA DASHBOARD -->
+        <!-- HALAMAN REPORT-->
         <section style="padding:32px;">
-
-            <!-- Judul halaman -->
             <div style="margin-bottom:25px;">
+                <!-- Judul halaman -->
                 <h1 style="margin:0; font-size:29px;">
                     <?= htmlspecialchars(__('reports'), ENT_QUOTES, 'UTF-8') ?>
                 </h1>
 
+                <!-- Deskripsi -->
                 <p style="color:#81776D; margin-top:10px; line-height:1.6;">
                     <?= htmlspecialchars(__('reports_description'), ENT_QUOTES, 'UTF-8') ?>
                 </p>
@@ -186,25 +195,27 @@ mysqli_data_seek($reports, 0);
             <!-- Filter laporan -->
             <div style="background:white;border:1px solid #E9E1D7; border-radius:12px; padding:22px; margin-bottom:25px;">
                 <form method="GET">
+                    <!-- Parameter ID bisnis tersembunyi agar posisi bisnis aktif tidak berubah saat filter dikirim -->
                     <input type="hidden" name="business_id" value="<?= (int)$business_id ?>">
                     <div style="display:flex; gap:15px; align-items:end; flex-wrap:wrap;">
 
+                        <!-- Input tanggal awal laporan -->
                         <div>
                             <label style="display:block; margin-bottom:7px; font-weight:600;">
                                 <?= htmlspecialchars(__('date_from'), ENT_QUOTES, 'UTF-8') ?>
                             </label>
-
                             <input type="date" name="date_from" value="<?= htmlspecialchars($date_from) ?>" style="padding:10px; border:1px solid #E9E1D7; border-radius:8px;">
                         </div>
 
+                        <!-- Input tanggal akhir laporan -->
                         <div>
                             <label style="display:block; margin-bottom:7px; font-weight:600;">
                                 <?= htmlspecialchars(__('date_to'), ENT_QUOTES, 'UTF-8') ?>
                             </label>
-
                             <input type="date" name="date_to" value="<?= htmlspecialchars($date_to) ?>" style="padding:10px; border:1px solid #E9E1D7; border-radius:8px;">
                         </div>
 
+                        <!-- Dropdown pilihan kolom untuk pengurutan data laporan -->
                         <div>
                             <label style="display:block; margin-bottom:7px; font-weight:600;">
                                 <?= htmlspecialchars(__('sort_by'), ENT_QUOTES, 'UTF-8') ?>
@@ -213,56 +224,60 @@ mysqli_data_seek($reports, 0);
                             <select name="sort"
                                 style="padding:10px; border:1px solid #E9E1D7; border-radius:8px;">
 
+                                <!-- Opsi urutkan berdasarkan keuntungan -->
                                 <option value="profit" <?= $sort === 'profit' ? 'selected' : '' ?>>
                                     <?= htmlspecialchars(__('profit'), ENT_QUOTES, 'UTF-8') ?>
                                 </option>
 
+                                <!-- Opsi urutkan berdasarkan jumlah barang masuk -->
                                 <option value="stock_in" <?= $sort === 'stock_in' ? 'selected' : '' ?>>
                                     <?= htmlspecialchars(__('stock_in'), ENT_QUOTES, 'UTF-8') ?>
                                 </option>
 
+                                <!-- Opsi urutkan berdasarkan jumlah barang keluar -->
                                 <option value="stock_out" <?= $sort === 'stock_out' ? 'selected' : '' ?>>
                                     <?= htmlspecialchars(__('stock_out'), ENT_QUOTES, 'UTF-8') ?>
                                 </option>
 
+                                <!-- Opsi urutkan berdasarkan jumlah stok saat ini -->
                                 <option value="current_stock" <?= $sort === 'current_stock' ? 'selected' : '' ?>>
                                     <?= htmlspecialchars(__('current_stock'), ENT_QUOTES, 'UTF-8') ?>
                                 </option>
 
+                                <!-- Opsi urutkan berdasarkan nama produk -->
                                 <option value="product_name" <?= $sort === 'product_name' ? 'selected' : '' ?>>
                                     <?= htmlspecialchars(__('product_name'), ENT_QUOTES, 'UTF-8') ?>
                                 </option>
                             </select>
                         </div>
 
-
+                        <!-- Dropdown arah pengurutan -->
                         <div>
                             <label style="display:block; margin-bottom:7px; font-weight:600;">
                                 <?= htmlspecialchars(__('order'), ENT_QUOTES, 'UTF-8') ?>
                             </label>
 
-                            <select name="order"
-                                style="padding:10px; border:1px solid #E9E1D7; border-radius:8px;">
-
+                            <select name="order" style="padding:10px; border:1px solid #E9E1D7; border-radius:8px;">   
+                                <!-- Opsi pengurutan data DESC -->
                                 <option value="DESC" <?= $order === 'DESC' ? 'selected' : '' ?>>
                                     Descending
                                 </option>
 
+                                <!-- Opsi pengurutan data DESC -->
                                 <option value="ASC" <?= $order === 'ASC' ? 'selected' : '' ?>>
                                     Ascending
                                 </option>
                             </select>
                         </div>
 
+                        <!-- Tombol terapkan -->
                         <button type="submit"
                             style="height:40px; padding:0 20px; border:0; border-radius:9px; background:#76553D; color:white; font-weight:600; cursor:pointer;">
                             <?= htmlspecialchars(__('apply'), ENT_QUOTES, 'UTF-8') ?>
                         </button>
 
                     </div>
-
                 </form>
-
             </div>
 
             <!-- Summary Report -->
@@ -270,6 +285,7 @@ mysqli_data_seek($reports, 0);
 
                 <!-- Total Produk -->
                 <div style="background:white; border:1px solid #E9E1D7; border-radius:12px; padding:20px;">
+                    <!-- judul -->
                     <p style="margin:0; color:#81776D; font-size:13px;">
                         <?= htmlspecialchars(__('total_products'), ENT_QUOTES, 'UTF-8') ?>
                     </p>
@@ -281,6 +297,7 @@ mysqli_data_seek($reports, 0);
 
                 <!-- Total Stok -->
                 <div style="background:white; border:1px solid #E9E1D7; border-radius:12px; padding:20px;">
+                    <!-- judul -->
                     <p style="margin:0; color:#81776D; font-size:13px;">
                         <?= htmlspecialchars(__('total_stock'), ENT_QUOTES, 'UTF-8') ?>
                     </p>
@@ -292,10 +309,11 @@ mysqli_data_seek($reports, 0);
 
                 <!-- Stock In -->
                 <div style="background:white; border:1px solid #E9E1D7; border-radius:12px; padding:20px;">
+                    <!-- judul -->
                     <p style="margin:0; color:#81776D; font-size:13px;">
                         <?= htmlspecialchars(__('stock_in'), ENT_QUOTES, 'UTF-8') ?>
                     </p>
-
+                    <!-- total -->
                     <h2 style="margin:10px 0 0;">
                         <?= number_format($total_stock_in) ?>
                     </h2>
@@ -303,10 +321,11 @@ mysqli_data_seek($reports, 0);
 
                 <!-- Stock Out -->
                 <div style="background:white; border:1px solid #E9E1D7; border-radius:12px; padding:20px;">
+                    <!-- judul -->
                     <p style="margin:0; color:#81776D; font-size:13px;">
                         <?= htmlspecialchars(__('stock_out'), ENT_QUOTES, 'UTF-8') ?>
                     </p>
-
+                    <!-- total -->
                     <h2 style="margin:10px 0 0;">
                         <?= number_format($total_stock_out) ?>
                     </h2>
@@ -314,9 +333,11 @@ mysqli_data_seek($reports, 0);
 
                 <!-- Total Harga Modal -->
                 <div style="background:white; border:1px solid #E9E1D7; border-radius:12px; padding:20px;">
+                    <!-- judul -->
                     <p style="margin:0; color:#81776D; font-size:13px;">
                         <?= htmlspecialchars(__('total_capital') ?? 'Total Harga Modal', ENT_QUOTES, 'UTF-8') ?>
                     </p>
+                    <!-- total -->
                     <h2 style="margin:10px 0 0; color:#76553D;">
                         <?= htmlspecialchars(formatMoneyPHP($total_modal_value, $business['currency']), ENT_QUOTES, 'UTF-8') ?>
                     </h2>
@@ -324,19 +345,19 @@ mysqli_data_seek($reports, 0);
 
                 <!-- Profit -->
                 <div style="background:white; border:1px solid #E9E1D7; border-radius:12px; padding:20px; grid-column:span 2;">
+                    <!-- judul -->
                     <p style="margin:0; color:#81776D; font-size:13px;">
                         <?= htmlspecialchars(__('profit'), ENT_QUOTES, 'UTF-8') ?>
                     </p>
-
+                    <!-- total -->
                     <h2 style="margin:10px 0 0;">
                         <?= htmlspecialchars(formatMoneyPHP($total_profit, $business['currency']), ENT_QUOTES, 'UTF-8'
                         ) ?>
                     </h2>
                 </div>
-
             </div>
 
-            <!-- Tabel laporan produk -->
+            <!-- TABEL LAPORAN -->
             <div style="background:white; border:1px solid #E9E1D7; border-radius:12px; overflow:hidden;">
 
                 <!-- Header Table -->
@@ -359,10 +380,12 @@ mysqli_data_seek($reports, 0);
                 </div>
 
                 <!-- Table -->
+                <!-- Container tabel laporan -->
                 <div style="max-height: 500px; overflow-y: auto; overflow-x: auto; border-top: 1px solid #E9E1D7;">
                     <table id="reportTable" style="width:100%; border-collapse:collapse; text-align:left; white-space:nowrap;">
-
+                        <!-- Header tabel -->
                         <thead style="background:#F5EFE8; position: sticky; top: 0; z-index: 1;">
+                            <!-- Looping nama-nama kolom header -->
                             <tr>
                                 <?php foreach (
                                     [
@@ -374,6 +397,7 @@ mysqli_data_seek($reports, 0);
                                     ] as $key
                                 ): ?>
 
+                                <!-- Judul kolom header tabel -->
                                 <th style=" padding:14px 16px; font-size:13px; color:#76553D; border-bottom:1px solid #E9E1D7;">
                                     <?= htmlspecialchars(__($key), ENT_QUOTES, 'UTF-8') ?>
                                 </th>
@@ -383,38 +407,46 @@ mysqli_data_seek($reports, 0);
                         </thead>
 
                         <tbody>
+                        <!-- Cek apakah data laporan hasil query kosong -->
                         <?php if (mysqli_num_rows($reports) === 0): ?>
                             <tr>
+                                <!-- Pesan pemberitahuan jika kosong-->
                                 <td colspan="5" style="padding:35px; text-align:center; color:#81776D;">
                                     <?= htmlspecialchars(__('no_data'), ENT_QUOTES, 'UTF-8') ?>
                                 </td>
                             </tr>
                         <?php else: ?>
-
+                            <!-- Looping untuk menampilkan baris data laporan per produk -->
                             <?php while ($row = mysqli_fetch_assoc($reports)): ?>
                                 <tr>
+                                    <!-- Nama produk -->
                                     <td style="padding:14px 16px; border-bottom:1px solid #F0EBE5; font-weight:600;">
                                         <?= htmlspecialchars($row['product_name'], ENT_QUOTES, 'UTF-8') ?>
                                     </td>
 
+                                    <!-- Total kuantitas barang masuk -->
                                     <td style="padding:14px 16px; border-bottom:1px solid #F0EBE5;">
                                         <?= number_format((int)$row['stock_in']) ?>
                                     </td>
 
+                                    <!-- Total kuantitas barang keluar -->
                                     <td style="padding:14px 16px; border-bottom:1px solid #F0EBE5;">
                                         <?= number_format((int)$row['stock_out']) ?>
                                     </td>
 
+                                    <!-- Total estimasi keuntungan -->
                                     <td style="padding:14px 16px; border-bottom:1px solid #F0EBE5;">
                                         <?= htmlspecialchars(formatMoneyPHP($row['profit'], $business['currency']), ENT_QUOTES, 'UTF-8') ?>
                                     </td>
 
+                                    <!-- Jumlah sisa stok produk saat ini -->
                                     <td style="padding:14px 16px; border-bottom:1px solid #F0EBE5;">
                                         <?= number_format((int)$row['current_stock']) ?>
                                     </td>
                                 </tr>
                             <?php endwhile; ?>
                         <?php endif; ?>
+
                         </tbody>
                     </table>
 
@@ -422,69 +454,81 @@ mysqli_data_seek($reports, 0);
 
             </div>
 
-    <!-- Iframe tersembunyi untuk memuat file export-pdf.php tanpa pindah halaman -->
-    <iframe id="pdfFrame" style="display:none;"></iframe>
+<!-- Iframe tersembunyi untuk memuat file export-pdf.php tanpa pindah halaman -->
+<iframe id="pdfFrame" style="display:none;"></iframe>
 
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script>
-        lucide.createIcons();
-    </script>
+<!-- Ikon -->
+<script src="https://unpkg.com/lucide@latest"></script>
 
+<script>
+lucide.createIcons();
 
-    <script>
-        // mengonversi tabel laporan ke bentuk file CSV
-        async function exportTableToCSV(defaultFilename) {
-            const table = document.getElementById('reportTable');
-            let csv = [];
-            
-            // Ambil data dari baris tabel
-            for (let row of table.rows) {
-                let cols = Array.from(row.cells).map(cell => `"${cell.innerText.replace(/"/g, '""')}"`);
-                csv.push(cols.join(','));
-            }
+// Fungsi untuk mengonversi data tabel laporan ke file CSV
+async function exportTableToCSV(defaultFilename) {
+    // Ambil elemen tabel laporan berdasarkan ID
+    const table = document.getElementById('reportTable');
+    let csv = [];
+    
+    // Looping setiap baris tabel untuk mengambil isi sel data
+    for (let row of table.rows) {
+        // Format teks sel dengan escape karakter tanda kutip ganda agar CSV tetap terstruktur
+        let cols = Array.from(row.cells).map(cell => `"${cell.innerText.replace(/"/g, '""')}"`);
+        csv.push(cols.join(','));
+    }
 
-            const csvData = '\uFEFF' + csv.join('\n');
+    // Tambahkan karakter UTF-8 BOM (\uFEFF) agar simbol mata uang dan karakter khusus terbaca rapi di Excel
+    const csvData = '\uFEFF' + csv.join('\n');
 
-            // Cek apakah browser mendukung fitur pemilih lokasi file (Save File Picker)
-            if ('showSaveFilePicker' in window) {
-                try {
-                    const handle = await window.showSaveFilePicker({
-                        suggestedName: defaultFilename,
-                        types: [{
-                            description: 'CSV File',
-                            accept: { 'text/csv': ['.csv'] },
-                        }],
-                    });
-                    const writable = await handle.createWritable();
-                    await writable.write(csvData);
-                    await writable.close();
-                } catch (err) {
-                    // Abaikan jika pengguna membatalkan dialog Save As
-                }
-            } else {
-                // Fallback otomatis untuk browser lama yang tidak mendukung
-                const csvFile = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
-                const downloadLink = document.createElement('a');
-                downloadLink.download = defaultFilename;
-                downloadLink.href = window.URL.createObjectURL(csvFile);
-                downloadLink.style.display = 'none';
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                document.body.removeChild(downloadLink);
-            }
+    // Gunakan fitur modern File System Access API jika didukung oleh browser
+    if ('showSaveFilePicker' in window) {
+        try {
+            // Tampilkan dialog pilihan folder penyimpanan 'Save As' kepada pengguna
+            const handle = await window.showSaveFilePicker({
+                suggestedName: defaultFilename,
+                types: [{
+                    description: 'CSV File',
+                    accept: { 'text/csv': ['.csv'] },
+                }],
+            });
+            // Tulis dan simpan data CSV ke file yang dipilih pengguna
+            const writable = await handle.createWritable();
+            await writable.write(csvData);
+            await writable.close();
+        } catch (err) {
+            // Abaikan error jika pengguna menutup atau membatalkan dialog penyimpanan
         }
+    } else {
+        // Alternatif unduhan otomatis (fallback) untuk browser yang belum mendukung Save File Picker
+        const csvFile = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+        const downloadLink = document.createElement('a');
+        downloadLink.download = defaultFilename;
+        downloadLink.href = window.URL.createObjectURL(csvFile);
+        downloadLink.style.display = 'none';
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+    }
+}
 
-        // Fungsi JS untuk mengisi src iframe tanpa reload/pindah page
-        function printPDF(url) {
-            const iframe = document.getElementById('pdfFrame');
-            iframe.src = url;
-            iframe.onload = function() {
-                iframe.contentWindow.focus();
-                iframe.contentWindow.print();
-            };
-        }
+// Fungsi untuk memuat dan mencetak file PDF secara otomatis 
+function printPDF(url) {
+    // Ambil elemen penampung dari halaman HTML
+    const iframe = document.getElementById('pdfFrame');
+    
+    // Masukkan lokasi file PDF ke dalam iframe
+    iframe.src = url;
+    
+    // Jalankan perintah cetak begitu PDF selesai dimuat sempurna
+    iframe.onload = function() {
+        // Fokuskan kursor browser ke dalam iframe
+        iframe.contentWindow.focus();
+        
+        // Panggil perintah cetak bawaan browser untuk isi iframe tersebut
+        iframe.contentWindow.print();
+    };
+}
 
-    </script>
+</script>
 
 </body>
 </html>

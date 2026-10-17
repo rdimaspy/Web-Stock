@@ -1,4 +1,4 @@
-
+// Konfigurasi standar format mata uang beserta lokasi wilayah (locale)
 const CURRENCY_CONFIG = {
     IDR: {
         locale: 'id-ID',
@@ -26,10 +26,13 @@ const CURRENCY_CONFIG = {
     }
 };
 
+// Fungsi untuk memformat angka nominal menjadi tampilan mata uang lengkap dengan simbolnya
 function formatMoney(amount, currency = 'IDR') {
+    // Memilih konfigurasi mata uang yang sesuai atau menggunakan IDR sebagai default
     const config = CURRENCY_CONFIG[currency]
         || CURRENCY_CONFIG.IDR;
 
+    // Mengembalikan string harga terformat menggunakan standar Intl.NumberFormat
     return new Intl.NumberFormat(config.locale, {
         style: 'currency',
         currency: config.currency,

@@ -88,9 +88,7 @@ $query = mysqli_stmt_get_result($stmt);
                 
                 <!-- PILIHAN BAHASA -->
                 <div style="position:relative; display:inline-block;">
-                    <button
-                        type="button"
-                        onclick="const m=document.getElementById('business-language-menu');m.style.display=m.style.display==='block'?'none':'block';"
+                    <button type="button" onclick="const m=document.getElementById('business-language-menu');m.style.display=m.style.display==='block'?'none':'block';"
                         style="display:flex; align-items:center; gap:8px; padding:8px; border:0; background:transparent; color:#81776D; cursor:pointer;">
                         <i data-lucide="globe" style="width:21px; height:21px;"></i>
                         <i data-lucide="chevron-down" style="width:15px; height:15px;"></i>
@@ -99,15 +97,11 @@ $query = mysqli_stmt_get_result($stmt);
                     <!-- Dropdown Menu Bahasa -->
                     <div id="business-language-menu" class="lang-dropdown-menu"
                         style="display:none; position:absolute; top:42px; right:0; width:145px; background:white; border:1px solid #E9E1D7; border-radius:14px; padding:8px; box-shadow:0 5px 18px rgba(73,56,45,0.10); z-index:100;">
-                        
                         <form action="set-language.php" method="POST" style="margin:0;">
                             <input type="hidden" name="language" value="id">
                             <input type="hidden" name="redirect" value="businesses.php">
 
-                            <button
-                                type="submit"
-                                data-language-option="id"
-                                style="width:100%; padding:12px; text-align:left; border:0; border-radius:9px; background:<?= $lang === 'id' ? '#F5EFE8' : 'white' ?>; color:#49382D; cursor:pointer;">
+                            <button type="submit" data-language-option="id" style="width:100%; padding:12px; text-align:left; border:0; border-radius:9px; background:<?= $lang === 'id' ? '#F5EFE8' : 'white' ?>; color:#49382D; cursor:pointer;">
                                 Indonesia
                             </button>
                         </form>
@@ -115,11 +109,7 @@ $query = mysqli_stmt_get_result($stmt);
                         <form action="set-language.php" method="POST" style="margin:0;">
                             <input type="hidden" name="language" value="en">
                             <input type="hidden" name="redirect" value="businesses.php">
-
-                            <button
-                                type="submit"
-                                data-language-option="en"
-                                style="width:100%; padding:12px; text-align:left; border:0; border-radius:9px; background:<?= $lang === 'en' ? '#F5EFE8' : 'white' ?>; color:#49382D; cursor:pointer;">
+                            <button type="submit" data-language-option="en" style="width:100%; padding:12px; text-align:left; border:0; border-radius:9px; background:<?= $lang === 'en' ? '#F5EFE8' : 'white' ?>; color:#49382D; cursor:pointer;">
                                 English
                             </button>
                         </form>
@@ -198,19 +188,22 @@ $query = mysqli_stmt_get_result($stmt);
 
                         <!-- INFORMASI DETAIL BISNIS -->
                         <div style="flex:1; min-width:0;">
+                            <!-- Nama bisnis -->
                             <div style="font-size:16px; font-weight:700; overflow-wrap:anywhere;">
                                 <?= htmlspecialchars($business['business_name'], ENT_QUOTES, 'UTF-8') ?>
                             </div>
 
+                            <!-- Mata uang utama bisnis -->
                             <div style="margin-top:5px; color:#81776D; font-size:13px;">
                                 <?= htmlspecialchars($business['currency'], ENT_QUOTES, 'UTF-8') ?>
                             </div>
 
+                            <!-- Catatan bisnis singkat maksimal 20 karakter -->
                             <?php if (!empty(trim($business['notes'] ?? ''))): ?>
                                 <div
                                     title="<?= htmlspecialchars($business['notes'], ENT_QUOTES, 'UTF-8') ?>"
-                                    style="margin-top:7px; color:#81776D; font-size:12px; line-height:1.5; overflow:hidden; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow-wrap:anywhere;">
-                                    <?= htmlspecialchars($business['notes'], ENT_QUOTES, 'UTF-8') ?>
+                                    style="margin-top:6px; color:#81776D; font-size:12px; line-height:1.4; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                    <?= htmlspecialchars(mb_strimwidth(trim($business['notes']), 0, 20), ENT_QUOTES, 'UTF-8') ?>
                                 </div>
                             <?php endif; ?>
                         </div>
