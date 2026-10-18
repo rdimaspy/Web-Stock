@@ -18,10 +18,7 @@ $trans = file_exists($langFile) ? require $langFile : require __DIR__ . "/lang/i
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Deskripsi meta untuk SEO -->
-    <meta
-        name="description"
-        content="Stock membantu pemilik bisnis mengelola produk, persediaan, penjualan, dan laporan stok."
-    >
+    <meta name="description" content="Stock membantu pemilik bisnis mengelola produk, persediaan, penjualan, dan laporan stok.">
 
     <title>Stock | Stock Management</title>
     <!-- Library ikon Lucide -->
@@ -29,6 +26,7 @@ $trans = file_exists($langFile) ? require $langFile : require __DIR__ . "/lang/i
     <script src="assets/js/app.js" defer></script>
 </head>
 
+<!-- Body Utama Halaman -->
 <body>
     <!-- Navigasi (Navbar) -->
     <header style="width: 100%; background: #FFFFFF; border-bottom: 2px solid #E9E1D7;">

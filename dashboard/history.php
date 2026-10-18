@@ -171,12 +171,12 @@ function historyTypeBadge($type) {
                 </div>
 
                 <!-- Tombol terapkan filter -->
-                <button type="submit" style="padding:11px 16px; border:0; border-radius:8px; background:#76553D; color:white; cursor:pointer;">
+                <button type="submit" style="padding:11px 16px; border:0; border-radius:8px; background:#76553D; color:white; font-weight:600; cursor:pointer;">
                     <?= htmlspecialchars(__('apply_filter'), ENT_QUOTES, 'UTF-8') ?>
                 </button>
 
                 <!-- Tombol reset untuk menghapus semua filter dan mengembalikan tampilan awal -->
-                <a href="history.php?business_id=<?= (int) $business_id ?>" style="padding:11px 14px; border-radius:8px; background:#F5EFE8; color:#76553D; text-decoration:none;">
+                <a href="history.php?business_id=<?= (int) $business_id ?>" style="padding:11px 14px; border-radius:8px; background:#B45F5F; color:white; font-weight:600; text-decoration:none;">
                     <?= htmlspecialchars(__('reset_filter'), ENT_QUOTES, 'UTF-8') ?>
                 </a>
             </form>

@@ -2,9 +2,10 @@
 // Menentukan header respon server dalam format JSON UTF-8
 header('Content-Type: application/json; charset=utf-8');
 
-// Memulai sesi login pengguna dan memuat file koneksi database
+// Memulai sesi login pengguna, memuat file koneksi database, dan bahasa
 session_start();
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../includes/language.php';
 
 // Helper buat nampilkan respon JSON dan menghentikan proses API
 function respond($status, $message, $extra = [])
@@ -19,7 +20,7 @@ function respond($status, $message, $extra = [])
 // Memeriksa status autentikasi sesi login pengguna
 if (!isset($_SESSION['user_id'])) {
     http_response_code(401);
-    respond('error', 'Sesi login berakhir. Silakan login kembali.');
+    respond('error', __('session_expired'));
 }
 
 // Menangkap dan memvalidasi input parameter dari formulir
@@ -71,7 +72,7 @@ if (
     $initial_stock < 0
 ) {
     http_response_code(400);
-    respond('error', 'Data produk tidak lengkap atau tidak valid.');
+    respond('error', __('incomplete_product_data'));
 }
 
 // Normalisasi format desimal untuk harga beli dan harga jual
@@ -87,7 +88,7 @@ if (
 ) {
     // Mengeset kode respon HTTP 400 Bad Request
     http_response_code(400);
-    respond('error', 'Harga harus berupa angka yang valid dan tidak boleh negatif.');
+    respond('error', __('invalid_price'));
 }
 
 // Mengonversi nilai harga ke tipe data float
@@ -118,7 +119,7 @@ $business_result = mysqli_stmt_get_result($stmt);
 if (mysqli_num_rows($business_result) === 0) {
     // Mengeset kode respon HTTP 403 Forbidden
     http_response_code(403);
-    respond('error', 'Bisnis tidak ditemukan atau akses ditolak.');
+    respond('error', __('business_unauthorized'));
 }
 
 // Memeriksa keberadaan produk pada bisnis tersebut
@@ -143,7 +144,7 @@ $existing_product = mysqli_fetch_assoc($product_result);
 if (!$existing_product) {
     // Mengeset kode respon HTTP 404 Not Found
     http_response_code(404);
-    respond('error', 'Produk tidak ditemukan.');
+    respond('error', __('product_not_found'));
 }
 
 // Memvalidasi kategori produk jika dipilih
@@ -151,7 +152,7 @@ if ($category_id !== null) {
     // Menolak jika ID kategori tidak bernilai integer valid
     if ($category_id === false) {
         http_response_code(400);
-        respond('error', 'Kategori tidak valid.');
+        respond('error', __('invalid_category'));
     }
 
     // Menyiapkan query untuk memastikan kategori terdaftar di bisnis ini
@@ -169,7 +170,7 @@ if ($category_id !== null) {
     // Mengembalikan error jika kategori tidak ditemukan pada bisnis
     if (mysqli_num_rows(mysqli_stmt_get_result($stmt)) === 0) {
         http_response_code(400);
-        respond('error', 'Kategori tidak ditemukan pada bisnis ini.');
+        respond('error', __('category_not_found'));
     }
 }
 
@@ -180,7 +181,7 @@ if ($expiration_date !== null) {
     // Memastikan objek tanggal valid dan sesuai dengan string input
     if (!$date || $date->format('Y-m-d') !== $expiration_date) {
         http_response_code(400);
-        respond('error', 'Tanggal kedaluwarsa tidak valid.');
+        respond('error', __('invalid_expiry_date'));
     }
 }
 
@@ -218,7 +219,7 @@ mysqli_stmt_bind_param(
 // Mengembalikan error jika query update produk gagal dieksekusi
 if (!mysqli_stmt_execute($stmt)) {
     http_response_code(500);
-    respond('error', 'Gagal memperbarui produk.');
+    respond('error', __('product_update_failed'));
 }
 
 // Memproses unggahan foto produk baru jika dipilih oleh pengguna
@@ -226,13 +227,13 @@ if (isset($_FILES['photo']) && $_FILES['photo']['error'] !== UPLOAD_ERR_NO_FILE)
     // Validasi error saat proses upload foto
     if ($_FILES['photo']['error'] !== UPLOAD_ERR_OK) {
         http_response_code(400);
-        respond('error', 'Upload foto gagal.');
+        respond('error', __('photo_upload_failed'));
     }
 
     // Validasi batas maksimum ukuran file foto (5 MB)
     if ($_FILES['photo']['size'] > 5 * 1024 * 1024) {
         http_response_code(400);
-        respond('error', 'Ukuran foto maksimal 5 MB.');
+        respond('error', __('photo_max_size'));
     }
 
     // Memeriksa keabsahan file gambar
@@ -240,7 +241,7 @@ if (isset($_FILES['photo']) && $_FILES['photo']['error'] !== UPLOAD_ERR_NO_FILE)
 
     if ($imageInfo === false) {
         http_response_code(400);
-        respond('error', 'File yang diunggah bukan gambar yang valid.');
+        respond('error', __('invalid_image_file'));
     }
 
     // Daftar format ekstensi foto yang diizinkan
@@ -256,7 +257,7 @@ if (isset($_FILES['photo']) && $_FILES['photo']['error'] !== UPLOAD_ERR_NO_FILE)
     // Menolak file yang memiliki format ekstensi di luar daftar izin
     if (!isset($mimeTypes[$mimeType])) {
         http_response_code(400);
-        respond('error', 'Format foto harus JPG, PNG, WEBP, atau GIF.');
+        respond('error', __('invalid_image_format'));
     }
 
     // Menentukan lokasi folder penyimpanan foto produk
@@ -265,7 +266,7 @@ if (isset($_FILES['photo']) && $_FILES['photo']['error'] !== UPLOAD_ERR_NO_FILE)
     // Membuat folder baru jika belum tersedia
     if (!is_dir($uploadDir) && !mkdir($uploadDir, 0755, true)) {
         http_response_code(500);
-        respond('error', 'Folder foto produk gagal dibuat.');
+        respond('error', __('folder_create_failed'));
     }
 
     // Membuat nama unik file foto baru secara acak
@@ -275,7 +276,7 @@ if (isset($_FILES['photo']) && $_FILES['photo']['error'] !== UPLOAD_ERR_NO_FILE)
     // Pindahkan file foto sementara ke direktori target
     if (!move_uploaded_file($_FILES['photo']['tmp_name'], $target)) {
         http_response_code(500);
-        respond('error', 'Foto produk gagal disimpan.');
+        respond('error', __('photo_save_failed'));
     }
 
     // Memperbarui nama file foto baru pada database
@@ -297,7 +298,7 @@ if (isset($_FILES['photo']) && $_FILES['photo']['error'] !== UPLOAD_ERR_NO_FILE)
     if (!mysqli_stmt_execute($updatePhoto)) {
         @unlink($target);
         http_response_code(500);
-        respond('error', 'Gagal menyimpan informasi foto produk.');
+        respond('error', __('photo_info_save_failed'));
     }
 
     // Menghapus file foto lama dari server setelah foto baru berhasil disimpan
@@ -311,6 +312,6 @@ if (isset($_FILES['photo']) && $_FILES['photo']['error'] !== UPLOAD_ERR_NO_FILE)
 }
 
 // Mengembalikan respons sukses pembaruan data produk
-respond('success', 'Produk berhasil diperbarui.', [
+respond('success', __('product_update_success'), [
     'product_id' => $product_id
 ]);

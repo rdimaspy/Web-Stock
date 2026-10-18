@@ -2,14 +2,15 @@
 // Menentukan format respons server sebagai JSON
 header('Content-Type: application/json');
 
-// Memuat file konfigurasi koneksi database
-require_once '../config/database.php';
+// memuat konfigurasi koneksi database daan bahasa
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../includes/language.php';
 
 // Memeriksa keberadaan parameter ID produk pada query string GET
 if (!isset($_GET['id'])) {
     echo json_encode([
         "status" => "error",
-        "message" => "ID produk tidak ditemukan"
+        "message" => __('product_id_not_found')
     ]);
     exit;
 }
@@ -27,7 +28,7 @@ $result = mysqli_stmt_get_result($stmt);
 if (mysqli_num_rows($result) == 0) {
     echo json_encode([
         "status" => "error",
-        "message" => "Produk tidak ditemukan"
+        "message" => __('product_not_found')
     ]);
     exit;
 }

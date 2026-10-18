@@ -2,6 +2,7 @@
 // Memulai sesi login dan memuat konfigurasi koneksi database
 session_start();
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../includes/language.php';
 
 // Menentukan format respons berupa JSON
 header('Content-Type: application/json');
@@ -10,7 +11,7 @@ header('Content-Type: application/json');
 if (!isset($_SESSION['user_id'])) {
     echo json_encode([
         'success' => false,
-        'message' => 'Unauthorized'
+        'message' => __('unauthorized')
     ]);
     exit;
 }
@@ -25,7 +26,7 @@ $notes       = trim($_POST['notes'] ?? '');
 if (!$business_id || !$product_id || !$quantity || $quantity < 1) {
     echo json_encode([
         'success' => false,
-        'message' => 'Data tidak valid'
+        'message' => __('invalid_data')
     ]);
     exit;
 }
@@ -52,14 +53,14 @@ try {
 
     // Menangani kondisi jika data produk tidak ditemukan
     if (!$product) {
-        throw new Exception('Produk tidak ditemukan');
+        throw new Exception(__('product_not_found'));
     }
 
     // Memvalidasi kecukupan stok produk sebelum transaksi barang keluar
     if ((int)$product['current_stock'] < $quantity) {
         echo json_encode([
             'success' => false,
-            'message' => 'Stok tidak mencukupi'
+            'message' => __('insufficient_stock')
         ]);
         exit;
     }
@@ -86,7 +87,7 @@ try {
     mysqli_stmt_bind_param($stmt, "iii", $stock_after, $product_id, $business_id);
 
     if (!mysqli_stmt_execute($stmt)) {
-        throw new Exception('Gagal update stok');
+        throw new Exception(__('stock_update_failed'));
     }
 
     // Menyiapkan query untuk mencatat riwayat transaksi stok keluar
@@ -125,7 +126,7 @@ try {
     );
 
     if (!mysqli_stmt_execute($stmt)) {
-        throw new Exception('Gagal menyimpan history');
+        throw new Exception(__('history_save_failed'));
     }
 
     // Konfirmasi dan simpan seluruh perubahan transaksi database jika sukses
@@ -133,7 +134,7 @@ try {
 
     echo json_encode([
         'success' => true,
-        'message' => 'Stok keluar berhasil disimpan'
+        'message' => __('stock_out_save_success')
     ]);
 
 } catch (Exception $e) {

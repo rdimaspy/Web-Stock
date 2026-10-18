@@ -63,9 +63,7 @@ $productCount = mysqli_num_rows($products);
                 </h1>
 
                 <p style="color:#81776D; margin-top:10px; line-height:1.6;">
-                    <?= $lang === 'en'
-                        ? 'Record products received into your business inventory.'
-                        : 'Catat barang masuk untuk menambah persediaan bisnismu.' ?>
+                    <?= htmlspecialchars(__('stock_in_desc'), ENT_QUOTES, 'UTF-8') ?>
                 </p>
             </div>
 
@@ -82,13 +80,10 @@ $productCount = mysqli_num_rows($products);
                     <!-- Judul form -->
                     <div>
                         <h2 style="font-size:22px; margin:0;">
-                            <?= $lang === 'en' ? 'New Stock In' : 'Catat Stok Masuk' ?>
+                            <?= htmlspecialchars(__('new_stock_in'), ENT_QUOTES, 'UTF-8') ?>
                         </h2>
-                        <!-- Deskripsi form -->
                         <p style="font-size:13px; color:#81776D; margin:5px 0 0;">
-                            <?= $lang === 'en'
-                                ? 'Select a product and enter the quantity received.'
-                                : 'Pilih produk dan masukkan jumlah barang yang diterima.' ?>
+                            <?= htmlspecialchars(__('new_stock_in_desc'), ENT_QUOTES, 'UTF-8') ?>
                         </p>
                     </div>
                 </div>
@@ -97,16 +92,14 @@ $productCount = mysqli_num_rows($products);
                 <?php if ($productCount === 0): ?>
                     <!-- Jika State kosong, akan memberi tombol navigasi ke halaman produk -->
                     <div style="padding:22px; text-align:center; background:#FAF7F2; border-radius:10px; color:#81776D; line-height:1.7;">
-                        <?= $lang === 'en'
-                            ? 'There are no products yet. Add a product first before recording stock in.'
-                            : 'Belum ada produk. Tambahkan produk terlebih dahulu sebelum mencatat stok masuk.' ?>
+                        <?= htmlspecialchars(__('no_products_stock_in'), ENT_QUOTES, 'UTF-8') ?>
 
                         <div style="margin-top:15px;">
                             <a href="products.php?business_id=<?= (int) $business_id ?>" style="color:#76553D; font-weight:600; text-decoration:none;">
-                                <?= $lang === 'en' ? 'Go to Products' : 'Buka Produk' ?>
+                                <?= htmlspecialchars(__('go_to_products'), ENT_QUOTES, 'UTF-8') ?>
                             </a>
                         </div>
-                    </div>
+                    </div>  
 
                 <!-- Tampilkan form input stok jika produk sudah tersedia -->
                 <?php else: ?>
@@ -123,7 +116,7 @@ $productCount = mysqli_num_rows($products);
                                     style="width:100%; box-sizing:border-box; padding:13px; border:1px solid #E9E1D7; border-radius:9px; background:white; color:#49382D;">
 
                                 <option value="">
-                                    <?= $lang === 'en' ? 'Select a product' : 'Pilih produk' ?>
+                                    <?= htmlspecialchars(__('select_product_placeholder'), ENT_QUOTES, 'UTF-8') ?>
                                 </option>
 
                                 <!-- Opsi daftar produk beserta sisa stoknya -->
@@ -137,21 +130,17 @@ $productCount = mysqli_num_rows($products);
 
                             <!-- Teks penjelas stok -->
                             <p id="currentStockInfo" style="font-size:13px; color:#81776D; margin:8px 0 0;">
-                                <?= $lang === 'en'
-                                    ? 'Current stock will appear after you select a product.'
-                                    : 'Stok saat ini akan ditampilkan setelah kamu memilih produk.' ?>
+                                <?= htmlspecialchars(__('current_stock_prompt'), ENT_QUOTES, 'UTF-8') ?>
                             </p>
                         </div>
 
                         <!-- Input jumlah stok masuk -->
                         <div style="margin-bottom:22px;">
                             <label for="quantity" style="display:block; margin-bottom:8px; font-weight:600;">
-                                <?= $lang === 'en' ? 'Quantity Received' : 'Jumlah Barang Masuk' ?>
+                                <?= htmlspecialchars(__('quantity_received'), ENT_QUOTES, 'UTF-8') ?>
                             </label>
 
-                            <input type="number" id="quantity" name="quantity"
-                                min="1" step="1" required
-                                placeholder="<?= $lang === 'en' ? 'Enter quantity' : 'Masukkan jumlah barang' ?>"
+                            <input type="number" id="quantity" name="quantity" min="1" step="1" required placeholder="<?= htmlspecialchars(__('enter_quantity_placeholder'), ENT_QUOTES, 'UTF-8') ?>"
                                 style="width:100%; box-sizing:border-box; padding:13px; border:1px solid #E9E1D7; border-radius:9px; outline-color:#B99A7D;">
                         </div>
 
@@ -165,18 +154,16 @@ $productCount = mysqli_num_rows($products);
                             </label>
 
                             <!-- Catatan -->
-                            <textarea id="notes" name="notes" rows="4"
-                                    placeholder="<?= $lang === 'en'
-                                        ? 'For example: supplier delivery or restock notes'
-                                        : 'Contoh: pengiriman pemasok atau keterangan pengisian stok' ?>"
-                                    style="width:100%; box-sizing:border-box; padding:13px; border:1px solid #E9E1D7; border-radius:9px; resize:vertical; font-family:inherit;"></textarea>
+                            <textarea id="notes" name="notes" rows="4" placeholder="<?= htmlspecialchars(__('notes_stock_in_placeholder'), ENT_QUOTES, 'UTF-8') ?>"
+                                style="width:100%; box-sizing:border-box; padding:13px; border:1px solid #E9E1D7; border-radius:9px; resize:vertical; font-family:inherit;">
+                            </textarea>
                         </div>
                         
                         <!-- Tombol Save -->
                         <div style="padding-top:20px; border-top:1px solid #E9E1D7; display:flex; justify-content:flex-end;">
                             <button type="submit" id="stockInSubmitButton" style="display:flex; align-items:center; gap:8px; padding:12px 19px; border:0; border-radius:9px; background:#76553D; color:white; font-weight:600; cursor:pointer;">
                                 <i data-lucide="save" style="width:18px;height:18px;"></i>
-                                <?= $lang === 'en' ? 'Save Stock In' : 'Simpan Stok Masuk' ?>
+                                <?= htmlspecialchars(__('save_stock_in'), ENT_QUOTES, 'UTF-8') ?>
                             </button>
                         </div>
 
@@ -206,19 +193,13 @@ if (productSelect && stockInfo) {
 
         // Reset pesan petunjuk jika tidak ada produk yang dipilih
         if (!this.value) {
-            stockInfo.textContent = <?= json_encode(
-                $lang === 'en'
-                    ? 'Current stock will appear after you select a product.'
-                    : 'Stok saat ini akan ditampilkan setelah kamu memilih produk.'
-            ) ?>;
+            stockInfo.textContent = <?= json_encode(__('current_stock_prompt')) ?>;
             return;
         }
         // Tampilkan angka stok dari atribut data-stock opsi terpilih
         const currentStock = Number(option.dataset.stock || 0);
 
-        stockInfo.textContent = <?= json_encode(
-            $lang === 'en' ? 'Current stock: ' : 'Stok saat ini: '
-        ) ?> + currentStock.toLocaleString();
+        stockInfo.textContent = <?= json_encode(__('current_stock_label')) ?> + currentStock.toLocaleString();
     });
 }
 
@@ -241,9 +222,7 @@ if (stockInForm && stockInSubmitButton) {
 
         // Ubah UI tombol ke status loading
         stockInSubmitButton.disabled = true;
-        stockInSubmitButton.textContent = <?= json_encode(
-            $lang === 'en' ? 'Saving...' : 'Menyimpan...'
-        ) ?>;
+        stockInSubmitButton.textContent = <?= json_encode(__('saving')) ?>;
         stockInSubmitButton.style.cursor = 'wait';
         stockInSubmitButton.style.opacity = '0.7';
 
@@ -258,11 +237,7 @@ if (stockInForm && stockInSubmitButton) {
 
             // Kegagalan respons dari server
             if (!response.ok || result.status !== 'success') {
-                alert(result.message || <?= json_encode(
-                    $lang === 'en'
-                        ? 'Failed to save stock in.'
-                        : 'Gagal menyimpan stok masuk.'
-                ) ?>);
+                alert(result.message || <?= json_encode(__('failed_save_stock_in')) ?>);
                 return;
             }
 
@@ -274,11 +249,7 @@ if (stockInForm && stockInSubmitButton) {
         } catch (error) {
             console.error(error);
 
-            alert(<?= json_encode(
-                $lang === 'en'
-                    ? 'An error occurred while saving stock in.'
-                    : 'Terjadi kesalahan saat menyimpan stok masuk.'
-            ) ?>);
+            alert(<?= json_encode(__('error_saving_stock_in')) ?>);
 
         } finally {
             // Kembalikan status tombol submit ke kondisi normal

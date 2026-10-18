@@ -7,6 +7,9 @@ $lang = $_SESSION['language'] ?? 'id';
 $langFile = __DIR__ . "/lang/{$lang}.php";
 $trans = file_exists($langFile) ? require $langFile : require __DIR__ . "/lang/id.php";
 ?>
+
+
+
 <!DOCTYPE html>
 <html lang="<?= htmlspecialchars($lang); ?>">
 
@@ -57,6 +60,7 @@ $trans = file_exists($langFile) ? require $langFile : require __DIR__ . "/lang/i
     </style>
 </head>
 
+<!-- Body Utama Halaman -->
 <body style="margin: 0; background: #FAF7F2; font-family: Arial, Helvetica, sans-serif; color: #302921; overflow-x: hidden; position: relative;">
 
     <!-- Desain elemen abstrak (Latar belakang) -->
@@ -80,7 +84,7 @@ $trans = file_exists($langFile) ? require $langFile : require __DIR__ . "/lang/i
             </div>
 
             <!-- Form pengiriman kredensial akun -->
-            <form action="api/login.php" method="POST">
+            <form action="api/api-login.php" method="POST">
                 <!-- Email -->
                 <div style="margin-bottom: 18px;">
                     <label style="display:block; font-size:13px; font-weight:600; margin-bottom:7px; color:#49382D;">
@@ -88,8 +92,8 @@ $trans = file_exists($langFile) ? require $langFile : require __DIR__ . "/lang/i
                     </label>
 
                     <input type="email" name="email" class="input-field" 
-                           placeholder="<?= htmlspecialchars($trans['email_placeholder'] ?? 'Masukkan email'); ?>" 
-                           style="width:100%; padding:12px 14px; border:1px solid #E9E1D7; border-radius:10px; box-sizing:border-box; font-size:14px; color:#302921;">
+                        placeholder="<?= htmlspecialchars($trans['email_placeholder'] ?? 'Masukkan email'); ?>" 
+                        style="width:100%; padding:12px 14px; border:1px solid #E9E1D7; border-radius:10px; box-sizing:border-box; font-size:14px; color:#302921;">
                 </div>
 
                 <!-- Password -->
@@ -99,8 +103,8 @@ $trans = file_exists($langFile) ? require $langFile : require __DIR__ . "/lang/i
                     </label>
 
                     <input type="password" name="password" class="input-field" 
-                           placeholder="<?= htmlspecialchars($trans['password_placeholder'] ?? 'Masukkan password'); ?>" 
-                           style="width:100%; padding:12px 14px; border:1px solid #E9E1D7; border-radius:10px; box-sizing:border-box; font-size:14px; color:#302921;">
+                        placeholder="<?= htmlspecialchars($trans['password_placeholder'] ?? 'Masukkan password'); ?>" 
+                        style="width:100%; padding:12px 14px; border:1px solid #E9E1D7; border-radius:10px; box-sizing:border-box; font-size:14px; color:#302921;">
                 </div>
 
                 <!-- Tombol Submit -->
@@ -130,9 +134,7 @@ $trans = file_exists($langFile) ? require $langFile : require __DIR__ . "/lang/i
     </div>
 
     <!-- ICON -->
-    <script>
-        lucide.createIcons();
-    </script>
-</body>
+<script> lucide.createIcons();</script>
 
+</body>
 </html>

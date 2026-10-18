@@ -260,12 +260,12 @@ mysqli_data_seek($reports, 0);
                             <select name="order" style="padding:10px; border:1px solid #E9E1D7; border-radius:8px;">   
                                 <!-- Opsi pengurutan data DESC -->
                                 <option value="DESC" <?= $order === 'DESC' ? 'selected' : '' ?>>
-                                    Descending
+                                    <?= htmlspecialchars(__('descending'), ENT_QUOTES, 'UTF-8') ?>
                                 </option>
 
-                                <!-- Opsi pengurutan data DESC -->
+                                <!-- Opsi pengurutan data ASC -->
                                 <option value="ASC" <?= $order === 'ASC' ? 'selected' : '' ?>>
-                                    Ascending
+                                    <?= htmlspecialchars(__('ascending'), ENT_QUOTES, 'UTF-8') ?>
                                 </option>
                             </select>
                         </div>
@@ -335,7 +335,7 @@ mysqli_data_seek($reports, 0);
                 <div style="background:white; border:1px solid #E9E1D7; border-radius:12px; padding:20px;">
                     <!-- judul -->
                     <p style="margin:0; color:#81776D; font-size:13px;">
-                        <?= htmlspecialchars(__('total_capital') ?? 'Total Harga Modal', ENT_QUOTES, 'UTF-8') ?>
+                        <?= htmlspecialchars(__('total_capital'), ENT_QUOTES, 'UTF-8') ?>
                     </p>
                     <!-- total -->
                     <h2 style="margin:10px 0 0; color:#76553D;">

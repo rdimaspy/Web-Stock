@@ -30,7 +30,7 @@
     ?>
         <!-- Item Link Navigasi Menu Utama -->
         <a href="<?= $page ?>?business_id=<?= (int)$business_id ?>"
-        style="display:flex; align-items:center; gap:12px; padding:12px; margin-bottom:7px; border-radius:9px; background:<?= $active ? '#76553D' : 'white' ?>; color:<?= $active ? 'white' : '#6F6257' ?>; text-decoration:none;">
+        style="display:flex; align-items:center; gap:12px; padding:12px; margin-bottom:7px; border-radius:9px; background:<?= $active ? '#76553D' : 'white' ?>; color:<?= $active ? 'white' : '#6F6257' ?>; text-decoration:none; font-weight:bold;">
             <i data-lucide="<?= $icon ?>" style="width:19px;height:19px;"></i>
             <span>
                 <?= htmlspecialchars(__($key), ENT_QUOTES, 'UTF-8') ?>
@@ -46,7 +46,7 @@
     <div style="margin-bottom:7px;">
         <!-- Tombol pemicu buka/tutup submenu Laporan -->
         <a href="#" onclick="toggleSubmenu(event, 'reportsSubmenu')"
-        style="display:flex; align-items:center; justify-space-between; gap:12px; padding:12px; border-radius:9px; background:<?= $isReportActive ? '#76553D' : 'white' ?>; color:<?= $isReportActive ? 'white' : '#6F6257' ?>; text-decoration:none;">
+        style="display:flex; align-items:center; justify-space-between; gap:12px; padding:12px; border-radius:9px; background:<?= $isReportActive ? '#76553D' : 'white' ?>; color:<?= $isReportActive ? 'white' : '#6F6257' ?>; text-decoration:none; font-weight:bold;">
             <div style="display:flex; align-items:center; gap:12px; flex:1;">
                 <i data-lucide="chart-no-axes-combined" style="width:19px;height:19px;"></i>
                 <span><?= htmlspecialchars(__('reports'), ENT_QUOTES, 'UTF-8') ?></span>
@@ -75,7 +75,7 @@
     <!-- Menu Pengaturan Toko / Bisnis -->
     <?php $activeSettings = $currentPage === 'settings.php'; ?>
     <a href="settings.php?business_id=<?= (int)$business_id ?>"
-    style="display:flex; align-items:center; gap:12px; padding:12px; margin-bottom:7px; border-radius:9px; background:<?= $activeSettings ? '#76553D' : 'white' ?>; color:<?= $activeSettings ? 'white' : '#6F6257' ?>; text-decoration:none;">
+    style="display:flex; align-items:center; gap:12px; padding:12px; margin-bottom:7px; border-radius:9px; background:<?= $activeSettings ? '#76553D' : 'white' ?>; color:<?= $activeSettings ? 'white' : '#6F6257' ?>; text-decoration:none; font-weight:bold;">
         <i data-lucide="settings" style="width:19px;height:19px;"></i>
         <span><?= htmlspecialchars(__('settings'), ENT_QUOTES, 'UTF-8') ?></span>
     </a>

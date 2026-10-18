@@ -39,19 +39,39 @@ return [
     'feat_multistore_desc' => 'Kelola setiap toko dengan persediaan dan laporan yang terorganisasi dalam satu akun.',
     
     // Halaman Login & Otentikasi
-    'login_subtitle'        => 'Masuk untuk mengelola stok bisnismu.',
-    'email_label'           => 'Email',
-    'email_placeholder'     => 'Masukkan email',
-    'password_label'        => 'Password',
+    'login_subtitle'    => 'Masuk untuk mengelola stok bisnismu.',
+    'email_label'    => 'Email',
+    'email_placeholder'    => 'Masukkan email',
+    'password_label'    => 'Password',
     'password_placeholder'  => 'Masukkan password',
-    'no_account'            => 'Belum punya akun?',
-    'back_to_home'          => 'Kembali ke Beranda',
-    'register_subtitle'          => 'Buat akun untuk mulai mengelola stok bisnis.',
-    'name_label'                 => 'Nama',
-    'name_placeholder'           => 'Masukkan nama',
+    'no_account'    => 'Belum punya akun?',
+    'back_to_home'      => 'Kembali ke Beranda',
+    'register_subtitle'   => 'Buat akun untuk mulai mengelola stok bisnis.',
+    'name_label'   => 'Nama',
+    'name_placeholder'      => 'Masukkan nama',
     'create_password_placeholder' => 'Buat password',
-    'create_account_btn'         => 'Buat Akun',
-    'already_have_account'       => 'Sudah punya akun?',
+    'create_account_btn'    => 'Buat Akun',
+    'already_have_account'   => 'Sudah punya akun?',
+
+    // Binis 
+    'hello' => 'Halo,',
+    'select_business_continue' => 'Pilih bisnis untuk melanjutkan',
+    'create_business_btn' => '+ Buat Bisnis',
+    'logout' => 'Keluar',
+    'delete_account' => 'Hapus Akun',
+    'no_businesses' => 'Belum ada bisnis. Yuk, buat bisnis pertamamu!',
+    'select_business_desc' => 'Pilih bisnis untuk melanjutkan',
+    'confirm_delete_account' => 'Apakah kamu yakin ingin menghapus akun? Seluruh toko dan data kamu akan terhapus secara permanen!',
+        
+    // Tambah Bisnis
+    'create_business_title'   => 'Buat Bisnis',
+    'create_business_desc'   => 'Tambahkan bisnis untuk mulai mengelola stok.',
+    'store_photo_optional'  => 'Foto Toko (Opsional)',
+    'store_name'    => 'Nama Toko',
+    'store_name_placeholder'   => 'Masukkan nama toko',
+    'notes_optional'    => 'Catatan (Opsional)',
+    'notes_business_placeholder' => 'Tambahkan catatan bisnis',
+    'back_to_business_list'    => 'Kembali ke daftar bisnis',
 
     // Dashboard bisnis
     'dashboard' => 'Dashboard',
@@ -70,8 +90,14 @@ return [
     'dashboard_ready' => 'Dashboard bisnismu siap!',
     'dashboard_placeholder' => 'Ringkasan stok, pendapatan, dan keuntungan akan ditampilkan di sini pada langkah berikutnya.',
     'menu_main' => 'MENU UTAMA',
+    'today_activity_summary'  => 'Aktivitas hari ini & ringkasan stok',
+    'total_units_available'    => 'total unit tersedia',
+    'units_received_today'   => 'Unit masuk hari ini',
+    'units_sold_today' => 'Unit terjual hari ini',
+    'todays_best_selling'  => 'Produk Paling Laris Hari Ini',
+    'no_sales_recorded_today' => 'Belum ada transaksi penjualan hari ini.',
+    'sold_today' => 'terjual hari ini',
 
-    
     // Halaman Produk
     'page_products_description' => 'Kelola produk dan persediaan bisnismu.',
     'add_product' => 'Tambah Produk',
@@ -97,7 +123,7 @@ return [
     'edit_product_description' => 'Perbarui informasi produk kamu.',
     'product_photo' => 'Foto Produk',
     'product_code' => 'Kode Produk',
-    'product_code_placeholder' => 'Masukkan kode produk (opsional)',
+    'product_code_placeholder' => 'Masukkan kode produk',
     'product_name_placeholder' => 'Masukkan nama produk',
     'select_category' => 'Pilih Kategori',
     'add_new_category' => 'Tambah Kategori Baru',
@@ -115,6 +141,26 @@ return [
     'price_invalid' => 'Harga beli dan harga jual tidak boleh negatif.',
     'stock_invalid' => 'Stok awal harus berupa bilangan bulat minimal 0.',
     'business_not_found' => 'Bisnis tidak ditemukan atau kamu tidak memiliki akses.',
+    'action'         => 'Aksi',
+    'edit'           => 'Edit',
+    'delete'         => 'Hapus',
+    'delete_product' => 'Hapus produk',
+
+    // Halaman Produk Masuk
+    'stock_in_desc'                 => 'Catat barang masuk untuk menambah persediaan bisnismu.',
+    'new_stock_in'                  => 'Catat Stok Masuk',
+    'new_stock_in_desc'             => 'Pilih produk dan masukkan jumlah barang yang diterima.',
+    'no_products_stock_in'          => 'Belum ada produk. Tambahkan produk terlebih dahulu sebelum mencatat stok masuk.',
+    'go_to_products'                => 'Buka Produk',
+    'select_product_placeholder'    => 'Pilih produk',
+    'current_stock_prompt'          => 'Stok saat ini akan ditampilkan setelah kamu memilih produk.',
+    'quantity_received'             => 'Jumlah Barang Masuk',
+    'enter_quantity_placeholder'    => 'Masukkan jumlah barang',
+    'notes_stock_in_placeholder'    => 'Contoh: pengiriman pemasok atau keterangan pengisian stok',
+    'save_stock_in'                 => 'Simpan Stok Masuk',
+    'current_stock_label'           => 'Stok saat ini: ',
+    'failed_save_stock_in'          => 'Gagal menyimpan stok masuk.',
+    'error_saving_stock_in'         => 'Terjadi kesalahan saat menyimpan stok masuk.',
 
     // Halaman Produk Keluar
     'stock_out_title' => 'Stok Keluar',
@@ -127,6 +173,28 @@ return [
     'quantity_out_placeholder' => 'Masukkan jumlah barang keluar',
     'save_stock_out' => 'Simpan Stok Keluar',
     'total_amount' => 'Total Penjualan',
+    'select_product_placeholder' => 'Pilih produk',
+    'available_stock_label'      => 'Stok tersedia:',
+    'selling_price_label'        => 'Harga Jual:',
+    'select_product_first'       => 'Pilih produk terlebih dahulu.',
+    'enter_quantity_out'         => 'Masukkan jumlah barang keluar.',
+    'insufficient_stock'         => 'Stok tidak mencukupi. Stok tersedia:',
+    'system_error'               => 'Terjadi kesalahan sistem.',
+
+    // Halaman Audit
+    'stock_audit_title' => 'Audit Stok',
+    'stock_audit_description' => 'Bandingkan stok sistem dengan stok fisik.',
+    'stock_audit_form_title' => 'Catat Audit Stok',
+    'stock_audit_form_description' => 'Bandingkan stok sistem dengan stok fisik.',
+    'system_stock' => 'Stok Sistem',
+    'physical_stock' => 'Stok Fisik',
+    'stock_difference' => 'Selisih Stok',
+    'enter_physical_stock' => 'Masukkan jumlah stok fisik',
+    'optional_notes' => 'Catatan (opsional)',
+    'save_audit' => 'Simpan Audit',
+    'select_product_first'  => 'Pilih produk terlebih dahulu.',
+    'enter_valid_physical'  => 'Masukkan stok fisik yang valid.',
+    'system_error'          => 'Terjadi kesalahan sistem.',
 
     // Halaman History
     'history_title' => 'Riwayat Transaksi',
@@ -150,18 +218,6 @@ return [
     'transaction_stock_out' => 'Stok Keluar',
     'transaction_stock_audit' => 'Audit Stok',
 
-    // Halaman Audit
-    'stock_audit_title' => 'Audit Stok',
-    'stock_audit_description' => 'Bandingkan stok sistem dengan stok fisik.',
-    'stock_audit_form_title' => 'Catat Audit Stok',
-    'stock_audit_form_description' => 'Bandingkan stok sistem dengan stok fisik.',
-    'system_stock' => 'Stok Sistem',
-    'physical_stock' => 'Stok Fisik',
-    'stock_difference' => 'Selisih Stok',
-    'enter_physical_stock' => 'Masukkan jumlah stok fisik',
-    'optional_notes' => 'Catatan (opsional)',
-    'save_audit' => 'Simpan Audit',
-
     // Halaman Reports
     'reports_description' => 'Lihat ringkasan persediaan dan performa transaksi bisnis.',
     'sort_by' => 'Urutkan berdasarkan',
@@ -176,6 +232,8 @@ return [
     'total_capital' => 'Total Harga Modal',
     'export_csv' => 'Ekspor CSV',
     'export_pdf' => 'Ekspor PDF',
+    'descending' => 'Menurun (Terbesar)',
+    'ascending'  => 'Menaik (Terkecil)',
 
     // Submenu laporan
     'analytics_title' => 'Grafik & Analitik Stok',
@@ -188,4 +246,130 @@ return [
     'analytics_desc' => 'Visualisasi tren pergerakan stok dan performa keuntungan bisnis.',
     'stock_movement_chart' => 'Grafik Pergerakan Stok',
     'profit_trend_chart' => 'Grafik Tren Keuntungan',
+    'analytics_report_title' => 'Laporan Analitik Stok & Keuntungan',
+    'period'    => 'Periode',
+    'to'   => 's/d',
+
+    // Settings
+    'delete_photo' => 'Hapus Foto',
+    'settings_title'             => 'Pengaturan',
+    'settings_description'       => 'Ubah detail bisnis dan profil akun kamu.',
+    'business_logo_photo'        => 'Foto / Logo Toko',
+    'change_photo'               => 'Ganti Foto',
+    'photo_hint'                 => 'JPG, PNG, atau WEBP (Maks 2MB)',
+    'business_name_label'        => 'Nama Bisnis',
+    'business_notes_label'       => 'Catatan Bisnis (Maks 20 karakter)',
+    'business_notes_placeholder' => 'Catatan singkat (maks 20 karakter)...',
+    'account_name_label'         => 'Nama Akun',
+    'email_address_label'        => 'Alamat Email',
+    'save_changes'               => 'Simpan Perubahan',
+    'danger_zone'                => 'Zona Berbahaya',
+    'delete_business_desc'       => 'Menghapus toko ini akan menghapus seluruh produk, kategori, dan riwayat transaksi di dalamnya secara permanen.',
+    'delete_business_btn'        => 'Hapus Toko Ini',
+    'confirm_delete_business'    => 'Apakah kamu yakin ingin menghapus toko ini secara permanen? Seluruh data produk dan transaksi akan hilang!',
+    'connection_error'           => 'Terjadi kesalahan koneksi atau respon server tidak valid.',
+    'change_photo' => 'Ganti Foto',
+
+    // ekspor PDF
+    'access_denied'          => 'Akses ditolak.',
+    'invalid_business'       => 'Bisnis tidak valid.',
+    'business_not_found'     => 'Bisnis tidak ditemukan.',
+    'print_save_pdf'         => 'Cetak / Simpan PDF',
+    'stock_report_header'    => 'Laporan Performa Stok & Inventaris',
+
+
+
+    // API
+    // Login
+    'email_password_required' => 'Email dan password wajib diisi.',
+    'invalid_credentials'     => 'Email atau password salah.',
+
+    // register
+    'all_fields_required'  => 'Semua kolom wajib diisi.',
+    'invalid_email_format' => 'Format email tidak valid.',
+    'password_exact_6'     => 'Password harus persis 6 karakter.',
+    'email_already_used'   => 'Email sudah digunakan.',
+    'account_created'      => 'Akun berhasil dibuat.',
+    'account_create_failed'=> 'Gagal membuat akun. Silakan coba lagi.',
+
+    // Create Business
+    'business_create_failed'  => 'Gagal membuat bisnis.',
+    'business_create_success' => 'Bisnis berhasil dibuat.',
+
+    // Create category
+    'session_expired'        => 'Sesi login berakhir. Silakan login kembali.',
+    'category_name_required' => 'Nama kategori wajib diisi.',
+    'business_unauthorized'  => 'Bisnis tidak ditemukan atau kamu tidak memiliki akses.',
+    'category_exists'        => 'Kategori tersebut sudah ada.',
+    'category_save_failed'   => 'Kategori gagal disimpan.',
+    'category_save_success'  => 'Kategori berhasil ditambahkan.',
+
+    // Create Product
+    'unauthorized'             => 'Akses tidak diizinkan.',
+    'product_name_code_req'    => 'Nama produk dan kode produk wajib diisi.',
+    'duplicate_product_code'   => 'Kode produk sudah digunakan. Gunakan kode produk lain.',
+    'invalid_price'            => 'Harga harus berupa angka yang valid dan tidak boleh negatif.',
+    'product_create_success'   => 'Produk berhasil dibuat.',
+
+    // Create Stok Audit
+    'invalid_data'          => 'Data tidak valid.',
+    'product_not_found'     => 'Produk tidak ditemukan.',
+    'no_stock_change'       => 'Tidak ada perubahan stok.',
+    'stock_update_failed'   => 'Gagal update stok.',
+    'audit_save_failed'     => 'Gagal menyimpan audit.',
+    'audit_save_success'    => 'Audit stok berhasil disimpan.',
+
+    // Create Stock In
+    'method_not_allowed'       => 'Metode permintaan tidak diizinkan.',
+    'invalid_business_product' => 'Bisnis atau produk tidak valid.',
+    'invalid_quantity'         => 'Jumlah barang masuk harus berupa bilangan bulat minimal 1.',
+    'transaction_start_failed' => 'Transaksi tidak dapat dimulai. Silakan coba lagi.',
+    'product_access_denied'    => 'Produk tidak ditemukan pada bisnis aktif atau kamu tidak memiliki akses.',
+    'stock_limit_exceeded'     => 'Jumlah barang melebihi batas stok yang dapat disimpan.',
+    'stock_in_save_success'    => 'Stok masuk berhasil disimpan.',
+    'stock_in_save_failed'     => 'Terjadi kesalahan saat menyimpan stok masuk. Periksa kembali dan coba lagi.',
+    'err_prep_product'      => 'Gagal menyiapkan pemeriksaan produk.',
+    'err_prep_update'       => 'Gagal menyiapkan pembaruan stok.',
+    'err_update_stock'      => 'Stok produk gagal diperbarui.',
+    'err_prep_transaction'  => 'Gagal menyiapkan pencatatan transaksi.',
+    'err_save_transaction'  => 'Transaksi stok masuk gagal disimpan.',
+    'err_commit_transaction'=> 'Transaksi tidak dapat diselesaikan.',
+
+    // Create stock out
+    'stock_out_save_success' => 'Stok keluar berhasil disimpan.',
+    'history_save_failed'    => 'Gagal menyimpan history.',
+
+    // Delete Account
+    'account_delete_success' => 'Akun kamu beserta seluruh data bisnis berhasil dihapus.',
+    'account_delete_failed'  => 'Gagal menghapus akun.',
+
+    // Delete Business
+    'business_delete_success' => 'Toko berhasil dihapus secara permanen.',
+    'business_delete_failed'  => 'Gagal menghapus toko dari database.',
+
+    // Delete Product
+    'invalid_product_data'   => 'Data produk tidak valid.',
+    'product_delete_failed'  => 'Produk gagal dihapus.',
+    'product_delete_success' => 'Produk berhasil dihapus.',
+    'product_id_not_found' => 'ID produk tidak ditemukan.',
+
+    // Update Product
+    'incomplete_product_data' => 'Data produk tidak lengkap atau tidak valid.',
+    'invalid_category'        => 'Kategori tidak valid.',
+    'category_not_found'      => 'Kategori tidak ditemukan pada bisnis ini.',
+    'invalid_expiry_date'     => 'Tanggal kedaluwarsa tidak valid.',
+    'product_update_failed'   => 'Gagal memperbarui produk.',
+    'photo_upload_failed'     => 'Upload foto gagal.',
+    'photo_max_size'          => 'Ukuran foto maksimal 5 MB.',
+    'invalid_image_file'      => 'File yang diunggah bukan gambar yang valid.',
+    'invalid_image_format'    => 'Format foto harus JPG, PNG, WEBP, atau GIF.',
+    'folder_create_failed'    => 'Folder foto produk gagal dibuat.',
+    'photo_save_failed'       => 'Foto produk gagal disimpan.',
+    'photo_info_save_failed'  => 'Gagal menyimpan informasi foto produk.',
+    'product_update_success'  => 'Produk berhasil diperbarui.',
+
+    // update settings
+    'business_name_user_required' => 'Nama bisnis dan nama pengguna tidak boleh kosong.',
+    'settings_update_success'     => 'Pengaturan berhasil diperbarui!',
+    'settings_update_failed'      => 'Gagal memperbarui pengaturan database.',
 ];

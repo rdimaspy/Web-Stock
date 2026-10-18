@@ -55,6 +55,26 @@ return [
     'create_account_btn'         => 'Create Account',
     'already_have_account'       => 'Already have an account?',
 
+    // Businesses 
+    'hello' => 'Hello,',
+    'select_business_continue' => 'Select a business to continue',
+    'create_business_btn' => '+ Create Business',
+    'logout' => 'Logout',
+    'delete_account' => 'Delete Account',
+    'no_businesses' => 'No businesses yet. Let\'s create your first business!',
+    'select_business_desc' => 'Select a business to continue',
+    'confirm_delete_account' => 'Are you sure you want to delete your account? All your businesses and data will be permanently deleted!',
+
+    // Create Businesses
+    'create_business_title'      => 'Create Business',
+    'create_business_desc'       => 'Add a business to start managing stock.',
+    'store_photo_optional'      => 'Store Photo (Optional)',
+    'store_name'                 => 'Store Name',
+    'store_name_placeholder'     => 'Enter store name',
+    'notes_optional'             => 'Notes (Optional)',
+    'notes_business_placeholder' => 'Add business notes',
+    'back_to_business_list'      => 'Back to business list',
+
     // Dashboard business
     'dashboard' => 'Dashboard',
     'products' => 'Products',
@@ -72,8 +92,14 @@ return [
     'dashboard_ready' => 'Your dashboard is ready!',
     'dashboard_placeholder' => 'Your stock, revenue, and profit summary will appear here in the next step.',
     'menu_main' => 'MAIN MENU',
+    'today_activity_summary'      => 'Today\'s activity & stock summary',
+    'total_units_available'       => 'total units available',
+    'units_received_today'        => 'Units received today',
+    'units_sold_today'            => 'Units sold today',
+    'todays_best_selling'         => 'Today\'s Best-Selling Products',
+    'no_sales_recorded_today'     => 'No sales recorded today.',
+    'sold_today'                  => 'sold today',
 
-    
     // Products page
     'page_products_description' => 'Manage your business products and inventory.',
     'add_product' => 'Add Product',
@@ -90,6 +116,10 @@ return [
     'no_products' => 'No products to display yet.',
     'uncategorized' => 'Uncategorized',
     'add_product_coming_soon' => 'The add product form will be created in the next step',
+    'action'         => 'Action',
+    'edit'           => 'Edit',
+    'delete'         => 'Delete',
+    'delete_product' => 'Delete product',
 
     // Add Product Page
     'add_product_page_description' => 'Add a new product to your business inventory.',
@@ -99,7 +129,7 @@ return [
     'edit_product_description' => 'Update your product information.',
     'product_photo' => 'Product Photo',
     'product_code' => 'Product Code',
-    'product_code_placeholder' => 'Enter product code (optional)',
+    'product_code_placeholder' => 'Enter product code',
     'product_name_placeholder' => 'Enter product name',
     'select_category' => 'Select Category',
     'add_new_category' => 'Add New Category',
@@ -118,6 +148,22 @@ return [
     'stock_invalid' => 'Initial stock must be an integer with minimum value of 0.',
     'business_not_found' => 'Business not found or you do not have access.',
 
+    // Product in page
+    'stock_in_desc'                 => 'Record products received into your business inventory.',
+    'new_stock_in'                  => 'New Stock In',
+    'new_stock_in_desc'             => 'Select a product and enter the quantity received.',
+    'no_products_stock_in'          => 'There are no products yet. Add a product first before recording stock in.',
+    'go_to_products'                => 'Go to Products',
+    'select_product_placeholder'    => 'Select a product',
+    'current_stock_prompt'          => 'Current stock will appear after you select a product.',
+    'quantity_received'             => 'Quantity Received',
+    'enter_quantity_placeholder'    => 'Enter quantity',
+    'notes_stock_in_placeholder'    => 'For example: supplier delivery or restock notes',
+    'save_stock_in'                 => 'Save Stock In',
+    'current_stock_label'           => 'Current stock: ',
+    'failed_save_stock_in'          => 'Failed to save stock in.',
+    'error_saving_stock_in'         => 'An error occurred while saving stock in.',
+
     // Product Out PAge
     'stock_out_title' => 'Stock Out',
     'stock_out_description' => 'Record outgoing product stock.',
@@ -129,6 +175,28 @@ return [
     'quantity_out_placeholder' => 'Enter outgoing quantity',
     'save_stock_out' => 'Save Stock Out',
     'total_amount' => 'Total Amount',
+    'select_product_placeholder' => 'Select a product',
+    'available_stock_label'      => 'Available stock:',
+    'selling_price_label'        => 'Selling price:',
+    'select_product_first'       => 'Please select a product first.',
+    'enter_quantity_out'         => 'Please enter the outgoing quantity.',
+    'insufficient_stock'         => 'Insufficient stock. Available stock:',
+    'system_error'               => 'A system error occurred.',
+
+    // Audit Page
+    'stock_audit_title' => 'Stock Audit',
+    'stock_audit_description' => 'Compare system stock with physical stock.',
+    'stock_audit_form_title' => 'Record Stock Audit',
+    'stock_audit_form_description' => 'Compare system stock with physical stock.',
+    'system_stock' => 'System Stock',
+    'physical_stock' => 'Physical Stock',
+    'stock_difference' => 'Stock Difference',
+    'enter_physical_stock' => 'Enter physical stock amount',
+    'optional_notes' => 'Notes (optional)',
+    'save_audit' => 'Save Audit',
+    'select_product_first'  => 'Please select a product first.',
+    'enter_valid_physical'  => 'Please enter a valid physical stock.',
+    'system_error'          => 'A system error occurred.',
 
     // History page
     'history_title' => 'Transaction History',
@@ -152,18 +220,6 @@ return [
     'transaction_stock_out' => 'Stock Out',
     'transaction_stock_audit' => 'Stock Audit',
 
-    // Audit Page
-    'stock_audit_title' => 'Stock Audit',
-    'stock_audit_description' => 'Compare system stock with physical stock.',
-    'stock_audit_form_title' => 'Record Stock Audit',
-    'stock_audit_form_description' => 'Compare system stock with physical stock.',
-    'system_stock' => 'System Stock',
-    'physical_stock' => 'Physical Stock',
-    'stock_difference' => 'Stock Difference',
-    'enter_physical_stock' => 'Enter physical stock amount',
-    'optional_notes' => 'Notes (optional)',
-    'save_audit' => 'Save Audit',
-
     // Reports Page
     'reports_description' => 'View inventory summary and business transaction performance.',
     'sort_by' => 'Sort by',
@@ -178,6 +234,8 @@ return [
     'total_capital' => 'Total Capital Value',
     'export_csv' => 'Export CSV',
     'export_pdf' => 'Export PDF',
+    'descending' => 'Descending',
+    'ascending'  => 'Ascending',
 
     // Submenu reports
     'analytics_title' => 'Stock Analytics & Charts',
@@ -190,4 +248,130 @@ return [
     'analytics_desc' => 'Visualization of stock movement trends and business profit performance.',
     'stock_movement_chart' => 'Stock Movement Chart',
     'profit_trend_chart' => 'Profit Trend Chart',
+    'analytics_report_title' => 'Stock & Profit Analytics Report',
+    'period'    => 'Period',
+    'to'  => 'to',
+
+    // Settings
+    'delete_photo' => 'Delete Photo',
+    'settings_title'             => 'Settings',
+    'settings_description'       => 'Update your business details and profile.',
+    'business_logo_photo'        => 'Business Logo / Photo',
+    'change_photo'               => 'Change Photo',
+    'photo_hint'                 => 'JPG, PNG, or WEBP (Max 2MB)',
+    'business_name_label'        => 'Business Name',
+    'business_notes_label'       => 'Business Notes (Max 20 chars)',
+    'business_notes_placeholder' => 'Brief note (max 20 chars)...',
+    'account_name_label'         => 'Account Name',
+    'email_address_label'        => 'Email Address',
+    'save_changes'               => 'Save Changes',
+    'danger_zone'                => 'Danger Zone',
+    'delete_business_desc'       => 'Deleting this business will permanently erase all associated products, categories, and transaction history.',
+    'delete_business_btn'        => 'Delete Business',
+    'confirm_delete_business'    => 'Are you sure you want to permanently delete this business? All data will be lost!',
+    'connection_error'           => 'A connection error occurred or the server response is invalid.',
+    'change_photo' => 'Change Photo',
+
+    // Export PDF
+    'access_denied'   => 'Access denied.',
+    'invalid_business'  => 'Invalid business.',
+    'business_not_found'   => 'Business not found.',
+    'print_save_pdf'   => 'Print / Save PDF',
+    'stock_report_header'  => 'Stock & Inventory Performance Report',
+
+
+
+    // API
+    // Login
+    'email_password_required' => 'Email and password are required.',
+    'invalid_credentials'     => 'Invalid email or password.',
+
+    // register
+    'all_fields_required'  => 'All fields are required.',
+    'invalid_email_format' => 'Invalid email format.',
+    'password_exact_6'     => 'Password must be exactly 6 characters.',
+    'email_already_used'   => 'Email is already in use.',
+    'account_created'      => 'Account created successfully.',
+    'account_create_failed'=> 'Failed to create account. Please try again.',
+
+    // Create Business
+    'business_create_failed'  => 'Failed to create business.',
+    'business_create_success' => 'Business created successfully.',
+
+    // create category
+    'session_expired'        => 'Session expired. Please log in again.',
+    'category_name_required' => 'Category name is required.',
+    'business_unauthorized'  => 'Business not found or access denied.',
+    'category_exists'        => 'That category already exists.',
+    'category_save_failed'   => 'Failed to save category.',
+    'category_save_success'  => 'Category added successfully.',
+
+    // Create Product
+    'unauthorized'             => 'Unauthorized',
+    'product_name_code_req'    => 'Product name and product code are required.',
+    'duplicate_product_code'   => 'Product code is already in use. Please use another code.',
+    'invalid_price'            => 'Price must be a valid number and cannot be negative.',
+    'product_create_success'   => 'Product created successfully.',
+
+    // Create Stock Audit
+    'invalid_data'          => 'Invalid data.',
+    'product_not_found'     => 'Product not found.',
+    'no_stock_change'       => 'No stock change.',
+    'stock_update_failed'   => 'Failed to update stock.',
+    'audit_save_failed'     => 'Failed to save audit.',
+    'audit_save_success'    => 'Stock audit saved successfully.',
+
+    // Create Stock in
+    'method_not_allowed'       => 'Method not allowed.',
+    'invalid_business_product' => 'Invalid business or product.',
+    'invalid_quantity'         => 'Quantity must be an integer of at least 1.',
+    'transaction_start_failed' => 'Transaction could not be started. Please try again.',
+    'product_access_denied'    => 'Product not found in active business or access denied.',
+    'stock_limit_exceeded'     => 'Quantity exceeds maximum stock limit.',
+    'stock_in_save_success'    => 'Stock in saved successfully.',
+    'stock_in_save_failed'     => 'An error occurred while saving stock in. Please check and try again.',
+    'err_prep_product'      => 'Failed to prepare product check.',
+    'err_prep_update'       => 'Failed to prepare stock update.',
+    'err_update_stock'      => 'Failed to update product stock.',
+    'err_prep_transaction'  => 'Failed to prepare transaction recording.',
+    'err_save_transaction'  => 'Failed to save stock in transaction.',
+    'err_commit_transaction'=> 'Transaction could not be completed.',
+
+    // Create Stock Out
+    'stock_out_save_success' => 'Stock out saved successfully.',
+    'history_save_failed'    => 'Failed to save transaction history.',
+
+    // Delete Account
+    'account_delete_success' => 'Your account and all business data have been successfully deleted.',
+    'account_delete_failed'  => 'Failed to delete account.',
+
+    // Delete Business
+    'business_delete_success' => 'Store successfully deleted permanently.',
+    'business_delete_failed'  => 'Failed to delete store from database.',
+
+    // Delete Product
+    'invalid_product_data'   => 'Invalid product data.',
+    'product_delete_failed'  => 'Failed to delete product.',
+    'product_delete_success' => 'Product deleted successfully.',
+    'product_id_not_found' => 'Product ID not found.',
+
+    // Update Product
+    'incomplete_product_data' => 'Incomplete or invalid product data.',
+    'invalid_category'        => 'Invalid category.',
+    'category_not_found'      => 'Category not found in this business.',
+    'invalid_expiry_date'     => 'Invalid expiration date.',
+    'product_update_failed'   => 'Failed to update product.',
+    'photo_upload_failed'     => 'Photo upload failed.',
+    'photo_max_size'          => 'Maximum photo size is 5 MB.',
+    'invalid_image_file'      => 'Uploaded file is not a valid image.',
+    'invalid_image_format'    => 'Photo format must be JPG, PNG, WEBP, or GIF.',
+    'folder_create_failed'    => 'Failed to create product photo folder.',
+    'photo_save_failed'       => 'Failed to save product photo.',
+    'photo_info_save_failed'  => 'Failed to save product photo information.',
+    'product_update_success'  => 'Product updated successfully.',
+
+    // update settings
+    'business_name_user_required' => 'Business name and user name cannot be empty.',
+    'settings_update_success'     => 'Settings updated successfully!',
+    'settings_update_failed'      => 'Failed to update database settings.',
 ];

@@ -72,14 +72,12 @@ $query = mysqli_stmt_get_result($stmt);
             <!-- Sapaan Pengguna -->
             <div>
                 <h2 style="margin:0;">
-                    <?= $lang === 'en' ? 'Hello,' : 'Halo,' ?>
+                    <?= htmlspecialchars(__('hello'), ENT_QUOTES, 'UTF-8') ?>
                     <?= htmlspecialchars($_SESSION['user_name'] ?? '', ENT_QUOTES, 'UTF-8') ?>
                 </h2>
 
                 <p style="color:#81776D; margin-top:8px; margin-bottom:0;">
-                    <?= $lang === 'en'
-                        ? 'Select a business to continue'
-                        : 'Pilih bisnis untuk melanjutkan' ?>
+                    <?= htmlspecialchars(__('select_business_desc'), ENT_QUOTES, 'UTF-8') ?>
                 </p>
             </div>
 
@@ -120,7 +118,7 @@ $query = mysqli_stmt_get_result($stmt);
                 <!-- TOMBOL BUAT BISNIS -->
                 <a href="create-business.php" class="btn-action"
                 style="background:#76553D; color:white; padding:12px 20px; border-radius:10px; text-decoration:none; font-size:14px; font-weight:600; white-space:nowrap; display:inline-flex; align-items:center;">
-                    <?= $lang === 'en' ? '+ Create Business' : '+ Buat Bisnis' ?>
+                    <?= htmlspecialchars(__('create_business_btn'), ENT_QUOTES, 'UTF-8') ?>
                 </a>
 
                 <!-- Dropdown Pengaturan Akun & Logout -->
@@ -135,13 +133,12 @@ $query = mysqli_stmt_get_result($stmt);
                         <!-- Pilihan Keluar / Logout -->
                         <a href="logout.php" style="display:flex; align-items:center; gap:8px; padding:10px; border-radius:8px; color:#49382D; text-decoration:none; font-size:13px; font-weight:600;">
                             <i data-lucide="log-out" style="width:16px; height:16px; color:#76553D;"></i>
-                            <?= $lang === 'en' ? 'Logout' : 'Keluar' ?>
+                            <?= htmlspecialchars(__('logout'), ENT_QUOTES, 'UTF-8') ?>
                         </a>
 
-                        <!-- Pilihan Hapus Akun -->
                         <button type="button" onclick="deleteUserAccount()" style="width:100%; display:flex; align-items:center; gap:8px; padding:10px; border:0; background:#B45F5F; border-radius:8px; color:white; cursor:pointer; font-size:13px; font-weight:600; text-align:left;">
                             <i data-lucide="trash-2" style="width:16px; height:16px; color:white;"></i>
-                            <?= $lang === 'en' ? 'Delete Account' : 'Hapus Akun' ?>
+                            <?= htmlspecialchars(__('delete_account'), ENT_QUOTES, 'UTF-8') ?>
                         </button>
                     </div>
                 </div>
@@ -162,9 +159,7 @@ $query = mysqli_stmt_get_result($stmt);
                     <div style="grid-column:1 / -1; text-align:center; padding:40px 20px; color:#81776D;">
                         <i data-lucide="store" style="width:40px; height:40px; margin-bottom:12px;"></i>
                         <p style="margin:0; font-size:15px; line-height:1.6;">
-                            <?= $lang === 'en'
-                                ? "No businesses yet. Let's create your first business!"
-                                : 'Belum ada bisnis. Yuk, buat bisnis pertamamu!' ?>
+                            <?= htmlspecialchars(__('no_businesses'), ENT_QUOTES, 'UTF-8') ?>
                         </p>
                     </div>
                 <?php else: ?>
@@ -176,11 +171,13 @@ $query = mysqli_stmt_get_result($stmt);
                         <!-- FOTO ATAU INISIAL BISNIS -->
                         <?php if (
                             !empty($business['photo']) &&
-                            file_exists(__DIR__ . '/uploads/businesses/' . $business['id'] . '/' . $business['photo'])
+                            file_exists(__DIR__ . '/uploads/businesses/' . $business['photo'])
                         ): ?>
-                            <img src="uploads/businesses/<?= (int) $business['id'] ?>/<?= htmlspecialchars($business['photo'], ENT_QUOTES, 'UTF-8') ?>" alt="Foto bisnis"
+                            <!-- Tampilkan foto bisnis jika file ada di folder uploads/businesses/ -->
+                            <img src="uploads/businesses/<?= htmlspecialchars($business['photo'], ENT_QUOTES, 'UTF-8') ?>" alt="Foto bisnis"
                                 style="width:56px; height:56px; flex-shrink:0; border-radius:10px; object-fit:cover;">
                         <?php else: ?>
+                            <!-- Tampilkan inisial huruf jika tidak ada foto -->
                             <div style="width:56px; height:56px; flex-shrink:0; border-radius:10px; background:#76553D; color:white; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:bold;">
                                 <?= htmlspecialchars(strtoupper(substr($business['business_name'], 0, 1)), ENT_QUOTES, 'UTF-8') ?>
                             </div>
@@ -228,9 +225,7 @@ lucide.createIcons();
 async function deleteUserAccount() {
     // Tampilkan kotak dialog konfirmasi penghapusan akun
     const confirmDelete = confirm(
-        <?= json_encode($lang === 'en'
-            ? 'Are you sure you want to delete your account? All your businesses and data will be permanently deleted!'
-            : 'Apakah kamu yakin ingin menghapus akun? Seluruh toko dan data kamu akan terhapus secara permanen!') ?>
+        <?= json_encode(__('confirm_delete_account')) ?>
     );
 
     // Batalkan proses jika pengguna memilih batal

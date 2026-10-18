@@ -2,7 +2,7 @@
 // Cek sesi autentikasi pengguna
 session_start();
 if (!isset($_SESSION['user_id'])) {
-    exit("Akses ditolak.");
+    exit(htmlspecialchars(__('access_denied'), ENT_QUOTES, 'UTF-8'));
 }
 
 // Memuat file konfigurasi database, bahasa, dan formatter mata uang
@@ -13,7 +13,7 @@ require_once __DIR__ . '/../includes/currency.php';
 // Validasi ID bisnis aktif dari parameter URL
 $business_id = filter_input(INPUT_GET, 'business_id', FILTER_VALIDATE_INT);
 if (!$business_id) {
-    exit("Bisnis tidak valid.");
+    exit(htmlspecialchars(__('invalid_business'), ENT_QUOTES, 'UTF-8'));
 }
 
 // Menyiapkan query untuk mengambil data nama bisnis dan mata uang aktif
@@ -22,7 +22,7 @@ mysqli_stmt_bind_param($stmt_b, "ii", $business_id, $_SESSION['user_id']);
 mysqli_stmt_execute($stmt_b);
 $business = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt_b));
 if (!$business) {
-    exit("Bisnis tidak ditemukan.");
+    exit(htmlspecialchars(__('business_not_found'), ENT_QUOTES, 'UTF-8'));
 }
 
 // Filter tanggal laporan (default ke tanggal awal bulan ini dan hari ini)
@@ -77,43 +77,52 @@ $total_modal_value = (float)(mysqli_fetch_assoc(mysqli_stmt_get_result($stmt_m))
 
 
 <!DOCTYPE html>
-<html lang="id">
+<html lang="<?= htmlspecialchars($lang, ENT_QUOTES, 'UTF-8') ?>">
+    
 <head>
     <meta charset="UTF-8">
     <title>Laporan_Stok_<?= htmlspecialchars($business['business_name']) ?></title>
     <style>
         /* CSS khusus format tampilan dokumen cetak / PDF */
         body { font-family: Arial, sans-serif; color: #333; margin: 20px; font-size: 12px; }
+
         .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #76553D; padding-bottom: 10px; }
+        
         .header h2 { margin: 0; color: #76553D; }
+        
         .info { margin-bottom: 15px; display: flex; justify-content: space-between; }
+        
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        
         th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        
         th { background: #F5EFE8; color: #76553D; }
+        
         @media print {
             body { margin: 0; }
             .no-print { display: none; }
         }
     </style>
 </head>
+
 <body>
 
-    <!-- Tombol pemicu cetak manual untuk cadangan jika tidak berjalan otomatis -->
+    <!-- Tombol cetak manual untuk cadangan jika tidak berjalan otomatis -->
     <div class="no-print" style="margin-bottom:15px; text-align:right;">
         <button onclick="window.print()" style="padding:8px 16px; background:#76553D; color:white; border:0; border-radius:6px; cursor:pointer;">
-            Cetak / Simpan PDF
+            <?= htmlspecialchars(__('print_save_pdf'), ENT_QUOTES, 'UTF-8') ?>
         </button>
     </div>
 
     <!-- Judul dan header dokumen cetak -->
     <div class="header">
-        <h2><?= htmlspecialchars($business['business_name']) ?></h2>
-        <p style="margin:5px 0 0;">Laporan Performa Stok & Inventaris</p>
+        <h2><?= htmlspecialchars($business['business_name'], ENT_QUOTES, 'UTF-8') ?></h2>
+        <p style="margin:5px 0 0;"><?= htmlspecialchars(__('stock_report_header'), ENT_QUOTES, 'UTF-8') ?></p>
     </div>
 
     <!-- Informasi periode filter laporan -->
     <div class="info">
-        <span><strong>Periode:</strong> <?= htmlspecialchars($date_from) ?> s/d <?= htmlspecialchars($date_to) ?></span>
+        <span><strong><?= htmlspecialchars(__('period'), ENT_QUOTES, 'UTF-8') ?>:</strong> <?= htmlspecialchars($date_from) ?> <?= htmlspecialchars(__('to'), ENT_QUOTES, 'UTF-8') ?> <?= htmlspecialchars($date_to) ?></span>
     </div>
 
     <!-- Tabel ringkasan statistik (Summary Cards) pada cetakan PDF -->
@@ -121,38 +130,38 @@ $total_modal_value = (float)(mysqli_fetch_assoc(mysqli_stmt_get_result($stmt_m))
         <tr>
             <!-- Card Total Produk -->
             <td style="padding:10px; border:1px solid #ccc; background:#f9f9f9;">
-                <small>Total Produk</small><br>
+                <small><?= htmlspecialchars(__('total_products'), ENT_QUOTES, 'UTF-8') ?></small>
                 <strong><?= number_format($total_products) ?></strong>
             </td>
 
             <!-- Card Total Stok -->
             <td style="padding:10px; border:1px solid #ccc; background:#f9f9f9;">
-                <small>Total Stok</small><br>
+                <small><?= htmlspecialchars(__('total_stock'), ENT_QUOTES, 'UTF-8') ?></small>
                 <strong><?= number_format($total_stock) ?></strong>
             </td>
 
             <!-- Card Total Stok Masuk -->
             <td style="padding:10px; border:1px solid #ccc; background:#f9f9f9;">
-                <small>Stok Masuk</small><br>
+                <small><?= htmlspecialchars(__('stock_in'), ENT_QUOTES, 'UTF-8') ?></small>
                 <strong><?= number_format($total_stock_in) ?></strong>
             </td>
 
             <!-- Card Total Stok Keluar -->
             <td style="padding:10px; border:1px solid #ccc; background:#f9f9f9;">
-                <small>Stok Keluar</small><br>
+                <small><?= htmlspecialchars(__('stock_out'), ENT_QUOTES, 'UTF-8') ?></small>
                 <strong><?= number_format($total_stock_out) ?></strong>
             </td>
         </tr>
         <tr>
             <!-- Card Total Harga Modal -->
             <td colspan="2" style="padding:10px; border:1px solid #ccc; background:#f9f9f9;">
-                <small>Total Harga Modal</small><br>
+                <small><?= htmlspecialchars(__('total_capital'), ENT_QUOTES, 'UTF-8') ?></small>
                 <strong><?= formatMoneyPHP($total_modal_value, $business['currency']) ?></strong>
             </td>
 
             <!-- Card Total Keuntungan -->
             <td colspan="2" style="padding:10px; border:1px solid #ccc; background:#f9f9f9;">
-                <small>Keuntungan</small><br>
+                <small><?= htmlspecialchars(__('profit'), ENT_QUOTES, 'UTF-8') ?></small>
                 <strong><?= formatMoneyPHP($total_profit, $business['currency']) ?></strong>
             </td>
         </tr>
@@ -162,18 +171,18 @@ $total_modal_value = (float)(mysqli_fetch_assoc(mysqli_stmt_get_result($stmt_m))
     <table>
         <thead>
             <tr>
-                <th>Nama Produk</th>
-                <th>Stok Masuk</th>
-                <th>Stok Keluar</th>
-                <th>Keuntungan</th>
-                <th>Stok Saat Ini</th>
+                <th><?= htmlspecialchars(__('product_name'), ENT_QUOTES, 'UTF-8') ?></th>
+                <th><?= htmlspecialchars(__('stock_in'), ENT_QUOTES, 'UTF-8') ?></th>
+                <th><?= htmlspecialchars(__('stock_out'), ENT_QUOTES, 'UTF-8') ?></th>
+                <th><?= htmlspecialchars(__('profit'), ENT_QUOTES, 'UTF-8') ?></th>
+                <th><?= htmlspecialchars(__('current_stock'), ENT_QUOTES, 'UTF-8') ?></th>
             </tr>
         </thead>
         <tbody>
             <!-- Cek jika tidak ada data laporan -->
             <?php if (mysqli_num_rows($reports) === 0): ?>
                 <tr>
-                    <td colspan="5" style="text-align:center;">Tidak ada data laporan.</td>
+                    <td colspan="5" style="text-align:center;"><?= htmlspecialchars(__('no_data'), ENT_QUOTES, 'UTF-8') ?></td>
                 </tr>
             <?php else: ?>
                 <!-- Looping menampilkan baris data produk -->

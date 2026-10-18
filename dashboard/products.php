@@ -23,11 +23,12 @@ $sql = "SELECT p.*, c.category_name FROM products p LEFT JOIN categories c ON p.
 $params = [$business_id];
 $types = "i";
 
-// Filter pencarian nama produk (keyword)
+// Filter pencarian nama produk atau kode produk
 if ($search !== '') {
-    $sql .= " AND p.product_name LIKE ?";
+    $sql .= " AND (p.product_name LIKE ? OR p.product_code LIKE ?)";
     $params[] = "%" . $search . "%";
-    $types .= "s";
+    $params[] = "%" . $search . "%";
+    $types .= "ss";
 }
 
 // Filter pencarian dr kategori
@@ -37,8 +38,18 @@ if ($category_id !== false && $category_id !== null) {
     $types .= "i";
 }
 
-// Urutkan daftar produk berdasarkan nama secara A-Z
-$sql .= " ORDER BY p.product_name ASC";
+// Ambil pilihan urutan kode produk dari URL (ASC atau DESC)
+$sort_code = $_GET['sort_code'] ?? '';
+
+// Tentukan aturan pengurutan berdasarkan pilihan user
+if ($sort_code === 'ASC') {
+    $sql .= " ORDER BY p.product_code ASC";
+} elseif ($sort_code === 'DESC') {
+    $sql .= " ORDER BY p.product_code DESC";
+} else {
+    // Default urutan berdasarkan nama produk A-Z
+    $sql .= " ORDER BY p.product_name ASC";
+}
 
 // Prepare statement query dinamis, menyesuaikan filter, eksekusi dan simpan hasil
 $stmt = mysqli_prepare($conn, $sql);
@@ -75,7 +86,7 @@ $products = mysqli_stmt_get_result($stmt);
         <!-- HEADER -->
         <?php require __DIR__ . '/components/header.php'; ?>
 
-        <!-- Judul dan filter + fitur tabel yang scroll -->
+        <!-- Judul dan filter -->
         <section style="padding:32px; display:flex; flex-direction:column; box-sizing:border-box;">
             <div style="display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom:25px; flex-shrink:0;">
                 <div>
@@ -83,7 +94,7 @@ $products = mysqli_stmt_get_result($stmt);
                     <p style="color:#81776D; margin:10px 0 0;"><?= htmlspecialchars(__('page_products_description'), ENT_QUOTES, 'UTF-8') ?></p>
                 </div>
 
-                <button type="button" onclick="openAddProduct()" style="display:flex; align-items:center; gap:8px; padding:12px 17px; background:#76553D; color:white; border:0; border-radius:9px; cursor:pointer;">
+                <button type="button" onclick="openAddProduct()" style="display:flex; align-items:center; gap:8px; padding:12px 17px; background:#76553D; color:white; border:0; border-radius:9px; cursor:pointer; font-weight:bold;">
                     <i data-lucide="plus" style="width:18px;height:18px;"></i><?= htmlspecialchars(__('add_product'), ENT_QUOTES, 'UTF-8') ?>
                 </button>
             </div>
@@ -124,10 +135,20 @@ $products = mysqli_stmt_get_result($stmt);
                     <?php endwhile; ?>
                 </select>
 
+                <!-- Dropdown Filter Urutan Kode Produk -->
+                <select name="sort_code" style="min-width:150px; padding:12px; border:1px solid #E9E1D7; border-radius:8px; background:white; color:#49382D;">
+                    <option value=""><?= htmlspecialchars(__('sort_code'), ENT_QUOTES, 'UTF-8') ?></option>
+                    <option value="ASC" <?= ($_GET['sort_code'] ?? '') === 'ASC' ? 'selected' : '' ?>>A - Z (ASC)</option>
+                    <option value="DESC" <?= ($_GET['sort_code'] ?? '') === 'DESC' ? 'selected' : '' ?>>Z - A (DESC)</option>
+                </select>
+
                 <!-- Tombol submit filter -->
-                <button type="submit" style="padding:12px 18px; background:#76553D; color:white; border:0; border-radius:8px; cursor:pointer;"><?= htmlspecialchars(__('search'), ENT_QUOTES, 'UTF-8') ?></button>
+                <button type="submit" style="padding:12px 18px; background:#76553D; color:white; border:0; border-radius:8px; cursor:pointer; font-weight:600;"><?= htmlspecialchars(__('search'), ENT_QUOTES, 'UTF-8') ?></button>
+
                 <!-- Tombol reset -->
-                <a href="products.php?business_id=<?= $business_id ?>" style="display:flex; align-items:center; padding:12px; color:#76553D; text-decoration:none;"><?= htmlspecialchars(__('reset'), ENT_QUOTES, 'UTF-8') ?></a>
+                <a href="products.php?business_id=<?= $business_id ?>" style="display:inline-flex; align-items:center; justify-content:center; padding:12px 18px; background:#B45F5F; color:white; border-radius:8px; text-decoration:none; font-weight:600; font-size:13px; box-sizing:border-box;">
+                    <?= htmlspecialchars(__('reset'), ENT_QUOTES, 'UTF-8') ?>
+                </a>
             </form>
 
             <!-- TABEL PRODUK -->
@@ -139,13 +160,14 @@ $products = mysqli_stmt_get_result($stmt);
                         <!-- Kolom nama produk -->
                         <tr style="background:#F5EFE8; text-align:left;">
                             <th style="position:sticky; top:0; z-index:2; padding:12px; width:18%; background:#F5EFE8;"><?= htmlspecialchars(__('product_name'), ENT_QUOTES, 'UTF-8') ?></th>
+                            <th style="position:sticky; top:0; z-index:2; padding:12px; width:12%; background:#F5EFE8;"><?= htmlspecialchars(__('product_code'), ENT_QUOTES, 'UTF-8') ?></th>
                             <th style="position:sticky; top:0; z-index:2; padding:12px; width:12%; background:#F5EFE8;"><?= htmlspecialchars(__('category'), ENT_QUOTES, 'UTF-8') ?></th>
                             <th style="position:sticky; top:0; z-index:2; padding:12px; width:15%; background:#F5EFE8;"><?= htmlspecialchars(__('notes'), ENT_QUOTES, 'UTF-8') ?></th>
                             <th style="position:sticky; top:0; z-index:2; padding:12px; width:13%; background:#F5EFE8;"><?= htmlspecialchars(__('purchase_price'), ENT_QUOTES, 'UTF-8') ?></th>
                             <th style="position:sticky; top:0; z-index:2; padding:12px; width:13%; background:#F5EFE8;"><?= htmlspecialchars(__('selling_price'), ENT_QUOTES, 'UTF-8') ?></th>
                             <th style="position:sticky; top:0; z-index:2; padding:12px; width:7%; background:#F5EFE8;"><?= htmlspecialchars(__('stock'), ENT_QUOTES, 'UTF-8') ?></th>
                             <th style="position:sticky; top:0; z-index:2; padding:12px; width:12%; background:#F5EFE8;"><?= htmlspecialchars(__('expiration_date'), ENT_QUOTES, 'UTF-8') ?></th>
-                            <th style="position:sticky; top:0; z-index:2; padding:12px; width:10%; background:#F5EFE8;">Action</th>
+                            <th style="position:sticky; top:0; z-index:2; padding:12px; width:10%; background:#F5EFE8;"><?= htmlspecialchars(__('action'), ENT_QUOTES, 'UTF-8') ?></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -167,6 +189,10 @@ $products = mysqli_stmt_get_result($stmt);
                                             <span style="font-weight:600; display:block; max-width:180px; word-break:break-word; overflow-wrap:anywhere;"><?= htmlspecialchars($product['product_name'], ENT_QUOTES, 'UTF-8') ?></span>
                                         </div>
                                     </td>
+                                    <!-- Kode Produk -->
+                                    <td style="padding:10px 12px; color:#49382D; font-size:13px; font-weight:600;">
+                                        <?= htmlspecialchars($product['product_code'], ENT_QUOTES, 'UTF-8') ?>
+                                    </td>
                                     <!-- Kategori-->
                                     <td style="padding:10px 12px; color:#81776D; font-size:13px"><?= htmlspecialchars($product['category_name'] ?? __('uncategorized'), ENT_QUOTES, 'UTF-8') ?></td>
                                     <!-- Catatam -->
@@ -186,11 +212,11 @@ $products = mysqli_stmt_get_result($stmt);
                                     <td style="padding:10px 12px;">
                                         <div style="display:flex; gap:8px; align-items:center;">
                                             <!-- Tombol edit -->
-                                            <button type="button" onclick="openEditProduct(<?= $product['id'] ?>)" style="width:32px; height:32px; border:none; background:#F5EFE8; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#76553D;" title="Edit">
+                                            <button type="button" onclick="openEditProduct(<?= (int) $product['id'] ?>)" style="width:32px; height:32px; border:none; background:#F5EFE8; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#76553D;" title="<?= htmlspecialchars(__('edit'), ENT_QUOTES, 'UTF-8') ?>">
                                                 <i data-lucide="pencil" style="width:16px;height:16px;"></i>
                                             </button>
                                             <!-- Tombol hapus -->
-                                            <button type="button" onclick="deleteProduct(<?= (int) $product['id'] ?>)" style="width:32px; height:32px; border:none; background:#FBECEC; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#B45F5F;" title="<?= $lang === 'en' ? 'Delete' : 'Hapus' ?>" aria-label="<?= $lang === 'en' ? 'Delete product' : 'Hapus produk' ?>">
+                                            <button type="button" onclick="deleteProduct(<?= (int) $product['id'] ?>)" style="width:32px; height:32px; border:none; background:#FBECEC; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#B45F5F;" title="<?= htmlspecialchars(__('delete'), ENT_QUOTES, 'UTF-8') ?>" aria-label="<?= htmlspecialchars(__('delete_product'), ENT_QUOTES, 'UTF-8') ?>">
                                                 <i data-lucide="trash-2" style="width:16px;height:16px;"></i>
                                             </button>
                                         </div>
@@ -200,7 +226,7 @@ $products = mysqli_stmt_get_result($stmt);
                         <!-- Tampilan baris khusus saat data produk tidak ditemukan, dengan menggabungkan 8 kolom -->
                         <?php else: ?>
                             <tr>
-                                <td colspan="8" style="padding:35px; text-align:center; color:#81776D;"><?= htmlspecialchars(__('no_products'), ENT_QUOTES, 'UTF-8') ?></td>
+                                <td colspan="9" style="padding:35px; text-align:center; color:#81776D;"><?= htmlspecialchars(__('no_products'), ENT_QUOTES, 'UTF-8') ?></td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
@@ -241,14 +267,14 @@ $products = mysqli_stmt_get_result($stmt);
 
                 <!-- Nama Produk -->
                 <div style="margin-bottom:18px;">
-                    <label style="display:block; margin-bottom:8px; font-weight:600;"><?= htmlspecialchars(__('product_name'), ENT_QUOTES, 'UTF-8') ?></label>
+                    <label style="display:block; margin-bottom:8px; font-weight:600;"><?= htmlspecialchars(__('product_name'), ENT_QUOTES, 'UTF-8') ?><span style="color:red;"> *</span></label>
                     <input type="text" name="product_name" placeholder="<?= htmlspecialchars(__('product_name_placeholder'), ENT_QUOTES, 'UTF-8') ?>" style="width:100%; box-sizing:border-box; padding:12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
                 </div>
 
                 <!-- Kode Produk -->
                 <div style="margin-bottom:18px;">
-                    <label style="display:block; margin-bottom:8px; font-weight:600;"><?= htmlspecialchars(__('product_code'), ENT_QUOTES, 'UTF-8') ?></label>
-                    <input type="text" name="product_code" readonly placeholder="<?= htmlspecialchars(__('product_code_placeholder'), ENT_QUOTES, 'UTF-8') ?>" style="width:100%; box-sizing:border-box; padding:12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
+                    <label style="display:block; margin-bottom:8px; font-weight:600;"><?= htmlspecialchars(__('product_code'), ENT_QUOTES, 'UTF-8') ?> <span style="color:red;">*</span></label>
+                    <input type="text" name="product_code" required placeholder="<?= htmlspecialchars(__('product_code_placeholder'), ENT_QUOTES, 'UTF-8') ?>" style="width:100%; box-sizing:border-box; padding:12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
                 </div>
 
                 <!-- Kategori -->
@@ -268,7 +294,7 @@ $products = mysqli_stmt_get_result($stmt);
                     <label style="display:block; margin-bottom:8px; font-weight:600;"><?= htmlspecialchars(__('new_category_name'), ENT_QUOTES, 'UTF-8') ?></label>
                     <input type="text" id="newCategoryInput" name="new_category" placeholder="<?= htmlspecialchars(__('new_category_name'), ENT_QUOTES, 'UTF-8') ?>" style="width:100%; box-sizing:border-box; padding:12px; border:1px solid #E9E1D7; border-radius:8px;">
                     <button type="button" id="saveCategoryButton" onclick="saveNewCategory()" style="margin-top:12px; padding:10px 16px; border:0; border-radius:8px; background:#76553D; color:white; font-weight:600; cursor:pointer;">
-                        Simpan Kategori
+                        <?= htmlspecialchars(__('save_category'), ENT_QUOTES, 'UTF-8') ?>
                     </button>
                 </div>
 
@@ -325,7 +351,10 @@ const translations = {
     add_product_title:"<?= __('add_product_title') ?>",
     add_product_description:"<?= __('add_product_description') ?>",
     edit_product_title:"<?= __('edit_product_title') ?>",
-    edit_product_description:"<?= __('edit_product_description') ?>"
+    edit_product_description:"<?= __('edit_product_description') ?>",
+    save_category:"<?= __('save_category') ?>",
+    saving:"<?= __('saving') ?>",
+    category_name_required:"<?= __('category_name_required') ?>"
 }
 
 // Flag penanda status (false = Tambah, true = Edit)
@@ -424,7 +453,7 @@ async function saveNewCategory() {
 
     // Validasi input nama kategori tidak boleh kosong
     if (!categoryName) {
-        alert('Nama kategori wajib diisi.');
+        alert(translations.category_name_required);
         input.focus();
         return;
     }
@@ -436,7 +465,7 @@ async function saveNewCategory() {
 
     // Nonaktifkan tombol dan ubah teks saat proses menyimpan
     button.disabled = true;
-    button.textContent = 'Menyimpan...';
+    button.textContent = translations.saving;
 
     try {
         // Kirim data kategori baru
@@ -481,7 +510,7 @@ async function saveNewCategory() {
     } finally {
         // Kembalikan tombol ke status aktif setelah proses selesai
         button.disabled = false;
-        button.textContent = 'Simpan Kategori';
+        button.textContent = translations.save_category;
     }
 }
 
@@ -628,9 +657,7 @@ document.querySelectorAll('.currency-input').forEach(input => {
 async function deleteProduct(productId) {
     // Tampilkan konfirmasi penghapusan sesuai pilihan bahasa aktif
     const confirmed = confirm(
-        <?= json_encode($lang === 'en'
-            ? 'Are you sure you want to permanently delete this product?'
-            : 'Apakah kamu yakin ingin menghapus produk ini secara permanen?') ?>
+        <?= json_encode(__('delete_product_confirm')) ?>
     );
 
     // Batal jalankan fungsi jika pengguna memilih batal

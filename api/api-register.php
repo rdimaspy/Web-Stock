@@ -1,6 +1,7 @@
 <?php
-// Memuat file konfigurasi koneksi database
+// Memuat file konfigurasi koneksi database & pengelola bahasa
 include "../config/database.php";
+require_once __DIR__ . '/../includes/language.php';
 
 // Memastikan permintaan dikirimkan khusus melalui metode POST
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
@@ -15,8 +16,9 @@ $password = $_POST["password"] ?? "";
 
 // Memvalidasi agar seluruh kolom formulir terisi
 if ($name === "" || $email === "" || $password === "") {
+    $msg = json_encode(__('all_fields_required'));
     echo "<script>
-        alert('Semua kolom wajib diisi');
+        alert({$msg});
         window.location.href='../register.php';
     </script>";
     exit;
@@ -24,8 +26,19 @@ if ($name === "" || $email === "" || $password === "") {
 
 // Memvalidasi kesesuaian format alamat email
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $msg = json_encode(__('invalid_email_format'));
     echo "<script>
-        alert('Format email tidak valid');
+        alert({$msg});
+        window.location.href='../register.php';
+    </script>";
+    exit;
+}
+
+// Validasi panjang password harus tepat 6 karakter
+if (strlen($password) !== 6) {
+    $msg = json_encode(__('password_exact_6'));
+    echo "<script>
+        alert({$msg});
         window.location.href='../register.php';
     </script>";
     exit;
@@ -45,8 +58,9 @@ $result = mysqli_stmt_get_result($stmt);
 
 // Menolak pendaftaran jika email sudah terdaftar sebelumnya
 if (mysqli_num_rows($result) > 0) {
+    $msg = json_encode(__('email_already_used'));
     echo "<script>
-        alert('Email sudah digunakan');
+        alert({$msg});
         window.location.href='../register.php';
     </script>";
     exit;
@@ -76,16 +90,18 @@ mysqli_stmt_bind_param(
 
 // Menampilkan pemberitahuan dan mengalihkan pengguna ke halaman login jika sukses
 if (mysqli_stmt_execute($stmt)) {
+    $msg = json_encode(__('account_created'));
     echo "<script>
-        alert('Akun berhasil dibuat');
+        alert({$msg});
         window.location.href='../login.php';
     </script>";
     exit;
 }
 
 // Menangani kegagalan saat proses pendaftaran akun
+$msgFail = json_encode(__('account_create_failed'));
 echo "<script>
-    alert('Gagal membuat akun. Silakan coba lagi.');
+    alert({$msgFail});
     window.location.href='../register.php';
 </script>";
 

@@ -20,7 +20,7 @@ $userProfile = mysqli_fetch_assoc(mysqli_stmt_get_result($stmtUser));
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $lang === 'en' ? 'Settings' : 'Pengaturan' ?> - Stock</title>
+    <title><?= htmlspecialchars(__('settings_title'), ENT_QUOTES, 'UTF-8') ?> - Stock</title>
 </head>
 
 <!-- Styling utama layout dan warna latar halaman -->
@@ -48,30 +48,58 @@ $userProfile = mysqli_fetch_assoc(mysqli_stmt_get_result($stmtUser));
                 <h1 style="margin:0; font-size:26px;"><?= $lang === 'en' ? 'Settings' : 'Pengaturan' ?></h1>
                 <!-- Deskripsi -->
                 <p style="color:#81776D; margin-top:6px; font-size:14px;">
-                    <?= $lang === 'en' ? 'Update your business details and profile.' : 'Ubah detail bisnis dan profil akun kamu.' ?>
+                    <?= htmlspecialchars(__('settings_description'), ENT_QUOTES, 'UTF-8') ?>
                 </p>
             </div>
 
             <!-- Form Pengaturan -->
             <div style="background:white; border:1px solid #E9E1D7; border-radius:12px; padding:24px;">
-                <form id="settingsForm">
+                <form id="settingsForm" enctype="multipart/form-data">
                     <!-- ID bisnis tersembunyi sebagai parameter acuan update data -->
                     <input type="hidden" name="business_id" value="<?= (int)$business_id ?>">
 
+                    <!-- Input Foto Toko / Bisnis -->
+                    <div style="margin-bottom:20px;">
+                        <label style="display:block; margin-bottom:8px; font-weight:600; font-size:14px;">
+                            <?= htmlspecialchars(__('business_logo_photo'), ENT_QUOTES, 'UTF-8') ?>
+                        </label>
+                        
+                        <div style="display:flex; align-items:center; gap:16px;">
+                            <!-- Area Preview -->
+                            <label for="businessPhoto" style="width:80px; height:80px; border-radius:12px; background:#F5EFE8; border:1px solid #E9E1D7; display:flex; align-items:center; justify-content:center; cursor:pointer; overflow:hidden; flex-shrink:0;">
+                                <img id="businessPreview" src="" style="width:100%; height:100%; object-fit:cover; display:none;">
+                                <i id="businessUploadIcon" data-lucide="camera" style="width:28px; height:28px; color:#76553D;"></i>
+                            </label>
+
+                            <!-- Tombol dan Keterangan -->
+                            <div>
+                                <input type="file" id="businessPhoto" name="photo" accept="image/*" style="display:none;">
+                                
+                                <label for="businessPhoto" style="display:inline-block; padding:8px 14px; background:#F5EFE8; color:#76553D; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer;">
+                                    <?= htmlspecialchars(__('change_photo'), ENT_QUOTES, 'UTF-8') ?>
+                                </label>
+                                
+                                <p style="margin:6px 0 0; color:#81776D; font-size:12px;">
+                                    <?= htmlspecialchars(__('photo_hint'), ENT_QUOTES, 'UTF-8') ?>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Input Nama Bisnis -->
                     <div style="margin-bottom:16px;">
-                        <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;"><?= $lang === 'en' ? 'Business Name' : 'Nama Bisnis' ?></label>
+                        <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;"><?= htmlspecialchars(__('business_name_label'), ENT_QUOTES, 'UTF-8') ?></label>
                         <input type="text" name="business_name" value="<?= htmlspecialchars($business['business_name'], ENT_QUOTES, 'UTF-8') ?>" required style="width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
                     </div>
 
                     <!-- Input Catatan Bisnis (Notes) -->
                     <div style="margin-bottom:16px;">
                         <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;">
-                            <?= $lang === 'en' ? 'Business Notes (Max 20 chars)' : 'Catatan Bisnis (Maks 20 karakter)' ?>
+                            <?= htmlspecialchars(__('business_notes_label'), ENT_QUOTES, 'UTF-8') ?>
                         </label>
                         <input type="text" name="notes" maxlength="20" 
                             value="<?= htmlspecialchars($business['notes'] ?? '', ENT_QUOTES, 'UTF-8') ?>" 
-                            placeholder="<?= $lang === 'en' ? 'Brief note (max 20 chars)...' : 'Catatan singkat (maks 20 karakter)...' ?>" 
+                            placeholder="<?= htmlspecialchars(__('business_notes_placeholder'), ENT_QUOTES, 'UTF-8') ?>" 
                             style="width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
                     </div>
 
@@ -79,19 +107,19 @@ $userProfile = mysqli_fetch_assoc(mysqli_stmt_get_result($stmtUser));
 
                     <!-- Input Nama Pengguna -->
                     <div style="margin-bottom:16px;">
-                        <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;"><?= $lang === 'en' ? 'Account Name' : 'Nama Akun' ?></label>
+                        <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;"><?= htmlspecialchars(__('account_name_label'), ENT_QUOTES, 'UTF-8') ?></label>
                         <input type="text" name="name" value="<?= htmlspecialchars($userProfile['name'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required style="width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
                     </div>
 
                     <!-- Email Pengguna (Hanya baca / disabled) -->
                     <div style="margin-bottom:20px;">
-                        <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;"><?= $lang === 'en' ? 'Email Address' : 'Alamat Email' ?></label>
+                        <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;"><?= htmlspecialchars(__('email_address_label'), ENT_QUOTES, 'UTF-8') ?></label>
                         <input type="email" value="<?= htmlspecialchars($userProfile['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>" disabled style="width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #E9E1D7; border-radius:8px; background:#F5EFE8; color:#81776D;">
                     </div>
 
                     <!-- Tombol Simpan Perubahan Pengaturan -->
                     <button type="submit" style="padding:11px 22px; background:#76553D; color:white; border:none; border-radius:8px; font-weight:600; cursor:pointer;">
-                        <?= $lang === 'en' ? 'Save Changes' : 'Simpan Perubahan' ?>
+                        <?= htmlspecialchars(__('save_changes'), ENT_QUOTES, 'UTF-8') ?>
                     </button>
                 </form>
             </div>
@@ -101,17 +129,17 @@ $userProfile = mysqli_fetch_assoc(mysqli_stmt_get_result($stmtUser));
             <div>
                 <!-- Judul -->
                 <h3 style="margin:0 0 6px; font-size:15px; color:#B45F5F;">
-                    <?= $lang === 'en' ? 'Danger Zone' : 'Zona Berbahaya' ?>
+                    <?= htmlspecialchars(__('danger_zone'), ENT_QUOTES, 'UTF-8') ?>
                 </h3>
 
                 <!-- Deskripsi -->
                 <p style="margin:0 0 14px; font-size:13px; color:#81776D;">
-                    <?= $lang === 'en' ? 'Deleting this business will permanently erase all associated products, categories, and transaction history.' : 'Menghapus toko ini akan menghapus seluruh produk, kategori, dan riwayat transaksi di dalamnya secara permanen.' ?>
+                    <?= htmlspecialchars(__('delete_business_desc'), ENT_QUOTES, 'UTF-8') ?>
                 </p>
 
                 <!-- Tombol hapus toko -->
                 <button type="button" id="btnDeleteBusiness" style="padding:10px 18px; background:#FBECEC; color:#B45F5F; border:1px solid #F3C6C6; border-radius:8px; font-weight:600; cursor:pointer; font-size:13px;">
-                    <?= $lang === 'en' ? 'Delete Business' : 'Hapus Toko Ini' ?>
+                    <?= htmlspecialchars(__('delete_business_btn'), ENT_QUOTES, 'UTF-8') ?>
                 </button>
             </div>
         </section>
@@ -123,6 +151,23 @@ $userProfile = mysqli_fetch_assoc(mysqli_stmt_get_result($stmtUser));
 
 <script>
 lucide.createIcons();
+
+// Preview foto baru, jika file dipilih
+document.getElementById('businessPhoto').addEventListener('change', function() {
+    const file = this.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.getElementById('businessPreview');
+            const icon = document.getElementById('businessUploadIcon');
+            
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+            if (icon) icon.style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+    }
+});
 
 // Menangani pengiriman form pengaturan secara asinkron via Fetch API
 document.getElementById('settingsForm').addEventListener('submit', async function(e) {
@@ -152,14 +197,11 @@ document.getElementById('settingsForm').addEventListener('submit', async functio
     }
 });
 
+
 // Menangani proses penghapusan toko saat tombol hapus toko diklik
 document.getElementById('btnDeleteBusiness').addEventListener('click', async function() {
     // Tampilkan dialog konfirmasi penghapusan toko
-    const confirmDelete = confirm(
-        <?= json_encode($lang === 'en' 
-            ? 'Are you sure you want to permanently delete this business? All data will be lost!' 
-            : 'Apakah kamu yakin ingin menghapus toko ini secara permanen? Seluruh data produk dan transaksi akan hilang!') ?>
-    );
+    const confirmDelete = confirm(<?= json_encode(__('confirm_delete_business')) ?>);
 
     // Batalkan proses jika pengguna memilih batal
     if (!confirmDelete) return;

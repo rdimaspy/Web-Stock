@@ -2,8 +2,9 @@
 // Memulai sesi untuk menyimpan data otentikasi login pengguna
 session_start();
 
-// Memuat file konfigurasi koneksi database
+// Memuat file konfigurasi koneksi database & pengelola bahasa
 include "../config/database.php";
+require_once __DIR__ . '/../includes/language.php';
 
 // Memastikan permintaan dikirimkan khusus melalui metode POST
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
@@ -17,8 +18,9 @@ $password = $_POST["password"] ?? "";
 
 // Memvalidasi agar input email dan password tidak dikirimkan dalam kondisi kosong
 if ($email === "" || $password === "") {
+    $msg = json_encode(__('email_password_required'));
     echo "<script>
-        alert('Email dan password wajib diisi');
+        alert({$msg});
         window.location.href='../login.php';
     </script>";
     exit;
@@ -42,8 +44,9 @@ $user   = mysqli_fetch_assoc($result);
 
 // Memeriksa keberadaan akun dan memverifikasi kesesuaian hash password
 if (!$user || !password_verify($password, $user["password"])) {
+    $msg = json_encode(__('invalid_credentials'));
     echo "<script>
-        alert('Email atau password salah');
+        alert({$msg});
         window.location.href='../login.php';
     </script>";
     exit;

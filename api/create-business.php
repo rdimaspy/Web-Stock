@@ -2,8 +2,9 @@
 // Memulai sesi untuk mengakses data otentikasi pengguna
 session_start();
 
-// Memuat file konfigurasi koneksi database
+// Memuat file konfigurasi koneksi database & pengelola bahasa
 include "../config/database.php";
+require_once __DIR__ . '/../includes/language.php';
 
 // Memeriksa status login pengguna, arahkan ke login jika belum terautentikasi
 if (!isset($_SESSION['user_id'])) {
@@ -22,7 +23,8 @@ $query = mysqli_query($conn, "INSERT INTO businesses (user_id, business_name, cu
 
 // Menangani kegagalan saat menyimpan data bisnis ke database
 if (!$query) {
-    echo "<script>alert('Gagal membuat bisnis'); window.location.href='../create-business.php';</script>";
+    $msgFail = json_encode(__('business_create_failed'));
+    echo "<script>alert({$msgFail}); window.location.href='../create-business.php';</script>";
     exit;
 }
 
@@ -60,6 +62,7 @@ if (isset($_FILES['photo']) && $_FILES['photo']['error'] == 0) {
 }
 
 // Menampilkan pesan sukses dan mengalihkan pengguna kembali ke daftar bisnis
-echo "<script>alert('Bisnis berhasil dibuat'); window.location.href='../businesses.php';</script>";
+$msgSuccess = json_encode(__('business_create_success'));
+echo "<script>alert({$msgSuccess}); window.location.href='../businesses.php';</script>";
 
 ?>

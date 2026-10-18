@@ -2,24 +2,62 @@
 // Menentukan header respon dalam format JSON
 header('Content-Type: application/json');
 
-// Memulai sesi login dan memuat file koneksi database
+// Memulai sesi login dan memuat file koneksi database & pengelola bahasa
 session_start();
 include "../config/database.php";
+require_once __DIR__ . '/../includes/language.php';
 
 // Memeriksa status autentikasi pengguna
 if (!isset($_SESSION['user_id'])) {
     http_response_code(401);
-    exit("Unauthorized");
+    echo json_encode([
+        "status"  => "error",
+        "message" => __('unauthorized')
+    ]);
+    exit;
 }
 
 // Menangkap dan mengamankan input data form produk
 $business_id  = $_POST['business_id'] ?? null;
-$product_name = $_POST['product_name'] ?? '';
-
-// Generate kode produk otomatis jika kolom kode produk dikosongkan
+$product_name = trim($_POST['product_name'] ?? '');
 $product_code = trim($_POST['product_code'] ?? '');
-if ($product_code == '') {
-    $product_code = 'PRD-' . strtoupper(substr(uniqid(), -6));
+
+// Memastikan parameter utama (bisnis, nama produk, dan kode produk) tidak kosong
+if (!$business_id || !$product_name || $product_code === '') {
+    http_response_code(400);
+    echo json_encode([
+        "status"  => "error",
+        "message" => __('product_name_code_req')
+    ]);
+    exit;
+}
+
+// Memeriksa hak akses dan keberadaan bisnis milik pengguna
+$stmt = mysqli_prepare($conn, "SELECT id FROM businesses WHERE id = ? AND user_id = ? LIMIT 1");
+mysqli_stmt_bind_param($stmt, "ii", $business_id, $_SESSION['user_id']);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+
+if (mysqli_num_rows($result) == 0) {
+    http_response_code(403);
+    echo json_encode([
+        "status"  => "error",
+        "message" => __('business_unauthorized')
+    ]);
+    exit;
+}
+
+// Cek duplikasi kode produk pada bisnis yang sama
+$stmtCheck = mysqli_prepare($conn, "SELECT id FROM products WHERE business_id = ? AND product_code = ? LIMIT 1");
+mysqli_stmt_bind_param($stmtCheck, "is", $business_id, $product_code);
+mysqli_stmt_execute($stmtCheck);
+if (mysqli_num_rows(mysqli_stmt_get_result($stmtCheck)) > 0) {
+    http_response_code(400);
+    echo json_encode([
+        "status"  => "error",
+        "message" => __('duplicate_product_code')
+    ]);
+    exit;
 }
 
 // Validasi kategori produk
@@ -41,7 +79,7 @@ if (
     http_response_code(400);
     echo json_encode([
         "status"  => "error",
-        "message" => "Harga harus berupa angka yang valid dan tidak boleh negatif."
+        "message" => __('invalid_price')
     ]);
     exit;
 }
@@ -53,21 +91,6 @@ $selling_price  = (float) $selling_price;
 $initial_stock   = $_POST['initial_stock'] ?? 0;
 $expiration_date = !empty($_POST['expiration_date']) ? $_POST['expiration_date'] : null;
 $notes           = $_POST['notes'] ?? null;
-
-// Memastikan kolom parameter utama tidak kosong
-if (!$business_id || !$product_name) {
-    exit("Data tidak lengkap");
-}
-
-// Memeriksa hak akses dan keberadaan bisnis milik pengguna
-$stmt = mysqli_prepare($conn, "SELECT id FROM businesses WHERE id = ? AND user_id = ? LIMIT 1");
-mysqli_stmt_bind_param($stmt, "ii", $business_id, $_SESSION['user_id']);
-mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
-
-if (mysqli_num_rows($result) == 0) {
-    exit("Business tidak ditemukan");
-}
 
 // Menyiapkan prepared statement untuk menyimpan data produk ke database
 $stmt = mysqli_prepare(
@@ -88,6 +111,7 @@ $stmt = mysqli_prepare(
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 );
 
+// Parameeter
 mysqli_stmt_bind_param(
     $stmt,
     "iissddisss",
@@ -131,7 +155,7 @@ if (mysqli_stmt_execute($stmt)) {
     // Mengembalikan respon sukses pembuatan produk baru
     echo json_encode([
         "status"     => "success",
-        "message"    => "Produk berhasil dibuat",
+        "message"    => __('product_create_success'),
         "product_id" => $product_id
     ]);
 

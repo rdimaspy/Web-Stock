@@ -7,11 +7,12 @@ $lang = $_SESSION['language'] ?? 'id';
 $langFile = __DIR__ . "/lang/{$lang}.php";
 $trans = file_exists($langFile) ? require $langFile : require __DIR__ . "/lang/id.php";
 ?>
+
+
 <!DOCTYPE html>
 <html lang="<?= htmlspecialchars($lang); ?>">
 
 <head>
-    <!-- Pengaturan karakter dan viewport halaman agar responsif di HP -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register | Stock</title>
@@ -57,6 +58,7 @@ $trans = file_exists($langFile) ? require $langFile : require __DIR__ . "/lang/i
     </style>
 </head>
 
+<!-- Body Utama Halaman -->
 <body style="margin: 0; background: #FAF7F2; font-family: Arial, Helvetica, sans-serif; color: #302921; overflow-x: hidden; position: relative;">
 
     <!-- Desain elemen abstrak (Latar belakang) -->
@@ -81,7 +83,7 @@ $trans = file_exists($langFile) ? require $langFile : require __DIR__ . "/lang/i
             </div>
 
             <!-- Form pengiriman data pendaftaran akun -->
-            <form action="api/register.php" method="POST">
+            <form action="api/api-register.php" method="POST">
                 <!-- Bidang Isian Nama Lengkap -->
                 <div style="margin-bottom: 18px;">
                     <label style="display:block; font-size:13px; font-weight:600; margin-bottom:7px; color:#49382D;">
@@ -110,8 +112,9 @@ $trans = file_exists($langFile) ? require $langFile : require __DIR__ . "/lang/i
                         <?= htmlspecialchars($trans['password_label'] ?? 'Password'); ?>
                     </label>
 
-                    <input type="password" name="password" class="input-field" 
-                        placeholder="<?= htmlspecialchars($trans['create_password_placeholder'] ?? 'Buat password'); ?>"
+                    <!-- Ketentuan password max 6 cahr -->
+                    <input type="password" name="password" class="input-field" minlength="6" maxlength="6" 
+                        placeholder="<?= htmlspecialchars($trans['create_password_placeholder'] ?? 'Buat password (6 karakter)'); ?>"
                         style="width: 100%; padding: 12px 14px; border: 1px solid #E9E1D7; border-radius: 10px; box-sizing: border-box; font-size: 14px; color: #302921;" required>
                 </div>
 
@@ -141,10 +144,9 @@ $trans = file_exists($langFile) ? require $langFile : require __DIR__ . "/lang/i
     </div>
 
     <!-- Ikon -->
-    <script>
-        lucide.createIcons();
-    </script>
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<script> lucide.createIcons(); </script>
 
 </body>
-
 </html>

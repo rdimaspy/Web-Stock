@@ -1,9 +1,8 @@
 <?php
-// Memulai sesi login pengguna
+// Memulai sesi login dan memuat konfigurasi koneksi database
 session_start();
-
-// Memuat file konfigurasi koneksi database
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../includes/language.php';
 
 // Menentukan format respons server sebagai JSON
 header('Content-Type: application/json');
@@ -11,14 +10,14 @@ header('Content-Type: application/json');
 // Memeriksa status autentikasi pengguna; kembalikan status 401 jika belum login
 if (!isset($_SESSION['user_id'])) {
     http_response_code(401);
-    echo json_encode(['status' => 'error', 'message' => 'Unauthorized']);
+    echo json_encode(['status' => 'error', 'message' => 'unauthorized']);
     exit;
 }
 
 // Memastikan permintaan hanya dikirimkan melalui metode POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
-    echo json_encode(['status' => 'error', 'message' => 'Method not allowed']);
+    echo json_encode(['status' => 'error', 'message' => __('method_not_allowed')]);
     exit;
 }
 
@@ -28,7 +27,7 @@ $user_id               = (int)$_SESSION['user_id'];
 
 // Memastikan nilai ID bisnis yang dikirimkan valid (lebih dari 0)
 if ($business_id_to_delete <= 0) {
-    echo json_encode(['status' => 'error', 'message' => 'ID Bisnis tidak valid.']);
+    echo json_encode(['status' => 'error', 'message' => __('invalid_business')]);
     exit;
 }
 
@@ -42,19 +41,19 @@ if (mysqli_stmt_execute($stmt)) {
     if (mysqli_stmt_affected_rows($stmt) > 0) {
         echo json_encode([
             'status'  => 'success',
-            'message' => 'Toko berhasil dihapus secara permanen.'
+            'message' => __('business_delete_success')
         ]);
     } else {
         echo json_encode([
             'status'  => 'error',
-            'message' => 'Toko tidak ditemukan atau kamu tidak memiliki hak akses.'
+            'message' => __('business_unauthorized')
         ]);
     }
 } else {
     // Mengembalikan respons error jika prepared statement gagal dieksekusi
     echo json_encode([
         'status'  => 'error',
-        'message' => 'Gagal menghapus toko dari database.'
+        'message' => __('business_delete_failed')
     ]);
 }
 exit;

@@ -148,16 +148,16 @@ $topProducts = mysqli_stmt_get_result($stmtTopProducts);
                 <!-- HEADER KARTU -->
                 <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; padding-bottom:18px; border-bottom:1px solid #E9E1D7;">
                     <div>
-                        <h2 style="margin:0; color:#302921; font-size:18px; font-weight:700;">
-                            <?= $lang === 'en' ? 'Business Overview' : 'Ringkasan Bisnis' ?>
+                        <h2 style="margin:0; color:#302921; font-size:20px; font-weight:700;">
+                            <?= htmlspecialchars(__('business_overview'), ENT_QUOTES, 'UTF-8') ?>
                         </h2>
                         <p style="margin:4px 0 0; color:#81776D; font-size:12px;">
-                            <?= $lang === 'en' ? "Today's activity & stock summary" : 'Aktivitas hari ini & ringkasan stok' ?>
+                            <?= htmlspecialchars(__('today_activity_summary'), ENT_QUOTES, 'UTF-8') ?>
                         </p>
                     </div>
 
                     <span style="padding:6px 12px; background:#FAF7F2; border:1px solid #E9E1D7; border-radius:8px; color:#76553D; font-size:12px; font-weight:600;">
-                        <?= $lang === 'en' ? 'Today' : 'Hari ini' ?>
+                        <?= htmlspecialchars(__('today'), ENT_QUOTES, 'UTF-8') ?>
                     </span>
                 </div>
 
@@ -167,46 +167,46 @@ $topProducts = mysqli_stmt_get_result($stmtTopProducts);
                     <!-- Total Produk -->
                     <div style="padding:16px; border:1px solid #E9E1D7; border-radius:12px; background:#FAF7F2;">
                         <p style="margin:0; color:#81776D; font-size:12px; font-weight:500;">
-                            <?= $lang === 'en' ? 'Total products' : 'Total produk' ?>
+                            <?= htmlspecialchars(__('total_products'), ENT_QUOTES, 'UTF-8') ?>
                         </p>
                         <h3 style="margin:8px 0 0; color:#302921; font-size:26px; font-weight:700;">
                             <?= number_format($stockStats['total_products'] ?? 0) ?>
                         </h3>
                         <p style="margin:4px 0 0; color:#6F8966; font-size:11px; font-weight:600;">
-                            <?= number_format($stockStats['total_stock'] ?? 0) ?> <?= $lang === 'en' ? 'total units available' : 'total unit tersedia' ?>
+                            <?= number_format($stockStats['total_stock'] ?? 0) ?> <?= htmlspecialchars(__('total_units_available'), ENT_QUOTES, 'UTF-8') ?>
                         </p>
                     </div>
 
                     <!-- Stok Masuk Hari Ini -->
                     <div style="padding:16px; border:1px solid #E9E1D7; border-radius:12px; background:#FAF7F2;">
                         <p style="margin:0; color:#81776D; font-size:12px; font-weight:500;">
-                            <?= $lang === 'en' ? 'Stock in' : 'Stok masuk' ?>
+                            <?= htmlspecialchars(__('stock_in'), ENT_QUOTES, 'UTF-8') ?>
                         </p>
                         <h3 style="margin:8px 0 0; color:#302921; font-size:26px; font-weight:700;">
                             +<?= number_format($dailyStats['total_stock_in'] ?? 0) ?>
                         </h3>
                         <p style="margin:4px 0 0; color:#6F8966; font-size:11px; font-weight:600;">
-                            <?= $lang === 'en' ? 'Units received today' : 'Unit masuk hari ini' ?>
+                            <?= htmlspecialchars(__('units_received_today'), ENT_QUOTES, 'UTF-8') ?>
                         </p>
                     </div>
 
                     <!-- Stok Keluar Hari Ini -->
                     <div style="padding:16px; border:1px solid #E9E1D7; border-radius:12px; background:#FAF7F2;">
                         <p style="margin:0; color:#81776D; font-size:12px; font-weight:500;">
-                            <?= $lang === 'en' ? 'Stock out' : 'Stok keluar' ?>
+                            <?= htmlspecialchars(__('stock_out'), ENT_QUOTES, 'UTF-8') ?>
                         </p>
                         <h3 style="margin:8px 0 0; color:#302921; font-size:26px; font-weight:700;">
                             -<?= number_format($dailyStats['total_stock_out'] ?? 0) ?>
                         </h3>
                         <p style="margin:4px 0 0; color:#6F8966; font-size:11px; font-weight:600;">
-                            <?= $lang === 'en' ? 'Units sold today' : 'Unit terjual hari ini' ?>
+                            <?= htmlspecialchars(__('units_sold_today'), ENT_QUOTES, 'UTF-8') ?>
                         </p>
                     </div>
 
                     <!-- Omset Hari Ini -->
                     <div style="padding:16px; border:1px solid #E9E1D7; border-radius:12px; background:#FAF7F2;">
                         <p style="margin:0; color:#81776D; font-size:12px; font-weight:500;">
-                            <?= $lang === 'en' ? 'Revenue' : 'Omset' ?>
+                            <?= htmlspecialchars(__('revenue'), ENT_QUOTES, 'UTF-8') ?>
                         </p>
                         <h3 style="margin:8px 0 0; color:#302921; font-size:22px; font-weight:700; overflow-wrap:anywhere;">
                             <!-- Menggunakan format angka standar jika fungsi formatCurrency belum tersedia -->
@@ -215,7 +215,7 @@ $topProducts = mysqli_stmt_get_result($stmtTopProducts);
                                 : 'Rp ' . number_format($dailyStats['total_revenue'] ?? 0, 0, ',', '.') ?>
                         </h3>
                         <p style="margin:4px 0 0; color:#6F8966; font-size:11px; font-weight:600;">
-                            <?= $lang === 'en' ? "Today's sales" : 'Penjualan hari ini' ?>
+                            <?= htmlspecialchars(__('todays_sales'), ENT_QUOTES, 'UTF-8') ?>
                         </p>
                     </div>
 
@@ -223,13 +223,13 @@ $topProducts = mysqli_stmt_get_result($stmtTopProducts);
 
                 <!-- MENAMPILKAN PRODUK TERLARIS HARI INI (TOP 5) -->
                 <h3 style="margin:20px 0 12px; color:#302921; font-size:14px; font-weight:700;">
-                    <?= $lang === 'en' ? "Today's Best-Selling Products" : 'Produk Paling Laris Hari Ini' ?>
+                    <?= htmlspecialchars(__('todays_best_selling'), ENT_QUOTES, 'UTF-8') ?>
                 </h3>
 
                 <?php if (mysqli_num_rows($topProducts) === 0): ?>
                     <!-- Tampilan jika belum ada transaksi penjualan hari ini -->
                     <p style="color:#81776D; font-size:13px; margin:10px 0;">
-                        <?= $lang === 'en' ? 'No sales recorded today.' : 'Belum ada transaksi penjualan hari ini.' ?>
+                        <?= htmlspecialchars(__('no_sales_recorded_today'), ENT_QUOTES, 'UTF-8') ?>
                     </p>
                 <?php else: ?>
                     <!-- Looping untuk menampilkan 5 produk terlaris hari ini -->
@@ -270,10 +270,10 @@ $topProducts = mysqli_stmt_get_result($stmtTopProducts);
                             <!-- Penjualan hari ini & sisa stok -->
                             <div style="text-align:right; flex-shrink:0;">
                                 <strong style="display:block; color:#302921; font-size:13px; font-weight:700;">
-                                    <?= number_format($prod['total_sold']) ?> <?= $lang === 'en' ? 'sold today' : 'terjual hari ini' ?>
+                                    <?= number_format($prod['total_sold']) ?> <?= htmlspecialchars(__('sold_today'), ENT_QUOTES, 'UTF-8') ?>
                                 </strong>
                                 <span style="color:#81776D; font-size:10px;">
-                                    <?= $lang === 'en' ? 'Stock:' : 'Stok:' ?> <?= number_format($prod['current_stock']) ?>
+                                    <?= htmlspecialchars(__('stock'), ENT_QUOTES, 'UTF-8') ?>: <?= number_format($prod['current_stock']) ?>
                                 </span>
                             </div>
                         </div>
@@ -289,9 +289,7 @@ $topProducts = mysqli_stmt_get_result($stmtTopProducts);
 <!-- ICON -->
 <script src="https://unpkg.com/lucide@latest"></script>
 
-<script>
-    lucide.createIcons();
-</script>
+<script>lucide.createIcons();</script>
 
 </body>
 </html>

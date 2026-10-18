@@ -232,13 +232,13 @@ async function saveAudit() {
 
     // Validasi pemilihan produk sebelum dikirimkan
     if (!productId) {
-        alert('Pilih produk terlebih dahulu.');
+        alert(<?= json_encode(__('select_product_first')) ?>);
         return;
     }
 
     // Validasi input angka stok fisik agar tidak kosong atau bernilai negatif
     if (physicalStock === '' || parseInt(physicalStock) < 0) {
-        alert('Masukkan stok fisik yang valid.');
+        alert(<?= json_encode(__('enter_valid_physical')) ?>);
         return;
     }
 
@@ -272,7 +272,7 @@ async function saveAudit() {
         }
     } catch (error) {
         // Tangani jika terjadi kendala koneksi atau error pada server
-        alert('Terjadi kesalahan sistem.');
+        alert(<?= json_encode(__('system_error')) ?>);
         console.error(error);
     } finally {
         // Kembalikan status tombol simpan ke kondisi semula

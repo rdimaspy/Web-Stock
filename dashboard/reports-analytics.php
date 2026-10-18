@@ -63,10 +63,58 @@ while ($row = mysqli_fetch_assoc($res_chart)) {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
     <style>
-        /* Mengamankan render laporan agar penuh saat di-export */
-        #reportContent {
-            max-width: 100% !important;
-            width: 100% !important;
+        /* Tampilan khusus saat Print / Preview PDF */
+        @media print {
+            /* Sembunyikan seluruh elemen kecuali #reportContent */
+            body * {
+                visibility: hidden !important;
+            }
+            
+            #reportContent, #reportContent * {
+                visibility: visible !important;
+            }
+
+            /* Posisikan #reportContent tepat di bagian paling atas dokumen */
+            #reportContent {
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            /* Pengaturan kertas cetak A4 Landscape */
+            @page {
+                size: A4 landscape;
+                margin: 12mm;
+            }
+
+            /* Tampilkan Kop Laporan saat cetak */
+            .print-header {
+                display: block !important;
+            }
+
+            /* Kunci kontainer grafik agar canvas tidak lepas dari judulnya */
+            .chart-container-print {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                border: 1px solid #E9E1D7 !important;
+                box-shadow: none !important;
+                margin-bottom: 0 !important;
+            }
+
+            /* Paksa Grafik 2 pindah ke Halaman 2 secara rapi */
+            .print-page-break {
+                page-break-before: always !important;
+                break-before: page !important;
+            }
+
+            /* Pastikan canvas Chart.js terisi penuh dalam kontainernya */
+            canvas {
+                max-width: 100% !important;
+                max-height: 320px !important;
+            }
         }
     </style>
 
@@ -125,45 +173,73 @@ while ($row = mysqli_fetch_assoc($res_chart)) {
                     <!-- Tombol untuk memicu fungsi cetak/ekspor dokumen PDF -->
                     <button type="button" onclick="exportReportToPDF()" style="display:flex; align-items:center; gap:8px; height:40px; padding:0 16px; background:#76553D; color:white; border:none; border-radius:9px; cursor:pointer; font-weight:600;">
                         <i data-lucide="file-down" style="width:18px; height:18px;"></i>
-                        <?= $lang === 'en' ? 'Export PDF' : 'Ekspor PDF' ?>
+                        <?= htmlspecialchars(__('export_pdf'), ENT_QUOTES, 'UTF-8') ?>
                     </button>
                 </form>
             </div>
 
-            <!-- Area Konten Laporan (Bisa Di-export ke PDF) -->
+            <!-- Area Konten Laporan -->
             <div id="reportContent">
-                <!-- Container Utama Grafik (Vertikal: Atas & Bawah) -->
-                <div style="display: flex; flex-direction: column; gap: 24px; margin-bottom: 25px;">
 
-                    <!-- Container Grafik 1: Pergerakan Stok Barang -->
-                    <div style="background: white; border: 1.5px solid #E9E1D7; border-radius: 12px; padding: 20px;">
-                        <!-- Judul grafik pergerakan stok berdasarkan bahasa aktif -->
-                        <h3 style="font-size: 18px; color: #76553D; margin-top: 0; margin-bottom: 15px;">
-                            <?= $lang === 'en' ? 'Stock Movement Chart' : 'Grafik Pergerakan Stok' ?>
-                        </h3>
-
-                        <!-- Pembungkus canvas grafik pergerakan stok -->
-                        <div style="position: relative; width: 100%; height: 350px;">
-                            <!-- Elemen canvas tempat Chart.js merender grafik barang masuk dan keluar -->
-                            <canvas id="stockMovementChart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- Container Grafik 2: Tren Keuntungan Produk -->
-                    <div style="background: white; border: 1.5px solid #E9E1D7; border-radius: 12px; padding: 20px;">
-                        <!-- Judul grafik tren keuntungan berdasarkan bahasa aktif -->
-                        <h3 style="font-size: 18px; color: #2E5A27; margin-top: 0; margin-bottom: 15px;">
-                            <?= $lang === 'en' ? 'Profit Trend Chart' : 'Grafik Tren Keuntungan' ?>
-                        </h3>
-
-                        <!-- Pembungkus canvas grafik tren keuntungan -->
-                        <div style="position: relative; width: 100%; height: 350px;">
-                            <!-- Elemen canvas tempat Chart.js merender grafik estimasi profit -->
-                            <canvas id="profitTrendChart"></canvas>
-                        </div>
-                    </div>
-
+                <!-- KOP LAPORAN -->
+                <div class="print-header" style="text-align:center; margin-bottom:15px; display:none;">
+                    <!-- Nama Bisnis / Toko -->
+                    <h2 style="margin:0; font-size:22px; color:#302921; text-transform:uppercase;">
+                        <?= htmlspecialchars($business['business_name'] ?? 'NAMA TOKO', ENT_QUOTES, 'UTF-8') ?>
+                    </h2>
+                    <!-- Judul Resmi Laporan -->
+                    <p style="margin:4px 0 0; font-size:13px; color:#81776D; font-weight:600;">
+                        <?= htmlspecialchars(__('analytics_report_title'), ENT_QUOTES, 'UTF-8') ?>
+                    </p>
+                    <!-- Rentang Periode Tanggal Laporan -->
+                    <p style="margin:4px 0 0; font-size:12px; color:#81776D;">
+                        <?= htmlspecialchars(__('period'), ENT_QUOTES, 'UTF-8') ?>: <?= htmlspecialchars($date_from) ?> <?= htmlspecialchars(__('to'), ENT_QUOTES, 'UTF-8') ?> <?= htmlspecialchars($date_to) ?>
+                    </p>
+                    <!-- Pembaatas -->
+                    <hr style="border:0; border-top:2px solid #76553D; margin:12px 0 18px;">
                 </div>
+
+                <!-- HALAMAN 1: Grafik Pergerakan Stok -->
+                <div class="chart-container-print" style="background: white; border: 1.5px solid #E9E1D7; border-radius: 12px; padding: 20px;">
+                    <!-- Judul Grafik Pergerakan Stok -->
+                    <h3 style="font-size: 18px; color: #76553D; margin-top: 0; margin-bottom: 15px;">
+                        <?= htmlspecialchars(__('stock_movement_chart'), ENT_QUOTES, 'UTF-8') ?>
+                    </h3>
+                    <!-- Pembungkus Canvas Grafik Chart.js -->
+                    <div style="position: relative; width: 100%; height: 350px;">
+                        <canvas id="stockMovementChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- HALAMAN 2: Grafik Tren Keuntungan -->
+                <div class="chart-container-print print-page-break" style="background: white; border: 1.5px solid #E9E1D7; border-radius: 12px; padding: 20px; margin-top: 20px;">
+                    <!-- Kop Laporan ulang di halaman 2 agar tetap resmi -->
+                    <div class="print-header" style="text-align:center; margin-bottom:15px; display:none;">
+                        <!-- Nama Bisnis / Toko -->
+                        <h2 style="margin:0; font-size:22px; color:#302921; text-transform:uppercase;">
+                            <?= htmlspecialchars($business['business_name'] ?? 'NAMA TOKO', ENT_QUOTES, 'UTF-8') ?>
+                        </h2>
+                        <!-- Judul Resmi Laporan -->
+                        <p style="margin:4px 0 0; font-size:13px; color:#81776D; font-weight:600;">
+                            <?= htmlspecialchars(__('analytics_report_title'), ENT_QUOTES, 'UTF-8') ?>
+                        </p>
+                        <!-- Rentang Periode Tanggal Laporan -->
+                        <p style="margin:4px 0 0; font-size:12px; color:#81776D;">
+                            <?= htmlspecialchars(__('period'), ENT_QUOTES, 'UTF-8') ?>: <?= htmlspecialchars($date_from) ?> <?= htmlspecialchars(__('to'), ENT_QUOTES, 'UTF-8') ?> <?= htmlspecialchars($date_to) ?>
+                        </p>
+                        <hr style="border:0; border-top:2px solid #76553D; margin:12px 0 18px;">
+                    </div>
+
+                    <!-- Judul Grafik Tren Keuntungan -->
+                    <h3 style="font-size: 18px; color: #2E5A27; margin-top: 0; margin-bottom: 15px;">
+                        <?= htmlspecialchars(__('profit_trend_chart'), ENT_QUOTES, 'UTF-8') ?>
+                    </h3>
+                    <!-- Pembungkus Canvas Grafik Chart.js -->
+                    <div style="position: relative; width: 100%; height: 350px;">
+                        <canvas id="profitTrendChart"></canvas>
+                    </div>
+                </div>
+
             </div>
 
         </section>
@@ -189,10 +265,10 @@ new Chart(document.getElementById('stockMovementChart'), {
         labels: productLabels,
         datasets: [
             // Dataset untuk kuantitas barang masuk
-            { label: '<?= $lang === 'en' ? 'Stock In' : 'Stok Masuk' ?>', data: stockInValues, backgroundColor: '#76553D' },
+            { label: <?= json_encode(__('stock_in')) ?>, data: stockInValues, backgroundColor: '#76553D' },
             
             // Dataset untuk kuantitas barang keluar
-            { label: '<?= $lang === 'en' ? 'Stock Out' : 'Stok Keluar' ?>', data: stockOutValues, backgroundColor: '#B99A7D' }
+            { label: <?= json_encode(__('stock_out')) ?>, data: stockOutValues, backgroundColor: '#B99A7D' }
         ]
     },
     options: { 
@@ -209,7 +285,7 @@ new Chart(document.getElementById('profitTrendChart'), {
         labels: productLabels,
         datasets: [
             // Dataset untuk estimasi keuntungan
-            { label: '<?= $lang === 'en' ? 'Profit' : 'Keuntungan' ?>', data: profitValues, backgroundColor: '#2E7D32' }
+            { label: <?= json_encode(__('profit')) ?>, data: profitValues, backgroundColor: '#2E7D32' }
         ]
     },
     options: { 
@@ -219,50 +295,10 @@ new Chart(document.getElementById('profitTrendChart'), {
     }
 });
 
-// Fungsi asinkron untuk mengonversi tampilan grafik analitik ke dokumen PDF
-async function exportReportToPDF() {
-    // Ambil elemen container utama yang berisi tampilan grafik dan data analitik
-    const element = document.getElementById('reportContent');
-    const fileName = `Laporan_Analitik_<?= date('Y-m-d') ?>.pdf`;
-
-    // Konfigurasi atribut dan resolusi untuk pembuatan file PDF lewat html2pdf
-    const opt = {
-        margin:       [10, 10, 10, 10],
-        filename:     fileName,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-
-    // Gunakan fitur modern File System Access API jika didukung oleh browser
-    if ('showSaveFilePicker' in window) {
-        try {
-            // Tampilkan dialog pilihan lokasi penyimpanan file PDF kepada pengguna
-            const handle = await window.showSaveFilePicker({
-                suggestedName: fileName,
-                types: [{
-                    description: 'PDF Document',
-                    accept: { 'application/pdf': ['.pdf'] },
-                }],
-            });
-
-            // File PDF ke bentuk binary Blob lalu tulis data ke lokasi yang dipilih
-            const pdfBlob = await html2pdf().set(opt).from(element).output('blob');
-            const writable = await handle.createWritable();
-            await writable.write(pdfBlob);
-            await writable.close();
-
-            // Tampilkan notifikasi berhasil ekspor PDF
-            alert(<?= json_encode($lang === 'en' ? 'PDF exported successfully!' : 'PDF berhasil diekspor!') ?>);
-            return;
-        } catch (err) {
-            // Abaikan penanganan error jika pengguna membatalkan dialog simpan file
-            if (err.name === 'AbortError') return;
-        }
-    }
-
-    // Alternatif unduhan otomatis (fallback) untuk browser yang belum mendukung Save File Picker
-    html2pdf().set(opt).from(element).save();
+// Fungsi untuk mengonversi tampilan grafik analitik ke dokumen PDF
+function exportReportToPDF() {
+    // Membuka jendela Print Preview resmi bawaan browser dengan layout terkonsep
+    window.print();
 }
 
 </script>

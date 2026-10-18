@@ -108,7 +108,7 @@ $products = mysqli_stmt_get_result($stmt);
 
                     <!-- Opsi default untuk memilih produk -->
                     <option value="">
-                        <?= $lang === 'en' ? 'Select a product' : 'Pilih produk' ?>
+                        <?= htmlspecialchars(__('select_product_placeholder'), ENT_QUOTES, 'UTF-8') ?>
                     </option>
 
                     <!-- Looping opsi daftar produk beserta atribut data stok dan harga -->
@@ -123,8 +123,12 @@ $products = mysqli_stmt_get_result($stmt);
 
                 <!-- Teks informasi stok dan harga jual di bawah pilihan produk -->
                 <div style="margin-top:8px; font-size:13px; color:#81776D; line-height:1.5;">
-                    <div><?= $lang === 'en' ? 'Available stock:' : 'Stok tersedia:' ?> <span id="stockDisplay">-</span></div>
-                    <div><?= $lang === 'en' ? 'Selling price:' : 'Harga Jual:' ?> <span id="priceDisplay">-</span></div>
+                    <div><?= htmlspecialchars(__('available_stock_label'), ENT_QUOTES, 'UTF-8') ?> 
+                        <span id="stockDisplay">-</span>
+                    </div>
+                    <div><?= htmlspecialchars(__('selling_price_label'), ENT_QUOTES, 'UTF-8') ?> 
+                        <span id="priceDisplay">-</span>
+                    </div>
                 </div>
 
                 <!-- Jumlah keluar -->
@@ -267,13 +271,13 @@ saveButton.addEventListener('click', function () {
 
     // Validasi input pemilihan produk
     if (!productId) {
-        alert('Pilih produk terlebih dahulu.');
+        alert(<?= json_encode(__('select_product_first')) ?>);
         return;
     }
 
     // Validasi input jumlah barang keluar
     if (!quantity || quantity < 1) {
-        alert('Masukkan jumlah barang keluar.');
+        alert(<?= json_encode(__('enter_quantity_out')) ?>);
         return;
     }
 
@@ -283,7 +287,7 @@ saveButton.addEventListener('click', function () {
 
     // Validasi ketersediaan stok produk
     if (parseInt(quantity) > stockAvailable) {
-        alert('Stok tidak mencukupi. Stok tersedia: ' + stockAvailable);
+        alert(<?= json_encode(__('insufficient_stock')) ?> + ' ' + stockAvailable);
         return;
     }
 
@@ -310,7 +314,7 @@ saveButton.addEventListener('click', function () {
     })
     .catch(error => {
         console.error(error);
-        alert('Terjadi kesalahan sistem.');
+        alert(<?= json_encode(__('system_error')) ?>);
     });
 });
 </script>

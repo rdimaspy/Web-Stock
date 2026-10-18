@@ -2,6 +2,7 @@
 // Memulai sesi login dan memuat konfigurasi koneksi database
 session_start();
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../includes/language.php';
 
 // Menentukan format respons berupa JSON
 header('Content-Type: application/json');
@@ -10,7 +11,7 @@ header('Content-Type: application/json');
 if (!isset($_SESSION['user_id'])) {
     echo json_encode([
         'success' => false,
-        'message' => 'Unauthorized'
+        'message' => __('unauthorized')
     ]);
     exit;
 }
@@ -31,7 +32,7 @@ if (
 ) {
     echo json_encode([
         'success' => false,
-        'message' => 'Data tidak valid'
+        'message' => __('invalid_data')
     ]);
     exit;
 }
@@ -58,7 +59,7 @@ try {
 
     // Menangani kondisi jika data produk tidak ditemukan
     if (!$product) {
-        throw new Exception('Produk tidak ditemukan');
+        throw new Exception(__('product_not_found'));
     }
 
     // Mengambil nilai stok sebelum proses audit dilakukan
@@ -73,7 +74,7 @@ try {
 
         echo json_encode([
             'success' => true,
-            'message' => 'Tidak ada perubahan stok'
+            'message' => __('no_stock_change')
         ]);
         exit;
     }
@@ -91,7 +92,7 @@ try {
     mysqli_stmt_bind_param($stmt, "iii", $physical_stock, $product_id, $business_id);
 
     if (!mysqli_stmt_execute($stmt)) {
-        throw new Exception('Gagal update stok');
+        throw new Exception(__('stock_update_failed'));
     }
 
     // Menyiapkan query untuk mencatat transaksi penyesuaian audit ke riwayat
@@ -126,7 +127,7 @@ try {
     );
 
     if (!mysqli_stmt_execute($stmt)) {
-        throw new Exception('Gagal menyimpan audit');
+        throw new Exception(__('audit_save_failed'));
     }
 
     // Konfirmasi dan simpan seluruh perubahan transaksi database jika berhasil
@@ -134,7 +135,7 @@ try {
 
     echo json_encode([
         'success' => true,
-        'message' => 'Audit stok berhasil disimpan'
+        'message' => __('audit_save_success')
     ]);
 
 } catch (Exception $e) {

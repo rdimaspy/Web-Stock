@@ -1,9 +1,8 @@
 <?php
-// Memulai sesi untuk mengakses data login pengguna
+// Memulai sesi login dan memuat konfigurasi koneksi database
 session_start();
-
-// Memuat file konfigurasi koneksi database
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../includes/language.php';
 
 // Menentukan format respons server sebagai JSON
 header('Content-Type: application/json');
@@ -11,14 +10,14 @@ header('Content-Type: application/json');
 // Memeriksa autentikasi pengguna yang sedang login
 if (!isset($_SESSION['user_id'])) {
     http_response_code(401);
-    echo json_encode(['status' => 'error', 'message' => 'Unauthorized']);
+    echo json_encode(['status' => 'error', 'message' => 'unauthorized']);
     exit;
 }
 
 // Memastikan permintaan hanya dikirim melalui metode POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
-    echo json_encode(['status' => 'error', 'message' => 'Method not allowed']);
+    echo json_encode(['status' => 'error', 'message' => __('method_not_allowed')]);
     exit;
 }
 
@@ -37,11 +36,11 @@ if (mysqli_stmt_execute($stmt)) {
 
     echo json_encode([
         'status' => 'success',
-        'message' => 'Akun kamu beserta seluruh data bisnis berhasil dihapus.'
+        'message' => __('account_delete_success')
     ]);
 } else {
     echo json_encode([
         'status' => 'error',
-        'message' => 'Gagal menghapus akun.'
+        'message' => __('account_delete_failed')
     ]);
 }

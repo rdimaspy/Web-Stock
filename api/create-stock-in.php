@@ -6,6 +6,7 @@ header('Content-Type: application/json; charset=utf-8');
 session_start();
 date_default_timezone_set('Asia/Jakarta');
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../includes/language.php';
 
 // Fungsi helper untuk merender respon JSON dan menghentikan eksekusi script
 function respond(string $status, string $message, int $httpCode = 200, array $extra = []): void
@@ -20,12 +21,12 @@ function respond(string $status, string $message, int $httpCode = 200, array $ex
 
 // Memeriksa status otentikasi sesi login pengguna
 if (!isset($_SESSION['user_id'])) {
-    respond('error', 'Sesi login berakhir. Silakan login kembali.', 401);
+    respond('error', __('session_expired'), 401);
 }
 
 // Memastikan request API dikirimkan khusus dengan metode POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    respond('error', 'Metode permintaan tidak diizinkan.', 405);
+    respond('error', __('method_not_allowed'), 405);
 }
 
 // Menangkap dan mengamankan input parameter
@@ -39,18 +40,18 @@ $notes      = $notes === '' ? null : $notes;
 
 // Validasi keberadaan ID bisnis dan ID produk
 if (!$businessId || $businessId < 1 || !$productId || $productId < 1) {
-    respond('error', 'Bisnis atau produk tidak valid.', 400);
+    respond('error', __('invalid_business_product'), 400);
 }
 
 // Validasi kuantitas barang masuk agar bernilai minimal 1
 if ($quantity === false || $quantity === null || $quantity < 1) {
-    respond('error', 'Jumlah barang masuk harus berupa bilangan bulat minimal 1.', 400);
+    respond('error', __('invalid_quantity'), 400);
 }
 
 try {
     // Memulai transaksi database agar proses update stok dan pencatatan riwayat bersifat atomik
     if (!mysqli_begin_transaction($conn)) {
-        respond('error', 'Transaksi tidak dapat dimulai. Silakan coba lagi.', 500);
+        respond('error', __('transaction_start_failed'), 500);
     }
 
     // Mengambil dan mengunci record produk (FOR UPDATE) untuk menghindari kondisi race condition
@@ -73,7 +74,7 @@ try {
     );
 
     if (!$stmt) {
-        throw new RuntimeException('Gagal menyiapkan pemeriksaan produk.');
+        throw new RuntimeException(__('err_prep_product'));
     }
 
     // Eksekusi statement pencarian produk milik bisnis pengguna
@@ -85,7 +86,7 @@ try {
     // Menolak permintaan jika produk tidak terdaftar pada bisnis pengguna
     if (!$product) {
         mysqli_rollback($conn);
-        respond('error', 'Produk tidak ditemukan pada bisnis aktif atau kamu tidak memiliki akses.', 404);
+        respond('error', __('product_access_denied'), 404);
     }
 
     // Menghitung jumlah stok awal dan batas maksimum kapasitas
@@ -95,7 +96,7 @@ try {
     // Memvalidasi agar penambahan stok tidak melebih kapasitas integer
     if ($quantity > $maxStock - $stockBefore) {
         mysqli_rollback($conn);
-        respond('error', 'Jumlah barang melebihi batas stok yang dapat disimpan.', 400);
+        respond('error', __('stock_limit_exceeded'), 400);
     }
 
     // Menyiapkan variabel kalkulasi stok baru, harga, serta waktu transaksi
@@ -115,7 +116,7 @@ try {
     );
 
     if (!$stmt) {
-        throw new RuntimeException('Gagal menyiapkan pembaruan stok.');
+        throw new RuntimeException(__('err_prep_update'));
     }
 
     // Eksekusi pembaruan stok produk terkini
@@ -124,7 +125,7 @@ try {
 
     if (mysqli_stmt_affected_rows($stmt) !== 1) {
         mysqli_stmt_close($stmt);
-        throw new RuntimeException('Stok produk gagal diperbarui.');
+        throw new RuntimeException(__('err_update_stock'));
     }
     mysqli_stmt_close($stmt);
 
@@ -139,7 +140,7 @@ try {
     );
 
     if (!$stmt) {
-        throw new RuntimeException('Gagal menyiapkan pencatatan transaksi.');
+        throw new RuntimeException(__('err_prep_transaction'));
     }
 
     // Eksekusi penyimpanan catatan riwayat transaksi ke database
@@ -161,7 +162,7 @@ try {
 
     if (!mysqli_stmt_execute($stmt)) {
         mysqli_stmt_close($stmt);
-        throw new RuntimeException('Transaksi stok masuk gagal disimpan.');
+        throw new RuntimeException(__('err_save_transaction'));
     }
 
     $transactionId = mysqli_insert_id($conn);
@@ -169,20 +170,19 @@ try {
 
     // Konfirmasi dan commit seluruh transaksi database jika sukses
     if (!mysqli_commit($conn)) {
-        throw new RuntimeException('Transaksi tidak dapat diselesaikan.');
+        throw new RuntimeException(__('err_commit_transaction'));
     }
 
     // Mengembalikan respon JSON sukses penambahan stok masuk
-    respond('success', 'Stok masuk berhasil disimpan.', 200, [
+    respond('success', __('stock_in_save_success'), 200, [
         'transaction_id' => $transactionId,
         'product_id'     => $productId,
         'quantity_added' => $quantity,
         'stock_before'   => $stockBefore,
         'stock_after'    => $stockAfter,
     ]);
-} catch (Throwable $e) {
-    // Membatalkan semua perubahan transaksi jika terjadi kesalahan
-    @mysqli_rollback($conn);
-    error_log('Stock In error: ' . $e->getMessage());
-    respond('error', 'Terjadi kesalahan saat menyimpan stok masuk. Periksa kembali dan coba lagi.', 500);
-}
+    } catch (Throwable $e) {
+        @mysqli_rollback($conn);
+        error_log('Stock In error: ' . $e->getMessage());
+        respond('error', __('stock_in_save_failed'), 500);
+    }
