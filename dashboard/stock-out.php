@@ -180,8 +180,10 @@ $products = mysqli_stmt_get_result($stmt);
 </div>
 
 
-<!-- Ikon -->
+<!-- Ikon & UI Helpers -->
 <script src="https://unpkg.com/lucide@latest"></script>
+<script src="../assets/js/toast.js" defer></script>
+
 <script>
     lucide.createIcons();
 </script>
@@ -264,59 +266,64 @@ quantityInput.addEventListener('input', function () {
 /* Menyimpan Transaksi Stock Out */
 const saveButton = document.getElementById('saveStockOut');
 
-saveButton.addEventListener('click', function () {
+// Menyimpan transaksi stok keluar secara asinkron
+saveButton.addEventListener('click', async function () {
     const productId = productSelect.value;
     const quantity = quantityInput.value;
     const notes = document.getElementById('notes').value;
 
     // Validasi input pemilihan produk
     if (!productId) {
-        alert(<?= json_encode(__('select_product_first')) ?>);
+        showToast(<?= json_encode(__('select_product_first')) ?>, 'error');
         return;
     }
 
     // Validasi input jumlah barang keluar
     if (!quantity || quantity < 1) {
-        alert(<?= json_encode(__('enter_quantity_out')) ?>);
+        showToast(<?= json_encode(__('enter_quantity_out')) ?>, 'error');
         return;
     }
 
-    // Ambil stok tersedia langsung dari dataset produk yang terpilih
+    // Ambil stok tersedia dari opsi produk terpilih
     const selectedOption = productSelect.options[productSelect.selectedIndex];
     const stockAvailable = parseInt(selectedOption.dataset.stock) || 0;
 
     // Validasi ketersediaan stok produk
     if (parseInt(quantity) > stockAvailable) {
-        alert(<?= json_encode(__('insufficient_stock')) ?> + ' ' + stockAvailable);
+        showToast(<?= json_encode(__('insufficient_stock')) ?> + ' ' + stockAvailable, 'error');
         return;
     }
 
-    // Menyusun payload FormData untuk dikirimkan ke server
+    // Menyusun payload FormData untuk dikirimkan ke API
     const formData = new FormData();
     formData.append('business_id', <?= (int)$business_id ?>);
     formData.append('product_id', productId);
     formData.append('quantity', quantity);
     formData.append('notes', notes);
 
-    // Mengirimkan data transaksi stok keluar melalui API
-    fetch('../api/create-stock-out.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(result => {
+    try {
+        // Mengirimkan data transaksi stok keluar via Fetch API
+        const response = await fetch('../api/create-stock-out.php', {
+            method: 'POST',
+            body: formData
+        });
+
+        const result = await response.json();
+
         if (result.success) {
-            alert(result.message);
-            window.location.reload();
+            showToast(result.message, 'success');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
         } else {
-            alert(result.message);
+            showToast(result.message, 'error');
         }
-    })
-    .catch(error => {
+    } catch (error) {
         console.error(error);
-        alert(<?= json_encode(__('system_error')) ?>);
-    });
+        showToast(<?= json_encode(__('system_error')) ?>, 'error');
+    }
 });
+
 </script>
 
 </body>

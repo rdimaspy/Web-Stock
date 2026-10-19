@@ -246,8 +246,9 @@ while ($row = mysqli_fetch_assoc($res_chart)) {
     </main>
 </div>
 
-<!-- Ikon -->
+<!-- Library Ikon & Notifikasi UI Kustom -->
 <script src="https://unpkg.com/lucide@latest"></script>
+<script src="../assets/js/toast.js" defer></script>
 
 <script>
 lucide.createIcons();
@@ -295,9 +296,23 @@ new Chart(document.getElementById('profitTrendChart'), {
     }
 });
 
+// Flag ketersediaan data grafik dari PHP
+const hasChartData = <?= count($product_names) > 0 ? 'true' : 'false' ?>;
+
 // Fungsi untuk mengonversi tampilan grafik analitik ke dokumen PDF
 function exportReportToPDF() {
-    // Membuka jendela Print Preview resmi bawaan browser dengan layout terkonsep
+    if (!hasChartData) {
+        showToast(<?= json_encode(__('no_data_to_export')) ?>, 'error');
+        return;
+    }
+
+    // Tampilkan notifikasi Toast setelah pengguna selesai memilih lokasi simpan / menutup dialog cetak
+    window.addEventListener('afterprint', function handleAfterPrint() {
+        showToast(<?= json_encode(__('pdf_export_success') ?? 'Dokumen PDF berhasil diproses.') ?>, 'success');
+        window.removeEventListener('afterprint', handleAfterPrint);
+    });
+
+    // Buka dialog cetak PDF bawaan browser
     window.print();
 }
 

@@ -216,16 +216,21 @@ $query = mysqli_stmt_get_result($stmt);
 
     </div>
 
-<!-- Ikon -->
+<!-- Library Ikon & Notifikasi UI Kustom -->
 <script src="https://unpkg.com/lucide@latest"></script>
+<script src="assets/js/toast.js" defer></script>
+
 <script>
 lucide.createIcons();
 
 // Menangani proses penghapusan akun pengguna secara permanen
 async function deleteUserAccount() {
-    // Tampilkan kotak dialog konfirmasi penghapusan akun
-    const confirmDelete = confirm(
-        <?= json_encode(__('confirm_delete_account')) ?>
+    // Tampilkan kotak dialog konfirmasi kustom untuk penghapusan akun
+    const confirmDelete = await showConfirm(
+        <?= json_encode(__('confirm_delete_account')) ?>,
+        <?= json_encode(__('delete_account')) ?>,
+        <?= json_encode(__('btn_cancel')) ?>,
+        true // Menandai aksi berbahaya agar tombol berwarna merah
     );
 
     // Batalkan proses jika pengguna memilih batal
@@ -239,16 +244,22 @@ async function deleteUserAccount() {
 
         // Konversi respon dari server ke format JSON
         const result = await response.json();
-        alert(result.message);
 
-        // Jika berhasil, alihkan pengguna ke halaman login
+        // Tampilkan notifikasi toast berdasarkan status respon API
         if (result.status === 'success') {
-            window.location.href = 'login.html';
+            showToast(result.message, 'success');
+
+            // Jika berhasil, alihkan pengguna ke halaman login setelah jeda notifikasi
+            setTimeout(() => {
+                window.location.href = 'login.php';
+            }, 1200);
+        } else {
+            showToast(result.message, 'error');
         }
     } catch (err) {
         // Tangani jika terjadi kesalahan koneksi atau server
         console.error(err);
-        alert('Terjadi kesalahan saat menghapus akun.');
+        showToast(<?= json_encode(__('connection_error')) ?>, 'error');
     }
 }
 </script>

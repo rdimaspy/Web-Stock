@@ -170,8 +170,9 @@ $products = mysqli_stmt_get_result($stmt);
     </main>
 </div>
 
-
+<!-- Library Ikon & Notifikasi UI Kustom -->
 <script src="https://unpkg.com/lucide@latest"></script>
+<script src="../assets/js/toast.js" defer></script>
 
 <script>
 lucide.createIcons();
@@ -222,32 +223,30 @@ function calculateDifference() {
         : difference;
 }
 
-// Menangani proses penyimpanan data audit stok ke API
+// Menangani proses penyimpanan data audit stok secara asinkron
 async function saveAudit() {
-    // Ambil elemen dan nilai input dari formulir
     const productId = document.getElementById('product_id').value;
     const physicalStock = document.getElementById('physical_stock').value;
     const notes = document.getElementById('notes').value.trim();
     const saveButton = document.querySelector('button[onclick="saveAudit()"]');
 
-    // Validasi pemilihan produk sebelum dikirimkan
+    // Validasi pemilihan produk sebelum dikirim
     if (!productId) {
-        alert(<?= json_encode(__('select_product_first')) ?>);
+        showToast(<?= json_encode(__('select_product_first')) ?>, 'error');
         return;
     }
 
-    // Validasi input angka stok fisik agar tidak kosong atau bernilai negatif
+    // Validasi input angka stok fisik
     if (physicalStock === '' || parseInt(physicalStock) < 0) {
-        alert(<?= json_encode(__('enter_valid_physical')) ?>);
+        showToast(<?= json_encode(__('enter_valid_physical')) ?>, 'error');
         return;
     }
 
-    // Ubah status tombol untuk mencegah pengiriman ganda saat proses simpan berlangsung
+    // Ubah UI tombol saat proses menyimpan
     const originalButtonHTML = saveButton.innerHTML;
     saveButton.disabled = true;
     saveButton.style.opacity = '0.7';
 
-    // Susun payload data formulir untuk dikirim ke API
     const formData = new FormData();
     formData.append('business_id', <?= (int)$business_id ?>);
     formData.append('product_id', productId);
@@ -255,27 +254,27 @@ async function saveAudit() {
     formData.append('notes', notes);
 
     try {
-        // Kirim permintaan pembuatan audit stok via Fetch API
+        // Kirim permintaan pencatatan audit stok via Fetch API
         const response = await fetch('../api/create-stock-audit.php', {
             method: 'POST',
             body: formData
         });
 
-        // Konversi respons server ke format JSON
         const result = await response.json();
 
-        alert(result.message);
-
-        // Jika transaksi berhasil, muat ulang halaman untuk memperbarui data stok
         if (result.success) {
-            window.location.reload();
+            showToast(result.message, 'success');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } else {
+            showToast(result.message, 'error');
         }
     } catch (error) {
-        // Tangani jika terjadi kendala koneksi atau error pada server
-        alert(<?= json_encode(__('system_error')) ?>);
+        showToast(<?= json_encode(__('system_error')) ?>, 'error');
         console.error(error);
     } finally {
-        // Kembalikan status tombol simpan ke kondisi semula
+        // Kembalikan tombol ke status aktif semula
         saveButton.disabled = false;
         saveButton.style.opacity = '1';
         saveButton.innerHTML = originalButtonHTML;

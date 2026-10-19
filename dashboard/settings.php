@@ -45,7 +45,7 @@ $userProfile = mysqli_fetch_assoc(mysqli_stmt_get_result($stmtUser));
         <section style="padding:32px; max-width:650px;">
             <div style="margin-bottom:20px;">
                 <!-- Judul halaman -->
-                <h1 style="margin:0; font-size:26px;"><?= $lang === 'en' ? 'Settings' : 'Pengaturan' ?></h1>
+                <h1 style="margin:0; font-size:26px;"><?= htmlspecialchars(__('settings_title'), ENT_QUOTES, 'UTF-8') ?></h1>
                 <!-- Deskripsi -->
                 <p style="color:#81776D; margin-top:6px; font-size:14px;">
                     <?= htmlspecialchars(__('settings_description'), ENT_QUOTES, 'UTF-8') ?>
@@ -146,8 +146,9 @@ $userProfile = mysqli_fetch_assoc(mysqli_stmt_get_result($stmtUser));
     </main>
 </div>
 
-<!-- Ikon -->
+<!-- Library Ikon & Notifikasi UI Kustom -->
 <script src="https://unpkg.com/lucide@latest"></script>
+<script src="../assets/js/toast.js" defer></script>
 
 <script>
 lucide.createIcons();
@@ -171,14 +172,15 @@ document.getElementById('businessPhoto').addEventListener('change', function() {
 
 // Menangani pengiriman form pengaturan secara asinkron via Fetch API
 document.getElementById('settingsForm').addEventListener('submit', async function(e) {
+    // Mencegah perilaku default pengiriman form halaman
     e.preventDefault();
-    const formData = new FormData(this);
     
-    // Ambil ID bisnis dari form data
+    // Membaca seluruh data input dari form
+    const formData = new FormData(this);
     const businessId = formData.get('business_id');
 
     try {
-        // Kirim data pembaruan pengaturan ke backend API
+        // Mengirimkan permintaan pembaruan data ke API backend
         const response = await fetch('../api/update-settings.php?business_id=' + businessId, {
             method: 'POST',
             body: formData
@@ -186,32 +188,43 @@ document.getElementById('settingsForm').addEventListener('submit', async functio
         
         const result = await response.json();
         
-        // Memunculkan pesan respons dan memuat ulang halaman jika pembaruan sukses
-        alert(result.message);
+        // Menampilkan notifikasi toast berdasarkan status respon server
         if (result.status === 'success') {
-            location.reload();
+            showToast(result.message, 'success');
+            
+            // Memberikan jeda waktu sebentar agar toast terlihat sebelum halaman dimuat ulang
+            setTimeout(() => {
+                location.reload();
+            }, 1200);
+        } else {
+            showToast(result.message, 'error');
         }
     } catch (err) {
         console.error(err);
-        alert('Terjadi kesalahan koneksi atau respon server tidak valid.');
+        // Menampilkan toast error jika koneksi terputus atau server mengembalikan respon tidak valid
+        showToast(<?= json_encode(__('connection_error')) ?>, 'error');
     }
 });
 
-
 // Menangani proses penghapusan toko saat tombol hapus toko diklik
 document.getElementById('btnDeleteBusiness').addEventListener('click', async function() {
-    // Tampilkan dialog konfirmasi penghapusan toko
-    const confirmDelete = confirm(<?= json_encode(__('confirm_delete_business')) ?>);
+    // Memunculkan dialog modal konfirmasi kustom
+    const confirmDelete = await showConfirm(
+        <?= json_encode(__('confirm_delete_business')) ?>,
+        <?= json_encode(__('delete_business_btn')) ?>,
+        <?= json_encode(__('btn_cancel')) ?>,
+        true // Parameter true untuk mewarnai tombol konfirmasi menjadi merah (danger)
+    );
 
-    // Batalkan proses jika pengguna memilih batal
+    // Menghentikan eksekusi jika pengguna memilih batal
     if (!confirmDelete) return;
 
-    // Siapkan parameter ID bisnis yang akan dihapus
+    // Menyusun parameter ID bisnis yang akan dihapus
     const formData = new FormData();
     formData.append('business_id', '<?= (int)$business_id ?>');
 
     try {
-        // Kirim permintaan penghapusan toko ke API
+        // Mengirimkan permintaan penghapusan toko ke API backend
         const response = await fetch('../api/delete-business.php', {
             method: 'POST',
             body: formData
@@ -219,25 +232,29 @@ document.getElementById('btnDeleteBusiness').addEventListener('click', async fun
 
         const textText = await response.text();
         
-        // Parsing hasil respon JSON dari server
+        // Melakukan parsing data respon ke format JSON
         let result;
         try {
             result = JSON.parse(textText);
         } catch (e) {
             console.error('Server mengembalikan HTML alih-alih JSON:', textText);
-            alert('Terjadi kesalahan server. Cek konsol browser untuk melihat detail error.');
+            showToast(<?= json_encode(__('server_error')) ?>, 'error');
             return;
         }
 
-        alert(result.message);
-
-        // Jika penghapusan berhasil, alihkan pengguna kembali ke halaman daftar bisnis
+        // Menampilkan hasil pemrosesan dan mengarahkan halaman jika sukses
         if (result.status === 'success') {
-            window.location.href = '../businesses.php';
+            showToast(result.message, 'success');
+            
+            setTimeout(() => {
+                window.location.href = '../businesses.php';
+            }, 1200);
+        } else {
+            showToast(result.message, 'error');
         }
     } catch (err) {
         console.error(err);
-        alert('Terjadi kesalahan koneksi saat menghapus toko.');
+        showToast(<?= json_encode(__('connection_error')) ?>, 'error');
     }
 });
 </script>

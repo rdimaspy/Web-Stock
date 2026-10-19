@@ -1,11 +1,7 @@
 <?php
 // Memulai sesi dan menentukan bahasa yang sedang aktif
 session_start();
-$lang = $_SESSION['language'] ?? 'id';
-
-// Memuat kamus bahasa berdasarkan file PHP di folder lang/
-$langFile = __DIR__ . "/lang/{$lang}.php";
-$trans = file_exists($langFile) ? require $langFile : require __DIR__ . "/lang/id.php";
+require_once __DIR__ . '/includes/language.php';
 ?>
 
 
@@ -17,8 +13,9 @@ $trans = file_exists($langFile) ? require $langFile : require __DIR__ . "/lang/i
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register | Stock</title>
 
-    <!-- Library ikon Lucide -->
+    <!-- Library ikon Lucide & Notifikasi UI Kustom -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="assets/js/toast.js" defer></script>
 
     <!-- CSS background register-->
     <style>
@@ -78,57 +75,57 @@ $trans = file_exists($langFile) ? require $langFile : require __DIR__ . "/lang/i
                 </a>
 
                 <p style="margin-top: 10px; color: #81776D; font-size: 14px; line-height: 1.5;">
-                    <?= htmlspecialchars($trans['register_subtitle'] ?? 'Buat akun untuk mulai mengelola stok bisnis.'); ?>
+                    <?= htmlspecialchars(__('register_subtitle'), ENT_QUOTES, 'UTF-8'); ?>
                 </p>
             </div>
 
             <!-- Form pengiriman data pendaftaran akun -->
-            <form action="api/api-register.php" method="POST">
+            <form id="registerForm">
                 <!-- Bidang Isian Nama Lengkap -->
                 <div style="margin-bottom: 18px;">
                     <label style="display:block; font-size:13px; font-weight:600; margin-bottom:7px; color:#49382D;">
-                        <?= htmlspecialchars($trans['name_label'] ?? 'Nama'); ?>
+                        <?= htmlspecialchars(__('name_label'), ENT_QUOTES, 'UTF-8'); ?>
                     </label>
 
                     <input type="text" name="name" class="input-field" 
-                        placeholder="<?= htmlspecialchars($trans['name_placeholder'] ?? 'Masukkan nama'); ?>" 
+                        placeholder="<?= htmlspecialchars(__('name_placeholder'), ENT_QUOTES, 'UTF-8'); ?>" 
                         style="width: 100%; padding: 12px 14px; border: 1px solid #E9E1D7; border-radius: 10px; box-sizing: border-box; font-size: 14px; color: #302921;" required>
                 </div>
 
                 <!-- Email -->
                 <div style="margin-bottom: 18px;">
                     <label style="display: block; font-size: 13px; font-weight:600; margin-bottom: 7px; color:#49382D;">
-                        <?= htmlspecialchars($trans['email_label'] ?? 'Email'); ?>
+                        <?= htmlspecialchars(__('email_label'), ENT_QUOTES, 'UTF-8'); ?>
                     </label>
 
                     <input type="email" name="email" class="input-field" 
-                        placeholder="<?= htmlspecialchars($trans['email_placeholder'] ?? 'Masukkan email'); ?>"
+                        placeholder="<?= htmlspecialchars(__('email_placeholder'), ENT_QUOTES, 'UTF-8'); ?>"
                         style="width: 100%; padding: 12px 14px; border: 1px solid #E9E1D7; border-radius: 10px; box-sizing: border-box; font-size: 14px; color: #302921;" required>
                 </div>
 
                 <!-- Password -->
                 <div style="margin-bottom: 24px;">
                     <label style="display: block; font-size: 13px; font-weight:600; margin-bottom: 7px; color:#49382D;">
-                        <?= htmlspecialchars($trans['password_label'] ?? 'Password'); ?>
+                        <?= htmlspecialchars(__('password_label'), ENT_QUOTES, 'UTF-8'); ?>
                     </label>
 
                     <!-- Ketentuan password max 6 cahr -->
                     <input type="password" name="password" class="input-field" minlength="6" maxlength="6" 
-                        placeholder="<?= htmlspecialchars($trans['create_password_placeholder'] ?? 'Buat password (6 karakter)'); ?>"
+                        placeholder="<?= htmlspecialchars(__('create_password_placeholder'), ENT_QUOTES, 'UTF-8'); ?>"
                         style="width: 100%; padding: 12px 14px; border: 1px solid #E9E1D7; border-radius: 10px; box-sizing: border-box; font-size: 14px; color: #302921;" required>
                 </div>
 
                 <!-- Tombol Submit Buat Akun -->
                 <button type="submit" style="width: 100%; padding: 13px; background: #76553D; color: #FFFFFF; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s;">
-                    <?= htmlspecialchars($trans['create_account_btn'] ?? 'Buat Akun'); ?>
+                    <?= htmlspecialchars(__('create_account_btn'), ENT_QUOTES, 'UTF-8'); ?>
                 </button>
             </form>
 
             <!-- Tautan navigasi ke halaman login -->
             <p style="text-align:center; margin-top:28px; color:#81776D; font-size:13px;">
-                <span><?= htmlspecialchars($trans['already_have_account'] ?? 'Sudah punya akun?'); ?></span>
+                <span><?= htmlspecialchars(__('already_have_account'), ENT_QUOTES, 'UTF-8'); ?></span>
                 <a href="login.php" style="color:#76553D; text-decoration:none; font-weight:600; margin-left:4px;">
-                    <?= htmlspecialchars($trans['login'] ?? 'Masuk'); ?>
+                    <?= htmlspecialchars(__('login'), ENT_QUOTES, 'UTF-8'); ?>
                 </a>
             </p>
 
@@ -136,17 +133,56 @@ $trans = file_exists($langFile) ? require $langFile : require __DIR__ . "/lang/i
             <div style="margin-top: 20px; padding-top: 16px; border-top: 1px dashed #E9E1D7; text-align: center;">
                 <a href="index.php" style="display: inline-flex; align-items: center; gap: 6px; color: #81776D; text-decoration: none; font-size: 13px; font-weight: 500;">
                     <i data-lucide="arrow-left" style="width: 14px; height: 14px;"></i>
-                    <span><?= htmlspecialchars($trans['back_to_home'] ?? 'Kembali ke Beranda'); ?></span>
+                    <span><?= htmlspecialchars(__('back_to_home'), ENT_QUOTES, 'UTF-8'); ?></span>
                 </a>
             </div>
         </div>
 
     </div>
 
-    <!-- Ikon -->
+<!-- Library ikon Lucide & Notifikasi UI Kustom -->
 <script src="https://unpkg.com/lucide@latest"></script>
+<script src="assets/js/toast.js" defer></script>
 
-<script> lucide.createIcons(); </script>
+<script>
+lucide.createIcons();
+
+// Menangani pengiriman form pendaftaran akun secara asinkron via Fetch API
+document.getElementById('registerForm')?.addEventListener('submit', async function(e) {
+    // Mencegah reload halaman bawaan
+    e.preventDefault();
+
+    // Membaca seluruh data input formulir pendaftaran
+    const formData = new FormData(this);
+
+    try {
+        // Mengirimkan data pendaftaran ke API backend
+        const response = await fetch('api/api-register.php', {
+            method: 'POST',
+            body: formData
+        });
+
+        // Menerjemahkan hasil respons ke format JSON
+        const result = await response.json();
+
+        // Menampilkan notifikasi toast berdasarkan hasil registrasi
+        if (result.status === 'success') {
+            showToast(result.message, 'success');
+
+            // Jika sukses membuat akun, alihkan ke halaman login setelah jeda singkat
+            setTimeout(() => {
+                window.location.href = 'login.php';
+            }, 1200);
+        } else {
+            showToast(result.message, 'error');
+        }
+    } catch (err) {
+        // Menangani kegagalan koneksi atau error server
+        console.error(err);
+        showToast(<?= json_encode(__('connection_error')) ?>, 'error');
+    }
+});
+</script>
 
 </body>
 </html>

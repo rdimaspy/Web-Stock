@@ -41,7 +41,7 @@ require_once __DIR__ . '/includes/language.php';
                 <p style="color:#81776D; font-size:14px; margin-top:10px;"><?= htmlspecialchars(__('create_business_desc'), ENT_QUOTES, 'UTF-8') ?></p>
             </div>
 
-            <form action="api/create-business.php" method="POST" enctype="multipart/form-data">
+            <form id="createBusinessForm" enctype="multipart/form-data">
 
                 <!-- PHOTO -->
                 <label style="display:block; font-size:13px; margin-bottom:10px;">
@@ -84,8 +84,9 @@ require_once __DIR__ . '/includes/language.php';
         </div>
     </div>
 
-<!-- Ikon -->
+<!-- Library Ikon & Notifikasi UI Kustom -->
 <script src="https://unpkg.com/lucide@latest"></script>
+<script src="assets/js/toast.js" defer></script>
 
 <script>
 lucide.createIcons();
@@ -119,6 +120,42 @@ input.addEventListener("change", function(){
         };
         // Konversi file gambar ke URL data biner
         reader.readAsDataURL(file);
+    }
+});
+
+// Menangani proses pengiriman formulir pembuatan bisnis
+document.getElementById('createBusinessForm')?.addEventListener('submit', async function(e) {
+    // Mencegah reload halaman bawaan formulir
+    e.preventDefault();
+
+    // Membaca seluruh data input dari form
+    const formData = new FormData(this);
+
+    try {
+        // Mengirimkan data pembuatan toko ke API backend
+        const response = await fetch('api/api-create-business.php', {
+            method: 'POST',
+            body: formData
+        });
+
+        // Menerjemahkan respons server ke format JSON
+        const result = await response.json();
+
+        // Menampilkan notifikasi toast sesuai hasil pemrosesan
+        if (result.status === 'success') {
+            showToast(result.message, 'success');
+
+            // Mengalihkan halaman ke daftar bisnis setelah jeda notifikasi
+            setTimeout(() => {
+                window.location.href = 'businesses.php';
+            }, 1200);
+        } else {
+            showToast(result.message, 'error');
+        }
+    } catch (err) {
+        // Menangani kegagalan koneksi atau error server
+        console.error(err);
+        showToast(<?= json_encode(__('connection_error')) ?>, 'error');
     }
 });
 </script>

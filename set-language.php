@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // Menangkap input pilihan bahasa dengan default bahasa Indonesia ('id')
 $lang = $_POST['language'] ?? 'id';
 
-// Memvalidasi agar kode bahasa yang masuk hanya 'id' atau 'en'
+// Memvalidasi agar kode bahasa yang masuk hanya 'id' or 'en'
 if (!in_array($lang, ['id', 'en'], true)) {
     $lang = 'id';
 }

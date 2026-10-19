@@ -4,7 +4,7 @@ session_start();
 
 // Kembalikan pengguna ke halaman login, jika belum memiliki sesi login
 if (!isset($_SESSION['user_id'])) {
-    header("Location: ../login.html");
+    header("Location: login.php");
     exit;
 }
 

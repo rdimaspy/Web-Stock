@@ -138,8 +138,8 @@ $products = mysqli_stmt_get_result($stmt);
                 <!-- Dropdown Filter Urutan Kode Produk -->
                 <select name="sort_code" style="min-width:150px; padding:12px; border:1px solid #E9E1D7; border-radius:8px; background:white; color:#49382D;">
                     <option value=""><?= htmlspecialchars(__('sort_code'), ENT_QUOTES, 'UTF-8') ?></option>
-                    <option value="ASC" <?= ($_GET['sort_code'] ?? '') === 'ASC' ? 'selected' : '' ?>>A - Z (ASC)</option>
-                    <option value="DESC" <?= ($_GET['sort_code'] ?? '') === 'DESC' ? 'selected' : '' ?>>Z - A (DESC)</option>
+                    <option value="ASC" <?= ($_GET['sort_code'] ?? '') === 'ASC' ? 'selected' : '' ?>><?= htmlspecialchars(__('sort_code_asc'), ENT_QUOTES, 'UTF-8') ?></option>
+                    <option value="DESC" <?= ($_GET['sort_code'] ?? '') === 'DESC' ? 'selected' : '' ?>><?= htmlspecialchars(__('sort_code_desc'), ENT_QUOTES, 'UTF-8') ?></option>
                 </select>
 
                 <!-- Tombol submit filter -->
@@ -339,9 +339,10 @@ $products = mysqli_stmt_get_result($stmt);
     </div>
 </div>
 
-<!-- ICON -->
+<!-- ICON & UI HELPERS -->
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../assets/js/currency.js"></script>
+<script src="../assets/js/toast.js" defer></script>
 
 <script>
 lucide.createIcons();
@@ -372,38 +373,45 @@ function closeProductModal(){
     resetProductForm();
 }
 
-// Cek form isi produk
-document.getElementById('productForm').addEventListener('submit', function(e){
+// Menangani pengiriman form simpan/update produk
+document.getElementById('productForm').addEventListener('submit', async function(e){
+    // Mencegah reload halaman bawaan form
     e.preventDefault();
 
     const form = this;
     const formData = new FormData(form);
 
-    // Kirim request ke endpoint API sesuai mode form
-    fetch( 
-        editMode 
-        ? '../api/update-product.php'
-        : '../api/create-product.php', 
-    {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        // Tampilkan respons server dan reload jika sukses
-        if(data.status === 'success'){
-            alert(data.message);
+    try {
+        // Menentukan endpoint API berdasarkan mode (Edit / Tambah)
+        const response = await fetch( 
+            editMode 
+            ? '../api/update-product.php'
+            : '../api/create-product.php', 
+        {
+            method: 'POST',
+            body: formData
+        });
+
+        // Menerjemahkan respon server ke format JSON
+        const data = await response.json();
+
+        // Menampilkan notifikasi Toast berdasarkan status respon
+        if (data.status === 'success'){
+            showToast(data.message, 'success');
             closeProductModal();
             form.reset();
-            location.reload();
-        }else{
-            alert(data.message || 'Gagal menyimpan produk');
+
+            // Memuat ulang halaman setelah jeda notifikasi
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        } else {
+            showToast(data.message || <?= json_encode(__('product_save_error')) ?>, 'error');
         }
-    })
-    .catch(error => {
+    } catch (error) {
         console.error(error);
-        alert('Terjadi kesalahan');
-    });
+        showToast(<?= json_encode(__('connection_error')) ?>, 'error');
+    }
 });
 
 // Menambahkan event listener saat berkas foto produk dipilih oleh pengguna
@@ -444,7 +452,7 @@ function toggleCategoryForm(){
 
 }
 
-// Simpan kategori baru ke server
+// Menimpan kategori baru ke server secara asinkron
 async function saveNewCategory() {
     // Ambil elemen input, tombol simpan, dan nilai nama kategori
     const input = document.getElementById('newCategoryInput');
@@ -453,7 +461,7 @@ async function saveNewCategory() {
 
     // Validasi input nama kategori tidak boleh kosong
     if (!categoryName) {
-        alert(translations.category_name_required);
+        showToast(translations.category_name_required, 'error');
         input.focus();
         return;
     }
@@ -468,7 +476,7 @@ async function saveNewCategory() {
     button.textContent = translations.saving;
 
     try {
-        // Kirim data kategori baru
+        // Kirim data kategori baru ke API backend
         const response = await fetch('../api/create-category.php', {
             method: 'POST',
             body: formData
@@ -479,7 +487,7 @@ async function saveNewCategory() {
 
         // Cek jika HTTP status gagal atau status respon bukan success
         if (!response.ok || result.status !== 'success') {
-            alert(result.message || 'Kategori gagal disimpan.');
+            showToast(result.message || <?= json_encode(__('category_save_failed')) ?>, 'error');
             return;
         }
 
@@ -501,12 +509,12 @@ async function saveNewCategory() {
         input.value = '';
         document.getElementById('newCategoryBox').style.display = 'none';
 
-        // Tampilkan pesan sukses dari server
-        alert(result.message);
+        // Tampilkan pesan sukses dari server lewat Toast
+        showToast(result.message, 'success');
     } catch (error) {
         // Jika terjadi error koneksi atau sistem
         console.error(error);
-        alert('Terjadi kesalahan saat menyimpan kategori.');
+        showToast(<?= json_encode(__('category_error')) ?>, 'error');
     } finally {
         // Kembalikan tombol ke status aktif setelah proses selesai
         button.disabled = false;
@@ -653,11 +661,14 @@ document.querySelectorAll('.currency-input').forEach(input => {
     });
 });
 
-// Hapus data produk secara permanen dari database
+// Menghapus data produk secara permanen dari database
 async function deleteProduct(productId) {
-    // Tampilkan konfirmasi penghapusan sesuai pilihan bahasa aktif
-    const confirmed = confirm(
-        <?= json_encode(__('delete_product_confirm')) ?>
+    // Tampilkan modal konfirmasi kustom sesuai pilihan bahasa aktif
+    const confirmed = await showConfirm(
+        <?= json_encode(__('delete_product_confirm')) ?>,
+        <?= json_encode(__('delete')) ?>,
+        <?= json_encode(__('cancel')) ?>,
+        true // Parameter true untuk tombol berlatar merah (aksi hapus)
     );
 
     // Batal jalankan fungsi jika pengguna memilih batal
@@ -682,17 +693,19 @@ async function deleteProduct(productId) {
 
         // Cek jika status respons gagal atau bermasalah
         if (!response.ok || result.status !== 'success') {
-            alert(result.message || 'Produk gagal dihapus.');
+            showToast(result.message || <?= json_encode(__('product_delete_failed')) ?>, 'error');
             return;
         }
 
-        // Tampilkan pesan sukses dan muat ulang halaman
-        alert(result.message);
-        window.location.reload();
+        // Tampilkan pesan sukses dan muat ulang halaman setelah jeda notifikasi
+        showToast(result.message, 'success');
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000);
     } catch (error) {
         // Tangani jika terjadi error koneksi atau server
         console.error(error);
-        alert('Terjadi kesalahan saat menghapus produk.');
+        showToast(<?= json_encode(__('product_delete_error')) ?>, 'error');
     }
 }
 </script>

@@ -457,32 +457,39 @@ mysqli_data_seek($reports, 0);
 <!-- Iframe tersembunyi untuk memuat file export-pdf.php tanpa pindah halaman -->
 <iframe id="pdfFrame" style="display:none;"></iframe>
 
-<!-- Ikon -->
+<!-- Library Ikon & Notifikasi UI Kustom -->
 <script src="https://unpkg.com/lucide@latest"></script>
+<script src="../assets/js/toast.js" defer></script>
 
 <script>
 lucide.createIcons();
 
+// Flag jumlah data laporan dari PHP
+const hasReportData = <?= $total_products > 0 ? 'true' : 'false' ?>;
+
 // Fungsi untuk mengonversi data tabel laporan ke file CSV
 async function exportTableToCSV(defaultFilename) {
-    // Ambil elemen tabel laporan berdasarkan ID
+    // Validasi keberadaan data sebelum diekspor
+    if (!hasReportData) {
+        showToast(<?= json_encode(__('no_data_to_export')) ?>, 'error');
+        return;
+    }
+
     const table = document.getElementById('reportTable');
     let csv = [];
     
     // Looping setiap baris tabel untuk mengambil isi sel data
     for (let row of table.rows) {
-        // Format teks sel dengan escape karakter tanda kutip ganda agar CSV tetap terstruktur
         let cols = Array.from(row.cells).map(cell => `"${cell.innerText.replace(/"/g, '""')}"`);
         csv.push(cols.join(','));
     }
 
-    // Tambahkan karakter UTF-8 BOM (\uFEFF) agar simbol mata uang dan karakter khusus terbaca rapi di Excel
+    // Tambahkan karakter UTF-8 BOM (\uFEFF) agar simbol mata uang terbaca rapi di Excel
     const csvData = '\uFEFF' + csv.join('\n');
 
-    // Gunakan fitur modern File System Access API jika didukung oleh browser
+    // Gunakan File System Access API jika didukung oleh browser
     if ('showSaveFilePicker' in window) {
         try {
-            // Tampilkan dialog pilihan folder penyimpanan 'Save As' kepada pengguna
             const handle = await window.showSaveFilePicker({
                 suggestedName: defaultFilename,
                 types: [{
@@ -490,41 +497,57 @@ async function exportTableToCSV(defaultFilename) {
                     accept: { 'text/csv': ['.csv'] },
                 }],
             });
-            // Tulis dan simpan data CSV ke file yang dipilih pengguna
             const writable = await handle.createWritable();
             await writable.write(csvData);
             await writable.close();
+            showToast(<?= json_encode(__('csv_export_success')) ?>, 'success');
         } catch (err) {
-            // Abaikan error jika pengguna menutup atau membatalkan dialog penyimpanan
+            // Pengguna membatalkan dialog penyimpanan
         }
     } else {
-        // Alternatif unduhan otomatis (fallback) untuk browser yang belum mendukung Save File Picker
-        const csvFile = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
-        const downloadLink = document.createElement('a');
-        downloadLink.download = defaultFilename;
-        downloadLink.href = window.URL.createObjectURL(csvFile);
-        downloadLink.style.display = 'none';
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
+        // Fallback unduhan otomatis untuk browser biasa
+        try {
+            const csvFile = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+            const downloadLink = document.createElement('a');
+            downloadLink.download = defaultFilename;
+            downloadLink.href = window.URL.createObjectURL(csvFile);
+            downloadLink.style.display = 'none';
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+            showToast(<?= json_encode(__('csv_export_success')) ?>, 'success');
+        } catch (e) {
+            showToast(<?= json_encode(__('csv_export_failed')) ?>, 'error');
+        }
     }
 }
 
-// Fungsi untuk memuat dan mencetak file PDF secara otomatis 
+// Fungsi untuk memuat dan mencetak file PDF
 function printPDF(url) {
-    // Ambil elemen penampung dari halaman HTML
+    if (!hasReportData) {
+        showToast(<?= json_encode(__('no_data_to_export')) ?>, 'error');
+        return;
+    }
+
     const iframe = document.getElementById('pdfFrame');
-    
-    // Masukkan lokasi file PDF ke dalam iframe
     iframe.src = url;
     
-    // Jalankan perintah cetak begitu PDF selesai dimuat sempurna
     iframe.onload = function() {
-        // Fokuskan kursor browser ke dalam iframe
-        iframe.contentWindow.focus();
-        
-        // Panggil perintah cetak bawaan browser untuk isi iframe tersebut
-        iframe.contentWindow.print();
+        try {
+            iframe.contentWindow.focus();
+
+            // Pasang pendeteksi selesai cetak pada window iframe
+            iframe.contentWindow.addEventListener('afterprint', function handleAfterPrint() {
+                showToast(<?= json_encode(__('pdf_export_success') ?? 'Dokumen PDF berhasil diproses.') ?>, 'success');
+                iframe.contentWindow.removeEventListener('afterprint', handleAfterPrint);
+            });
+
+            // Jalankan dialog cetak PDF
+            iframe.contentWindow.print();
+        } catch (e) {
+            console.error(e);
+            showToast(<?= json_encode(__('pdf_export_failed') ?? 'Gagal memuat dokumen PDF.') ?>, 'error');
+        }
     };
 }
 

@@ -176,8 +176,9 @@ $productCount = mysqli_num_rows($products);
     </main>
 </div>
 
-<!-- ICON -->
+<!-- Library Ikon & Notifikasi UI Kustom -->
 <script src="https://unpkg.com/lucide@latest"></script>
+<script src="../assets/js/toast.js" defer></script>
 
 <script>
 lucide.createIcons();
@@ -207,17 +208,16 @@ if (productSelect && stockInfo) {
 const stockInForm = document.getElementById('stockInForm');
 const stockInSubmitButton = document.getElementById('stockInSubmitButton');
 
-// Proses submit form stok masuk
+// Proses submit form stok masuk secara asinkron
 if (stockInForm && stockInSubmitButton) {
     stockInForm.addEventListener('submit', async function (event) {
+        // Mencegah reload halaman bawaan form
         event.preventDefault();
 
-        // Cek apakah semua kolom form sudah diisi dengan benar sebelum dikirim
         if (!stockInForm.reportValidity()) {
             return;
         }
 
-        // Simpan tampilan asli tombol untuk dikembalikan setelah proses selesai
         const originalButtonHTML = stockInSubmitButton.innerHTML;
 
         // Ubah UI tombol ke status loading
@@ -235,24 +235,24 @@ if (stockInForm && stockInSubmitButton) {
 
             const result = await response.json();
 
-            // Kegagalan respons dari server
+            // Penanganan jika status respon gagal
             if (!response.ok || result.status !== 'success') {
-                alert(result.message || <?= json_encode(__('failed_save_stock_in')) ?>);
+                showToast(result.message || <?= json_encode(__('failed_save_stock_in')) ?>, 'error');
                 return;
             }
 
-            alert(result.message);
-
-            // Muat ulang agar stok terbaru ditampilkan.
-            window.location.reload();
+            // Tampilkan toast sukses dan muat ulang halaman setelah jeda
+            showToast(result.message, 'success');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
 
         } catch (error) {
             console.error(error);
-
-            alert(<?= json_encode(__('error_saving_stock_in')) ?>);
+            showToast(<?= json_encode(__('error_saving_stock_in')) ?>, 'error');
 
         } finally {
-            // Kembalikan status tombol submit ke kondisi normal
+            // Kembalikan tombol ke kondisi semula
             stockInSubmitButton.disabled = false;
             stockInSubmitButton.innerHTML = originalButtonHTML;
             stockInSubmitButton.style.cursor = 'pointer';
