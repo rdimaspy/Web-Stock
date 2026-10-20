@@ -157,7 +157,7 @@ mysqli_data_seek($reports, 0);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars(__('reports'), ENT_QUOTES, 'UTF-8') ?> - Stock</title>
+    <title><?= htmlspecialchars(__('reports'), ENT_QUOTES, 'UTF-8') ?> - StockIn</title>
 </head>
 
 <!-- Styling utama layout dan warna latar halaman -->

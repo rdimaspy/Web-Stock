@@ -16,7 +16,7 @@ require_once __DIR__ . '/includes/language.php';
     <!-- Deskripsi meta untuk SEO -->
     <meta name="description" content="Stock membantu pemilik bisnis mengelola produk, persediaan, penjualan, dan laporan stok.">
 
-    <title>Stock | Stock Management</title>
+    <title>StockIn | Stock Management</title>
     <!-- Library ikon Lucide -->
     <script src="https://unpkg.com/lucide@latest" defer></script>
     <script src="assets/js/app.js" defer></script>
@@ -44,18 +44,22 @@ require_once __DIR__ . '/includes/language.php';
     <header style="width: 100%; background: #FFFFFF; border-bottom: 2px solid #E9E1D7;">
         <div class="navbar-container" style="max-width: 1160px; height: 64px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
 
-            <!-- Identitas dan logo aplikasi -->
-            <a href="index.php"
-            style="display: flex; align-items: center; gap: 9px; color: #302921; text-decoration: none; font-size: 22px; font-weight: 700;">
+            <!-- Logo StockIn -->
+            <div style="display:inline-flex; align-items:center; font-family:Arial, sans-serif; font-weight:800; font-size:24px; letter-spacing:-0.5px;">
+                <!-- Teks "Stock" -->
+                <span style="color:#49382D;">Stock</span>
 
-                <span style="width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; background: #76553D; color: #FFFFFF; border-radius: 10px; font-size: 17px;">
-                    S
-                </span>
-
-                <span>
-                    Stock<span style="color:#A77D5B;">.</span>
-                </span>
-            </a>
+                <!-- Container Berlapis / Stacked Box -->
+                <div style="position:relative; display:inline-block; margin-left:6px;">
+                    <!-- Lapisan Bayangan Belakang (Dus Bawah) -->
+                    <span style="position:absolute; top:-3px; right:-3px; width:100%; height:100%; background:#B99A7D; border-radius:6px; z-index:1;"></span>
+                    
+                    <!-- Kotak Utas "In" (Dus Atas) -->
+                    <span style="position:relative; z-index:2; display:block; background:#76553D; color:white; padding:3px 8px; border-radius:6px; font-size:20px; line-height:1.2;">
+                        In
+                    </span>
+                </div>
+            </div>
 
             <!-- Menu navigasi kanan -->
             <div style="display: flex; align-items: center; gap: 16px;">
@@ -84,12 +88,12 @@ require_once __DIR__ . '/includes/language.php';
                 </div>
 
                 <!-- Tombol navigasi masuk -->
-                <a href="login.php" style="color:#302921; text-decoration:none; font-size:13px; font-weight:600;">
+                <a href="login.php" style="color:#302921; text-decoration:none; font-size:13px; font-weight:bold;">
                     <?= htmlspecialchars(__('login'), ENT_QUOTES, 'UTF-8'); ?>
                 </a>
 
                 <!-- Tombol registrasi akun baru -->
-                <a href="register.php" style="padding:8px 15px; background:#76553D; color:#FFFFFF; border-radius:8px; text-decoration: none; font-size: 13px;">
+                <a href="register.php" style="padding:8px 15px; background:#76553D; color:#FFFFFF; border-radius:8px; text-decoration: none; font-size: 13px; font-weight:bold">
                     <?= htmlspecialchars(__('signup'), ENT_QUOTES, 'UTF-8'); ?>
                 </a>
             </div>
@@ -115,8 +119,8 @@ require_once __DIR__ . '/includes/language.php';
                 </p>
 
                 <div style="margin-top: 28px;">
-                    <a href="register.html"
-                    style="display: inline-block; padding: 13px 24px; background: #76553D; color: #FFFFFF; border-radius: 9px; text-decoration: none; font-size: 14px; font-weight: 600;">
+                    <a href="register.php"
+                    style="display: inline-block; padding: 13px 24px; background: #76553D; color: #FFFFFF; border-radius: 9px; text-decoration: none; font-size: 14px; font-weight: bold;">
                         <span><?= htmlspecialchars(__('create_account'), ENT_QUOTES, 'UTF-8'); ?></span> →
                     </a>
                 </div>
@@ -332,14 +336,25 @@ require_once __DIR__ . '/includes/language.php';
         <div class="footer-container" style="max-width: 1160px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
 
             <!-- Logo brand pada footer -->
-            <a href="index.php"
-            style="color: #302921; text-decoration: none; font-size: 22px; font-weight: 750;">
-                Stock<span style="color: #A77D5B;">.</span>
-            </a>
+            <div style="display:inline-flex; align-items:center; font-family:Arial, sans-serif; font-weight:800; font-size:24px; letter-spacing:-0.5px;">
+                <!-- Teks "Stock" -->
+                <span style="color:#49382D;">Stock</span>
+
+                <!-- Container Berlapis / Stacked Box -->
+                <div style="position:relative; display:inline-block; margin-left:6px;">
+                    <!-- Lapisan Bayangan Belakang (Dus Bawah) -->
+                    <span style="position:absolute; top:-3px; right:-3px; width:100%; height:100%; background:#B99A7D; border-radius:6px; z-index:1;"></span>
+                    
+                    <!-- Kotak Utas "In" (Dus Atas) -->
+                    <span style="position:relative; z-index:2; display:block; background:#76553D; color:white; padding:3px 8px; border-radius:6px; font-size:20px; line-height:1.2;">
+                        In
+                    </span>
+                </div>
+            </div>
 
             <!-- Informasi hak cipta -->
             <p style="color: #A0988E; font-size: 11px; margin: 0;">
-                © 2026 Stock. All rights reserved.
+                © 2026 StockIn. All rights reserved.
             </p>
 
         </div>

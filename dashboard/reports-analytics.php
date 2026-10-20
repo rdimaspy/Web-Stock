@@ -54,7 +54,7 @@ while ($row = mysqli_fetch_assoc($res_chart)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars(__('analytics_chart'), ENT_QUOTES, 'UTF-8') ?> - Stock</title>
+    <title><?= htmlspecialchars(__('analytics_chart'), ENT_QUOTES, 'UTF-8') ?> - StockIn</title>
 
     <!-- Library Chart.js untuk merender grafik secara interaktif -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

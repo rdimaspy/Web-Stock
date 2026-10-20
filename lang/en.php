@@ -4,7 +4,7 @@ return [
     // Landing Page
     'login'                => 'Login',
     'signup'               => 'Sign Up',
-    'hero_title_1'         => 'Organized stock.',
+    'hero_title_1'         => 'Organized stock,',
     'hero_title_2'         => 'Better directed business.',
     'hero_desc'            => 'Manage products, track stock movements, and understand your business growth all in one place.',
     'create_account'       => 'Create account',
@@ -22,7 +22,7 @@ return [
     'sample_products'      => 'Sample products',
     'clothing'             => 'Clothing',
     'accessories'          => 'Accessories',
-    'features_tag'         => 'STOCK FEATURES',
+    'features_tag'         => 'STOCKIN FEATURES',
     'features_title'       => 'Manage stock hassle-free',
     'features_desc'        => 'Everything you need to manage inventory and monitor your business in one place.',
     'feat_product_mgmt'    => 'Product Management',
@@ -146,7 +146,7 @@ return [
     'new_category_name'            => 'New Category Name',
     'initial_stock'                => 'Initial Stock',
     'notes'                        => 'Notes',
-    'notes_placeholder'            => 'Add notes if needed',
+    'notes_placeholder'            => '(Max 30 Characters)',
     'optional'                     => 'Optional',
     'save_product'                 => 'Save Product',
     'cancel'                       => 'Cancel',
@@ -276,6 +276,15 @@ return [
     'delete_business_btn'        => 'Delete Business',
     'confirm_delete_business'    => 'Are you sure you want to permanently delete this business? All data will be lost!',
     'connection_error'           => 'A connection error occurred or the server response is invalid.',
+    'change_password_section'    => 'Change Password',
+    'change_password_desc'       => 'Update your account password for safety.',
+    'current_password_label'     => 'Current Password',
+    'current_password_place'     => 'Enter current password',
+    'new_password_label'         => 'New Password',
+    'new_password_place'         => 'Enter new password (exact 6 chars)',
+    'confirm_password_label'     => 'Confirm New Password',
+    'confirm_password_place'     => 'Re-enter new password',
+    'update_password_btn'        => 'Update Password',
 
     // Export PDF
     'access_denied'       => 'Access denied.',
@@ -356,6 +365,15 @@ return [
     'product_delete_failed'  => 'Failed to delete product.',
     'product_delete_success' => 'Product deleted successfully.',
     'product_id_not_found'   => 'Product ID not found.',
+
+    // API Update Password
+    'current_password_req'       => 'Current password is required.',
+    'new_password_req'           => 'New password and confirmation are required.',
+    'password_exact_6'           => 'New password must be exactly 6 characters.',
+    'password_mismatch'          => 'New password and confirmation do not match.',
+    'wrong_current_password'     => 'Incorrect current password.',
+    'password_update_success'    => 'Password successfully updated!',
+    'password_update_failed'     => 'Failed to update password. Please try again.',
 
     // Update Product
     'incomplete_product_data' => 'Incomplete or invalid product data.',

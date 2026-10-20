@@ -20,7 +20,7 @@ $userProfile = mysqli_fetch_assoc(mysqli_stmt_get_result($stmtUser));
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars(__('settings_title'), ENT_QUOTES, 'UTF-8') ?> - Stock</title>
+    <title><?= htmlspecialchars(__('settings_title'), ENT_QUOTES, 'UTF-8') ?> - StockIn</title>
 </head>
 
 <!-- Styling utama layout dan warna latar halaman -->
@@ -115,6 +115,44 @@ $userProfile = mysqli_fetch_assoc(mysqli_stmt_get_result($stmtUser));
                     <div style="margin-bottom:20px;">
                         <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;"><?= htmlspecialchars(__('email_address_label'), ENT_QUOTES, 'UTF-8') ?></label>
                         <input type="email" value="<?= htmlspecialchars($userProfile['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>" disabled style="width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #E9E1D7; border-radius:8px; background:#F5EFE8; color:#81776D;">
+                    </div>
+
+                    <hr style="border:0; border-top:1px dashed #E9E1D7; margin:20px 0;">
+
+                    <!-- Bagian Ubah Kata Sandi (Opsional) -->
+                    <div style="margin-bottom:16px;">
+                        <h4 style="margin:0 0 6px; font-size:15px; color:#49382D;">
+                            <?= htmlspecialchars(__('change_password_section'), ENT_QUOTES, 'UTF-8') ?>
+                        </h4>
+                        <p style="margin:0 0 14px; font-size:12px; color:#81776D;">
+                            <?= htmlspecialchars(__('change_password_desc'), ENT_QUOTES, 'UTF-8') ?>
+                        </p>
+                    </div>
+
+                    <!-- Kata Sandi Saat Ini -->
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;">
+                            <?= htmlspecialchars(__('current_password_label'), ENT_QUOTES, 'UTF-8') ?>
+                        </label>
+                        <input type="password" name="current_password" maxlength="6" placeholder="<?= htmlspecialchars(__('current_password_place'), ENT_QUOTES, 'UTF-8') ?>" 
+                            style="width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
+                    </div>
+
+                    <!-- Kata Sandi Baru -->
+                    <div style="margin-bottom:16px;">
+                        <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;">
+                            <?= htmlspecialchars(__('new_password_label'), ENT_QUOTES, 'UTF-8') ?>
+                        </label>
+                        <input type="password" name="new_password" maxlength="6" placeholder="<?= htmlspecialchars(__('new_password_place'), ENT_QUOTES, 'UTF-8') ?>" 
+                            style="width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
+                    </div>
+
+                    <!-- Konfirmasi Kata Sandi Baru -->
+                    <div style="margin-bottom:20px;">
+                        <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;">
+                            <?= htmlspecialchars(__('confirm_password_label'), ENT_QUOTES, 'UTF-8') ?>
+                        </label>
+                        <input type="password" name="confirm_password" maxlength="6" placeholder="<?= htmlspecialchars(__('confirm_password_place'), ENT_QUOTES, 'UTF-8') ?>" style="width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
                     </div>
 
                     <!-- Tombol Simpan Perubahan Pengaturan -->

@@ -4,7 +4,7 @@ return [
     // Landing Page
     'login'                => 'Masuk',
     'signup'               => 'Daftar',
-    'hero_title_1'         => 'Stok teratur.',
+    'hero_title_1'         => 'Stok teratur,',
     'hero_title_2'         => 'Bisnis lebih terarah.',
     'hero_desc'            => 'Kelola produk, pantau pergerakan stok, dan pahami perkembangan bisnismu dalam satu tempat.',
     'create_account'       => 'Buat akun',
@@ -22,7 +22,7 @@ return [
     'sample_products'      => 'Contoh produk',
     'clothing'             => 'Pakaian',
     'accessories'          => 'Aksesori',
-    'features_tag'         => 'FITUR STOCK',
+    'features_tag'         => 'FITUR STOCKIN',
     'features_title'       => 'Kelola stok tanpa ribet',
     'features_desc'        => 'Semua yang kamu butuhkan untuk mengelola persediaan dan memantau bisnis dalam satu tempat.',
     'feat_product_mgmt'    => 'Manajemen Produk',
@@ -146,7 +146,7 @@ return [
     'new_category_name'            => 'Nama Kategori Baru',
     'initial_stock'                => 'Stok Awal',
     'notes'                        => 'Catatan',
-    'notes_placeholder'            => 'Tambahkan catatan jika diperlukan',
+    'notes_placeholder'            => '(Maks 30 Karakter)',
     'optional'                     => 'Opsional',
     'save_product'                 => 'Simpan Produk',
     'cancel'                       => 'Batal',
@@ -276,6 +276,15 @@ return [
     'delete_business_btn'        => 'Hapus Toko Ini',
     'confirm_delete_business'    => 'Apakah kamu yakin ingin menghapus toko ini secara permanen? Seluruh data produk dan transaksi akan hilang!',
     'connection_error'           => 'Terjadi kesalahan koneksi atau respon server tidak valid.',
+    'change_password_section'    => 'Ubah Kata Sandi',
+    'change_password_desc'       => 'Perbarui kata sandi akun kamu untuk menjaga keamanan.',
+    'current_password_label'     => 'Kata Sandi Saat Ini',
+    'current_password_place'     => 'Masukkan kata sandi saat ini',
+    'new_password_label'         => 'Kata Sandi Baru',
+    'new_password_place'         => 'Masukkan kata sandi baru (persis 6 karakter)',
+    'confirm_password_label'     => 'Konfirmasi Kata Sandi Baru',
+    'confirm_password_place'     => 'Masukkan ulang kata sandi baru',
+    'update_password_btn'        => 'Ubah Kata Sandi',
 
     // Ekspor PDF
     'access_denied'       => 'Akses ditolak.',
@@ -356,6 +365,15 @@ return [
     'product_delete_failed'  => 'Produk gagal dihapus.',
     'product_delete_success' => 'Produk berhasil dihapus.',
     'product_id_not_found'   => 'ID produk tidak ditemukan.',
+
+    // API Update Password
+    'current_password_req'       => 'Kata sandi saat ini wajib diisi.',
+    'new_password_req'           => 'Kata sandi baru dan konfirmasi wajib diisi.',
+    'password_exact_6'           => 'Kata sandi baru harus persis 6 karakter.',
+    'password_mismatch'          => 'Kata sandi baru dan konfirmasi tidak cocok.',
+    'wrong_current_password'     => 'Kata sandi saat ini salah.',
+    'password_update_success'    => 'Kata sandi berhasil diperbarui!',
+    'password_update_failed'     => 'Gagal memperbarui kata sandi. Silakan coba lagi.',
 
     // Update Product
     'incomplete_product_data' => 'Data produk tidak lengkap atau tidak valid.',

@@ -13,7 +13,7 @@ require_once __DIR__ . '/includes/language.php';
     <!-- Pengaturan karakter dan viewport halaman agar responsif di HP -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Stock</title>
+    <title>Login | StockIn</title>
 
     <!-- Library ikon Lucide & Notifikasi UI Kustom -->
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -66,14 +66,28 @@ require_once __DIR__ . '/includes/language.php';
 
     <!-- Container utama form autentikasi di tengah layar -->
     <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 30px; position: relative; z-index: 5;">
+        
         <!-- Kartu Form Login -->
         <div style="width: 100%; max-width: 420px; background: #FFFFFF; padding: 40px; border-radius: 20px; border: 1px solid #E9E1D7; box-shadow: 0 20px 50px rgba(92,69,48,0.07);">
 
             <!-- Identitas Logo dan Judul -->
             <div style="text-align: center; margin-bottom: 30px;">
-                <a href="index.php" style="text-decoration: none; color: #302921; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;">
-                    Stock<span style="color: #A77D5B;">.</span>
-                </a>
+                <!-- Logo StockIn -->
+                <div style="display:inline-flex; align-items:center; font-family:Arial, sans-serif; font-weight:800; font-size:24px; letter-spacing:-0.5px;">
+                <!-- Teks "Stock" -->
+                    <span style="color:#49382D;">Stock</span>
+
+                    <!-- Container Berlapis / Stacked Box -->
+                    <div style="position:relative; display:inline-block; margin-left:6px;">
+                        <!-- Lapisan Bayangan Belakang (Dus Bawah) -->
+                        <span style="position:absolute; top:-3px; right:-3px; width:100%; height:100%; background:#B99A7D; border-radius:6px; z-index:1;"></span>
+                        
+                        <!-- Kotak Utas "In" (Dus Atas) -->
+                        <span style="position:relative; z-index:2; display:block; background:#76553D; color:white; padding:3px 8px; border-radius:6px; font-size:20px; line-height:1.2;">
+                            In
+                        </span>
+                    </div>
+                </div>
 
                 <p style="margin-top:10px; color:#81776D; font-size:14px; line-height:1.5;">
                     <?= htmlspecialchars(__('login_subtitle'), ENT_QUOTES, 'UTF-8'); ?>
@@ -99,7 +113,7 @@ require_once __DIR__ . '/includes/language.php';
                         <?= htmlspecialchars(__('password_label'), ENT_QUOTES, 'UTF-8'); ?>
                     </label>
 
-                    <input type="password" name="password" class="input-field" 
+                    <input type="password" name="password" class="input-field" minlength="6" maxlength="6"
                         placeholder="<?= htmlspecialchars(__('password_placeholder'), ENT_QUOTES, 'UTF-8'); ?>" 
                         style="width:100%; padding:12px 14px; border:1px solid #E9E1D7; border-radius:10px; box-sizing:border-box; font-size:14px; color:#302921;">
                 </div>

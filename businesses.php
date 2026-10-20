@@ -37,7 +37,7 @@ $query = mysqli_stmt_get_result($stmt);
     <!-- Pengaturan karakter dan viewport halaman agar responsif di HP -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Business | Stock</title>
+    <title>Business | StockIn</title>
 
     <!-- CSS khusus untuk efek & responsif HP -->
     <style>

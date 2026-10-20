@@ -39,7 +39,7 @@ $products = mysqli_stmt_get_result($stmt);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars(__('stock_audit_title'), ENT_QUOTES, 'UTF-8') ?> - Stock</title>
+    <title><?= htmlspecialchars(__('stock_audit_title'), ENT_QUOTES, 'UTF-8') ?> - StockIn</title>
 </head>
 
 <!-- Styling utama layout dan warna latar halaman -->
@@ -103,7 +103,7 @@ $products = mysqli_stmt_get_result($stmt);
                 </label>
 
                 <!-- Elemen dropdown pilihan produk -->
-                <select id="product_id" onchange="updateAuditStock()" style="width:100%; height:54px; padding:0 16px; border:1px solid #E9E1D7; border-radius:12px; font-size:16px; background:white;">
+                <select id="product_id" onchange="updateAuditStock()" style="width:100%; box-sizing:border-box; padding: 13px; border:1px solid #E9E1D7; border-radius:9px; font-size:15px; background:white;">
                     <option value="">
                         <?= htmlspecialchars(__('select_product'), ENT_QUOTES, 'UTF-8') ?>
                     </option>
@@ -132,7 +132,7 @@ $products = mysqli_stmt_get_result($stmt);
 
                 <input type="number" id="physical_stock" min="0" oninput="calculateDifference()"
                     placeholder="<?= htmlspecialchars(__('enter_physical_stock'), ENT_QUOTES, 'UTF-8') ?>"
-                    style="width:100%; height:54px; padding:0 16px; box-sizing:border-box; border:1px solid #E9E1D7; border-radius:12px; font-size:16px;">
+                    style="width:100%; box-sizing:border-box; padding: 13px; border:1px solid #E9E1D7; border-radius:12px; font-size:15px;">
 
                 <!-- Selisih -->
                 <div style="margin-top:20px;">
@@ -141,7 +141,7 @@ $products = mysqli_stmt_get_result($stmt);
                     </label>
 
                     <div id="difference"
-                        style="height:54px; background:#FAF7F2; border:1px solid #E9E1D7; border-radius:12px; display:flex; align-items:center; padding:0 16px;">
+                        style="height: 40px; background:#FAF7F2; border:1px solid #E9E1D7; border-radius:12px; display:flex; align-items:center; padding:0 16px;">
                         -
                     </div>
 
@@ -150,14 +150,16 @@ $products = mysqli_stmt_get_result($stmt);
                 <!-- Catatan -->
                 <label style="display:block; font-weight:bold; margin-top:20px; margin-bottom:8px;">
                     <?= htmlspecialchars(__('notes'), ENT_QUOTES, 'UTF-8') ?>
+                    <span style="font-size:12px; color:#948578; font-weight:normal;">
+                        (<?= htmlspecialchars(__('optional'), ENT_QUOTES, 'UTF-8') ?>)
+                    </span>
                 </label>
 
-                <textarea id="notes" rows="4" placeholder="<?= htmlspecialchars(__('optional_notes'), ENT_QUOTES, 'UTF-8') ?>"
-                    style="width:100%; padding:14px 16px; box-sizing:border-box; border:1px solid #E9E1D7; border-radius:12px; font-size:16px; resize:vertical;">
-                </textarea>
+                <input type="text" id="notes" name="notes" maxlength="30" placeholder="<?= htmlspecialchars(__('notes_placeholder'), ENT_QUOTES, 'UTF-8') ?>"
+                    style="width:100%; padding:10px 12px; box-sizing:border-box; border:1px solid #E9E1D7; border-radius:8px; font-size:14px; outline-color:#B99A7D;">
 
                 <!-- Tombol save -->
-                <div style="padding-top:20px; border-top:1px solid #E9E1D7; display:flex; justify-content:flex-end;">
+                <div style="padding-top:20px; display:flex; justify-content:flex-end;">
                     <button type="button" onclick="saveAudit()" style="display:flex; align-items:center; gap:8px; padding:12px 19px; border:0; border-radius:9px; background:#76553D; color:white; font-weight:600; cursor:pointer;">
                         <i data-lucide="save" style="width:18px;height:18px;"></i>
                         <?= htmlspecialchars(__('save_audit'), ENT_QUOTES, 'UTF-8') ?>

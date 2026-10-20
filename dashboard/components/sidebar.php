@@ -1,11 +1,22 @@
 <!-- Komponen Sidebar Navigasi Utama -->
 <aside style="position:fixed; top:0; left:0; bottom:0; width:230px; overflow-y:auto; box-sizing:border-box; background:white; border-right:1px solid #E9E1D7; padding:25px 18px; z-index:200;">
     
-    <!-- Logo dan Judul Aplikasi -->
-    <h2 style="margin:0 0 35px; color:#76553D; font-size:27px;">
-        Stock
-        <span style="color:#B99A7D;">.</span>
-    </h2>
+    <!-- Logo Website -->
+    <div style="display:inline-flex; align-items:center; font-family:Arial, sans-serif; font-weight:800; font-size:24px; letter-spacing:-0.5px; margin-bottom: 20px;">
+        <!-- Teks "Stock" -->
+        <span style="color:#49382D;">Stock</span>
+
+        <!-- Container Berlapis / Stacked Box "In" -->
+        <div style="position:relative; display:inline-block; margin-left:6px;">
+            <!-- Lapisan Bayangan Belakang (Dus Bawah) -->
+            <span style="position:absolute; top:-3px; right:-3px; width:100%; height:100%; background:#B99A7D; border-radius:6px; z-index:1;"></span>
+            
+            <!-- Kotak Utama "In" (Dus Atas) -->
+            <span style="position:relative; z-index:2; display:block; background:#76553D; color:white; padding:3px 8px; border-radius:6px; font-size:20px; line-height:1.2;">
+                In
+            </span>
+        </div>
+    </div>
 
     <!-- Label Kategori Menu Utama -->
     <p style="font-size:11px; color:#A3978A; font-weight:bold; letter-spacing:1px;">

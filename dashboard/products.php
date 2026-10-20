@@ -64,7 +64,7 @@ $products = mysqli_stmt_get_result($stmt);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars(__('products'), ENT_QUOTES, 'UTF-8') ?> - Stock</title>
+    <title><?= htmlspecialchars(__('products'), ENT_QUOTES, 'UTF-8') ?> - StockIn</title>
 </head>
 
 <!-- Styling utama layout dan warna latar halaman -->
@@ -194,9 +194,12 @@ $products = mysqli_stmt_get_result($stmt);
                                     <!-- Kategori-->
                                     <td style="padding:10px 12px; color:#81776D; font-size:13px"><?= htmlspecialchars($product['category_name'] ?? __('uncategorized'), ENT_QUOTES, 'UTF-8') ?></td>
                                     <!-- Catatam -->
-                                    <td title="<?= htmlspecialchars($product['notes'] ?? '', ENT_QUOTES, 'UTF-8') ?>" style="padding:10px 12px; color:#81776D; font-size:13px; overflow-wrap:anywhere;"><?php if (!empty(trim($product['notes'] ?? ''))): ?>
-                                        <div style="display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden;"><?= htmlspecialchars($product['notes'], ENT_QUOTES, 'UTF-8') ?></div>
-                                        <?php else: ?>—<?php endif; ?>
+                                    <td style="padding:10px 12px; color:#81776D; font-size:13px; max-width:180px; overflow-wrap:anywhere; word-break:break-word;">
+                                        <?php if (!empty(trim($row['notes'] ?? ''))): ?>
+                                            <?= htmlspecialchars($row['notes'], ENT_QUOTES, 'UTF-8') ?>
+                                        <?php else: ?>
+                                            <span style="color:#B8B0A6;">—</span>
+                                        <?php endif; ?>
                                     </td>
                                     <!-- Harga beli -->
                                     <td style="padding:10px 12px; white-space:nowrap;"><?= htmlspecialchars(formatMoneyPHP($product['purchase_price'], $business['currency']), ENT_QUOTES, 'UTF-8') ?></td>

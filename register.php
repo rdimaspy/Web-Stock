@@ -11,7 +11,7 @@ require_once __DIR__ . '/includes/language.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register | Stock</title>
+    <title>Register | StockIn</title>
 
     <!-- Library ikon Lucide & Notifikasi UI Kustom -->
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -70,9 +70,22 @@ require_once __DIR__ . '/includes/language.php';
 
             <!-- Identitas Logo dan Judul Registrasi -->
             <div style="text-align: center; margin-bottom: 30px;">
-                <a href="index.php" style="text-decoration: none; color: #302921; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;">
-                    Stock<span style="color: #A77D5B;">.</span>
-                </a>
+                <!-- Logo StockIn -->
+                <div style="display:inline-flex; align-items:center; font-family:Arial, sans-serif; font-weight:800; font-size:24px; letter-spacing:-0.5px;">
+                <!-- Teks "Stock" -->
+                    <span style="color:#49382D;">Stock</span>
+
+                    <!-- Container Berlapis / Stacked Box -->
+                    <div style="position:relative; display:inline-block; margin-left:6px;">
+                        <!-- Lapisan Bayangan Belakang (Dus Bawah) -->
+                        <span style="position:absolute; top:-3px; right:-3px; width:100%; height:100%; background:#B99A7D; border-radius:6px; z-index:1;"></span>
+                        
+                        <!-- Kotak Utas "In" (Dus Atas) -->
+                        <span style="position:relative; z-index:2; display:block; background:#76553D; color:white; padding:3px 8px; border-radius:6px; font-size:20px; line-height:1.2;">
+                            In
+                        </span>
+                    </div>
+                </div>
 
                 <p style="margin-top: 10px; color: #81776D; font-size: 14px; line-height: 1.5;">
                     <?= htmlspecialchars(__('register_subtitle'), ENT_QUOTES, 'UTF-8'); ?>

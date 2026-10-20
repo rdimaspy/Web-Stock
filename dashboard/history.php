@@ -104,7 +104,7 @@ function historyTypeBadge($type) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars(__('history_title'), ENT_QUOTES, 'UTF-8') ?> - Stock</title>
+    <title><?= htmlspecialchars(__('history_title'), ENT_QUOTES, 'UTF-8') ?> - StockIn</title>
 </head>
 
 <!-- Styling utama layout dan warna latar halaman -->
@@ -265,8 +265,12 @@ function historyTypeBadge($type) {
                                             <?= $row['stock_after'] === null ? '—' : number_format((int) $row['stock_after']) ?>
                                         </td>
                                         <!-- Catatan -->
-                                        <td style="padding:14px 16px; min-width:180px; max-width:280px; white-space:normal; border-bottom:1px solid #F0EBE5;">
-                                            <?= htmlspecialchars($row['notes'] ?? '', ENT_QUOTES, 'UTF-8') ?: '—' ?>
+                                        <td style="padding:10px 12px; color:#81776D; font-size:13px; max-width:200px; overflow-wrap:anywhere; word-break:break-word;">
+                                            <?php if (!empty(trim($row['notes'] ?? ''))): ?>
+                                                <?= htmlspecialchars($row['notes'], ENT_QUOTES, 'UTF-8') ?>
+                                            <?php else: ?>
+                                                <span style="color:#B8B0A6;">—</span>
+                                            <?php endif; ?>
                                         </td>
                                     </tr>
                                 <?php endwhile; ?>

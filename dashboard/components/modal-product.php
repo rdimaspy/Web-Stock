@@ -81,11 +81,11 @@
                     <label style="display:block; margin-bottom:8px; font-weight:600;"><?= htmlspecialchars(__('expiration_date'), ENT_QUOTES, 'UTF-8') ?></label>
                     <input type="date" name="expiration_date" style="width:100%; box-sizing:border-box; padding:12px; border:1px solid #E9E1D7; border-radius:8px;">
                 </div>
-
-                <!-- Notes -->
+                
+                <!-- Notes Produk -->
                 <div style="margin-bottom:18px;">
-                    <label style="display:block; margin-bottom:8px; font-weight:600;"><?= htmlspecialchars(__('notes'), ENT_QUOTES, 'UTF-8') ?></label>
-                    <textarea name="notes" placeholder="<?= htmlspecialchars(__('notes_placeholder'), ENT_QUOTES, 'UTF-8') ?>" rows="4" style="width:100%; box-sizing:border-box; padding:12px; border:1px solid #E9E1D7; border-radius:8px; resize:none; font-family:inherit;"></textarea>
+                    <label style="display:block; margin-bottom:8px; font-weight:600; font-size:14px;"><?= htmlspecialchars(__('notes'), ENT_QUOTES, 'UTF-8') ?></label>
+                    <input type="text" name="notes" maxlength="30" placeholder="<?= htmlspecialchars(__('notes_placeholder'), ENT_QUOTES, 'UTF-8') ?>" style="width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #E9E1D7; border-radius:8px; font-size:14px; outline-color:#B99A7D;">
                 </div>
 
                 <!-- Toombol Save -->

@@ -33,7 +33,7 @@ $productCount = mysqli_num_rows($products);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars(__('stock_in'), ENT_QUOTES, 'UTF-8') ?> - Stock</title>
+    <title><?= htmlspecialchars(__('stock_in'), ENT_QUOTES, 'UTF-8') ?> - StockIn</title>
 </head>
 
 <!-- Styling utama layout dan warna latar halaman -->
@@ -106,6 +106,7 @@ $productCount = mysqli_num_rows($products);
                     <form id="stockInForm" method="POST">
                         <!-- ID bisnis tersembunyi sebagai parameter form -->
                         <input type="hidden" name="business_id" value="<?= (int) $business_id ?>">
+
                         <!-- Input pilihan produk -->
                         <div style="margin-bottom:22px;">
                             <label for="product_id" style="display:block; margin-bottom:8px; font-weight:600;">
@@ -113,7 +114,7 @@ $productCount = mysqli_num_rows($products);
                             </label>
 
                             <select id="product_id" name="product_id" required
-                                    style="width:100%; box-sizing:border-box; padding:13px; border:1px solid #E9E1D7; border-radius:9px; background:white; color:#49382D;">
+                                    style="width:100%; box-sizing:border-box; padding:13px; border:1px solid #E9E1D7; border-radius:9px; background:white; color:#49382D; font-size: 15px;">
 
                                 <option value="">
                                     <?= htmlspecialchars(__('select_product_placeholder'), ENT_QUOTES, 'UTF-8') ?>
@@ -141,7 +142,7 @@ $productCount = mysqli_num_rows($products);
                             </label>
 
                             <input type="number" id="quantity" name="quantity" min="1" step="1" required placeholder="<?= htmlspecialchars(__('enter_quantity_placeholder'), ENT_QUOTES, 'UTF-8') ?>"
-                                style="width:100%; box-sizing:border-box; padding:13px; border:1px solid #E9E1D7; border-radius:9px; outline-color:#B99A7D;">
+                                style="width:100%; box-sizing:border-box; padding:13px; border:1px solid #E9E1D7; border-radius:9px; outline-color:#B99A7D; font-size: 15px;">
                         </div>
 
                         <!-- Input catatan tambahan (opsional) -->
@@ -154,13 +155,12 @@ $productCount = mysqli_num_rows($products);
                             </label>
 
                             <!-- Catatan -->
-                            <textarea id="notes" name="notes" rows="4" placeholder="<?= htmlspecialchars(__('notes_stock_in_placeholder'), ENT_QUOTES, 'UTF-8') ?>"
-                                style="width:100%; box-sizing:border-box; padding:13px; border:1px solid #E9E1D7; border-radius:9px; resize:vertical; font-family:inherit;">
-                            </textarea>
+                            <input type="text" id="notes" name="notes" maxlength="30" placeholder="<?= htmlspecialchars(__('notes_placeholder'), ENT_QUOTES, 'UTF-8') ?>"
+                            style="width:100%; padding:10px 12px; box-sizing:border-box; border:1px solid #E9E1D7; border-radius:8px; font-size:14px; outline-color:#B99A7D;">
                         </div>
                         
                         <!-- Tombol Save -->
-                        <div style="padding-top:20px; border-top:1px solid #E9E1D7; display:flex; justify-content:flex-end;">
+                        <div style="padding-top:20px; display:flex; justify-content:flex-end;">
                             <button type="submit" id="stockInSubmitButton" style="display:flex; align-items:center; gap:8px; padding:12px 19px; border:0; border-radius:9px; background:#76553D; color:white; font-weight:600; cursor:pointer;">
                                 <i data-lucide="save" style="width:18px;height:18px;"></i>
                                 <?= htmlspecialchars(__('save_stock_in'), ENT_QUOTES, 'UTF-8') ?>

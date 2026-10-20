@@ -116,7 +116,7 @@ $topProducts = mysqli_stmt_get_result($stmtTopProducts);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Stock</title>
+    <title>Dashboard - StockIn</title>
     <script src="https://unpkg.com/lucide@latest" defer></script>
 </head>
 
