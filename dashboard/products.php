@@ -2,10 +2,8 @@
 // Validasi autentikasi user dan akses bisnis aktif
 require_once __DIR__ . '/../includes/auth_business.php';
 
-// Muat pengelola bahasa
+// Muat pengelola bahasa & mata uang
 require_once __DIR__ . '/../includes/language.php';
-
-// Muat Mata Uang
 require_once __DIR__ . '/../includes/currency.php';
 
 // Pencarian produk
@@ -23,7 +21,7 @@ $sql = "SELECT p.*, c.category_name FROM products p LEFT JOIN categories c ON p.
 $params = [$business_id];
 $types = "i";
 
-// Filter pencarian nama produk atau kode produk
+// Filter pencarian berdasarkan nama produk atau kode produk
 if ($search !== '') {
     $sql .= " AND (p.product_name LIKE ? OR p.product_code LIKE ?)";
     $params[] = "%" . $search . "%";
@@ -31,7 +29,7 @@ if ($search !== '') {
     $types .= "ss";
 }
 
-// Filter pencarian dr kategori
+// Filter berdasarkan kategori produk jika kategori dipilih
 if ($category_id !== false && $category_id !== null) {
     $sql .= " AND p.category_id = ?";
     $params[] = $category_id;
@@ -41,17 +39,17 @@ if ($category_id !== false && $category_id !== null) {
 // Ambil pilihan urutan kode produk dari URL (ASC atau DESC)
 $sort_code = $_GET['sort_code'] ?? '';
 
-// Tentukan aturan pengurutan berdasarkan pilihan user
+// Tentukan aturan pengurutan SQL berdasarkan pilihan pengguna
 if ($sort_code === 'ASC') {
     $sql .= " ORDER BY p.product_code ASC";
 } elseif ($sort_code === 'DESC') {
     $sql .= " ORDER BY p.product_code DESC";
 } else {
-    // Default urutan berdasarkan nama produk A-Z
+    // Default pengurutan alfabetis berdasarkan nama produk (A-Z)
     $sql .= " ORDER BY p.product_name ASC";
 }
 
-// Prepare statement query dinamis, menyesuaikan filter, eksekusi dan simpan hasil
+// Prepare statement query dinamis, bind parameter yang sesuai, eksekusi query, dan ambil hasil data produk
 $stmt = mysqli_prepare($conn, $sql);
 mysqli_stmt_bind_param($stmt, $types, ...$params);
 mysqli_stmt_execute($stmt);
@@ -207,7 +205,38 @@ $products = mysqli_stmt_get_result($stmt);
                                     <!-- Stok sekarang -->
                                     <td style="padding:10px 12px;"><?= number_format((int) $product['current_stock']) ?></td>
                                     <!-- Expired -->
-                                    <td style="padding:10px 12px; color:#81776D;"><?= $product['expiration_date'] ? htmlspecialchars(date('d/m/Y', strtotime($product['expiration_date']))) : '-' ?></td>
+                                    <td style="padding:10px 12px;">
+                                        <?php if ($product['expiration_date']): ?>
+                                            <?php 
+                                                $today = new DateTime();
+                                                $expDate = new DateTime($product['expiration_date']);
+                                                $interval = $today->diff($expDate);
+                                                $daysLeft = (int)$interval->format('%r%a'); // Menghitung selisih hari (+ / -)
+                                            ?>
+
+                                            <?php if ($daysLeft < 0): ?>
+                                                <!-- KONDISI 1: SUDAH KEDALUWARSA (Merah) -->
+                                                <span style="display:inline-block; padding:4px 8px; background:#FBECEC; color:#B45F5F; border-radius:6px; font-size:12px; font-weight:600;" title="Sudah Kedaluwarsa">
+                                                    <?= htmlspecialchars(date('d/m/Y', strtotime($product['expiration_date']))) ?> (Expired)
+                                                </span>
+
+                                            <?php elseif ($daysLeft <= 30): ?>
+                                                <!-- KONDISI 2: HAMPIR KEDALUWARSA <= 30 HARI (Kuning) -->
+                                                <span style="display:inline-block; padding:4px 8px; background:#FFF8E7; color:#B7791F; border-radius:6px; font-size:12px; font-weight:600;" title="Hampir Kedaluwarsa">
+                                                    <?= htmlspecialchars(date('d/m/Y', strtotime($product['expiration_date']))) ?>
+                                                </span>
+
+                                            <?php else: ?>
+                                                <!-- KONDISI 3: MASIH AMAN (Teks Normal) -->
+                                                <span style="color:#81776D; font-size:13px;">
+                                                    <?= htmlspecialchars(date('d/m/Y', strtotime($product['expiration_date']))) ?>
+                                                </span>
+                                            <?php endif; ?>
+
+                                        <?php else: ?>
+                                            <span style="color:#81776D;">-</span>
+                                        <?php endif; ?>
+                                    </td>
                                     <!-- Tombol edit & hapus -->
                                     <td style="padding:10px 12px;">
                                         <div style="display:flex; gap:8px; align-items:center;">
@@ -237,478 +266,38 @@ $products = mysqli_stmt_get_result($stmt);
     </main>
 </div>
 
-<!-- PRODUK -->
-<!-- Container tambah/edit produk -->
-<div id="productModal" style="display:none; position:fixed; inset:0; background:rgba(73,56,45,0.35); z-index:999; align-items:center; justify-content:center; padding:20px;">
-    <!-- Kotak dialog -->
-    <div style="width:520px; max-height:85vh; background:white; border-radius:16px; padding:25px; box-sizing:border-box; display:flex; flex-direction:column;">
-        <!-- Header, Judul (tambah atau edit produk), tombol close -->
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2 id="productModalTitle" style="margin:0;"><?= htmlspecialchars(__('add_product'), ENT_QUOTES, 'UTF-8') ?></h2>
-            <button onclick="closeProductModal()" style="border:none; background:none; font-size:22px; cursor:pointer; color:#76553D;">×</button>
-        </div>
 
-        <!-- Deskripsi petunjuk pengisian modal -->
-        <p id="productModalDescription" style="color:#81776D; margin-top:0;"><?= htmlspecialchars(__('add_product_page_description'), ENT_QUOTES, 'UTF-8') ?></p>
+<!-- COMPONENT MODAL -->
+<?php require __DIR__ . '/components/modal-product.php'; ?>
 
-        <!-- Area form -->
-        <div style="overflow-y:auto; padding-right:10px; flex:1;">
-            <!-- FORM ISI PRODUK -->
-            <form id="productForm" enctype="multipart/form-data">
-                <input type="hidden" name="business_id" value="<?= $business_id ?>">
-                <input type="hidden" name="product_id" id="product_id">
-
-                <!-- Foto Produk -->
-                <div style="margin-bottom:20px;">
-                    <label style="display:block; margin-bottom:10px; font-weight:600;"><?= htmlspecialchars(__('product_photo'), ENT_QUOTES, 'UTF-8') ?></label>
-                    <label for="productPhoto" style="width:100px; height:100px; border-radius:14px; background:#F5EFE8; display:flex; align-items:center; justify-content:center; cursor:pointer; overflow:hidden;"><img id="productPreview" src="" style="width:100%; height:100%; object-fit:cover; display:none;"><i id="uploadIcon" data-lucide="image-plus" style="width:35px; height:35px; color:#76553D;"></i></label>
-                    <input type="file" id="productPhoto" name="photo" accept="image/*" style="display:none;">
-                </div>
-
-                <!-- Nama Produk -->
-                <div style="margin-bottom:18px;">
-                    <label style="display:block; margin-bottom:8px; font-weight:600;"><?= htmlspecialchars(__('product_name'), ENT_QUOTES, 'UTF-8') ?><span style="color:red;"> *</span></label>
-                    <input type="text" name="product_name" placeholder="<?= htmlspecialchars(__('product_name_placeholder'), ENT_QUOTES, 'UTF-8') ?>" style="width:100%; box-sizing:border-box; padding:12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
-                </div>
-
-                <!-- Kode Produk -->
-                <div style="margin-bottom:18px;">
-                    <label style="display:block; margin-bottom:8px; font-weight:600;"><?= htmlspecialchars(__('product_code'), ENT_QUOTES, 'UTF-8') ?> <span style="color:red;">*</span></label>
-                    <input type="text" name="product_code" required placeholder="<?= htmlspecialchars(__('product_code_placeholder'), ENT_QUOTES, 'UTF-8') ?>" style="width:100%; box-sizing:border-box; padding:12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
-                </div>
-
-                <!-- Kategori -->
-                <div style="margin-bottom:18px;">
-                    <label style="display:block; margin-bottom:8px; font-weight:600;"><?= htmlspecialchars(__('category'), ENT_QUOTES, 'UTF-8') ?></label>
-                    <select name="category_id" style="width:100%; padding:12px; border:1px solid #E9E1D7; border-radius:8px; background:white;">
-                        <option value=""><?= htmlspecialchars(__('select_category'), ENT_QUOTES, 'UTF-8') ?></option>
-                        <?php while($category = mysqli_fetch_assoc($categories)): ?>
-                            <option value="<?= $category['id'] ?>"><?= htmlspecialchars($category['category_name'], ENT_QUOTES, 'UTF-8') ?></option>
-                        <?php endwhile; ?>
-                    </select>
-                    <button type="button" onclick="toggleCategoryForm()" style="margin-top:10px; border:none; background:none; color:#76553D; cursor:pointer; padding:0; font-weight:600;">+ <?= htmlspecialchars(__('add_new_category'), ENT_QUOTES, 'UTF-8') ?></button>
-                </div>
-
-                <!-- Tambah kategori baru -->
-                <div id="newCategoryBox" style="display:none; background:#FAF7F2; padding:15px; border-radius:10px; margin-bottom:18px;">
-                    <label style="display:block; margin-bottom:8px; font-weight:600;"><?= htmlspecialchars(__('new_category_name'), ENT_QUOTES, 'UTF-8') ?></label>
-                    <input type="text" id="newCategoryInput" name="new_category" placeholder="<?= htmlspecialchars(__('new_category_name'), ENT_QUOTES, 'UTF-8') ?>" style="width:100%; box-sizing:border-box; padding:12px; border:1px solid #E9E1D7; border-radius:8px;">
-                    <button type="button" id="saveCategoryButton" onclick="saveNewCategory()" style="margin-top:12px; padding:10px 16px; border:0; border-radius:8px; background:#76553D; color:white; font-weight:600; cursor:pointer;">
-                        <?= htmlspecialchars(__('save_category'), ENT_QUOTES, 'UTF-8') ?>
-                    </button>
-                </div>
-
-                <!-- Harga Beli -->
-                <div style="margin-bottom:18px;">
-                    <label style="display:block; margin-bottom:8px; font-weight:600;"><?= htmlspecialchars(__('purchase_price'), ENT_QUOTES, 'UTF-8') ?></label>
-                    <input type="text" name="purchase_price" class="currency-input" min="0" placeholder="0" style="width:100%; box-sizing:border-box; padding:12px; border:1px solid #E9E1D7; border-radius:8px;">
-                </div>
-
-                <!-- Harga Jual -->
-                <div style="margin-bottom:18px;">
-                    <label style="display:block; margin-bottom:8px; font-weight:600;"><?= htmlspecialchars(__('selling_price'), ENT_QUOTES, 'UTF-8') ?></label>
-                    <input type="text" name="selling_price" class="currency-input" min="0" placeholder="0" style="width:100%; box-sizing:border-box; padding:12px; border:1px solid #E9E1D7; border-radius:8px;">
-                </div>
-
-                <!-- Initial Stock -->
-                <div style="margin-bottom:18px;">
-                    <label style="display:block; margin-bottom:8px; font-weight:600;"><?= htmlspecialchars(__('initial_stock'), ENT_QUOTES, 'UTF-8') ?></label>
-                    <input type="number" name="initial_stock" min="0" placeholder="0" style="width:100%; box-sizing:border-box; padding:12px; border:1px solid #E9E1D7; border-radius:8px;">
-                </div>
-
-                <!-- Expiration Date -->
-                <div style="margin-bottom:18px;">
-                    <label style="display:block; margin-bottom:8px; font-weight:600;"><?= htmlspecialchars(__('expiration_date'), ENT_QUOTES, 'UTF-8') ?></label>
-                    <input type="date" name="expiration_date" style="width:100%; box-sizing:border-box; padding:12px; border:1px solid #E9E1D7; border-radius:8px;">
-                </div>
-
-                <!-- Notes -->
-                <div style="margin-bottom:18px;">
-                    <label style="display:block; margin-bottom:8px; font-weight:600;"><?= htmlspecialchars(__('notes'), ENT_QUOTES, 'UTF-8') ?></label>
-                    <textarea name="notes" placeholder="<?= htmlspecialchars(__('notes_placeholder'), ENT_QUOTES, 'UTF-8') ?>" rows="4" style="width:100%; box-sizing:border-box; padding:12px; border:1px solid #E9E1D7; border-radius:8px; resize:none; font-family:inherit;"></textarea>
-                </div>
-
-                <!-- Toombol Save -->
-                <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:20px; padding-top:20px; border-top:1px solid #E9E1D7;">
-                    <button type="button" onclick="closeProductModal()" style="padding:12px 22px; border-radius:9px; border:1px solid #E9E1D7; background:white; color:#76553D; cursor:pointer; font-weight:600;"><?= htmlspecialchars(__('cancel'), ENT_QUOTES, 'UTF-8') ?></button>
-                    <button type="submit" id="saveProductButton" style="padding:12px 22px; border-radius:9px; border:none; background:#76553D; color:white; cursor:pointer; font-weight:600;"><?= htmlspecialchars(__('save_product'), ENT_QUOTES, 'UTF-8') ?></button>
-                </div>
-            </form>
-        </div>
-
-    </div>
-</div>
-
-<!-- ICON & UI HELPERS -->
+<!-- ICON, ASSETS JS HELPERS -->
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../assets/js/currency.js"></script>
 <script src="../assets/js/toast.js" defer></script>
 
+<!-- DEKLARASI VARIABEL GLOBAL UNTUK JS EXTERNAL -->
 <script>
-lucide.createIcons();
-
-// Translate bahasa
-const translations = {
-    add_product_title:"<?= __('add_product_title') ?>",
-    add_product_description:"<?= __('add_product_description') ?>",
-    edit_product_title:"<?= __('edit_product_title') ?>",
-    edit_product_description:"<?= __('edit_product_description') ?>",
-    save_category:"<?= __('save_category') ?>",
-    saving:"<?= __('saving') ?>",
-    category_name_required:"<?= __('category_name_required') ?>"
-}
-
-// Flag penanda status (false = Tambah, true = Edit)
-let editMode = false;
-
-// Buka tampilan overlay tambah produk
-function openProductModal(){
-    document.getElementById('productModal').style.display='flex';
-}
-
-// Tutup tambah produk (close) dan reset isi form
-function closeProductModal(){
-    document.getElementById('productModal').style.display='none';
-    editMode = false;
-    resetProductForm();
-}
-
-// Menangani pengiriman form simpan/update produk
-document.getElementById('productForm').addEventListener('submit', async function(e){
-    // Mencegah reload halaman bawaan form
-    e.preventDefault();
-
-    const form = this;
-    const formData = new FormData(form);
-
-    try {
-        // Menentukan endpoint API berdasarkan mode (Edit / Tambah)
-        const response = await fetch( 
-            editMode 
-            ? '../api/update-product.php'
-            : '../api/create-product.php', 
-        {
-            method: 'POST',
-            body: formData
-        });
-
-        // Menerjemahkan respon server ke format JSON
-        const data = await response.json();
-
-        // Menampilkan notifikasi Toast berdasarkan status respon
-        if (data.status === 'success'){
-            showToast(data.message, 'success');
-            closeProductModal();
-            form.reset();
-
-            // Memuat ulang halaman setelah jeda notifikasi
-            setTimeout(() => {
-                location.reload();
-            }, 1000);
-        } else {
-            showToast(data.message || <?= json_encode(__('product_save_error')) ?>, 'error');
-        }
-    } catch (error) {
-        console.error(error);
-        showToast(<?= json_encode(__('connection_error')) ?>, 'error');
-    }
-});
-
-// Menambahkan event listener saat berkas foto produk dipilih oleh pengguna
-document.getElementById('productPhoto').addEventListener('change', function(){
-    // Mengambil berkas pertama yang diunggah dari input file
-    const file = this.files[0];
-
-    // Ambil file foto yang dipilih
-    if(file){
-        // Buat objek pembaca file lokal
-        const reader = new FileReader();
-
-        reader.onload = function(e){
-            // Ambil elemen foto preview
-            const preview = document.getElementById('productPreview');
-            const icon = document.getElementById('uploadIcon');
-
-            // Set sumber gambar dari hasil bacaan file
-            preview.src = e.target.result;
-            // Tampilkan foto preview dan sembunyikan ikon upload
-            preview.style.display = 'block';
-            icon.style.display = 'none';
-        }
-        // Baca file gambar
-        reader.readAsDataURL(file);
-    }
-});
-
-// Toggle tampilkan/sembunyikan box input kategori baru
-function toggleCategoryForm(){
-    const box = document.getElementById('newCategoryBox');
-    // Tampilkan kotak jika sedang tersembunyi, atau sembunyikan jika sedang tampil
-    if(box.style.display === 'none'){
-        box.style.display = 'block';
-    }else{
-        box.style.display = 'none';
-    }
-
-}
-
-// Menimpan kategori baru ke server secara asinkron
-async function saveNewCategory() {
-    // Ambil elemen input, tombol simpan, dan nilai nama kategori
-    const input = document.getElementById('newCategoryInput');
-    const button = document.getElementById('saveCategoryButton');
-    const categoryName = input.value.trim();
-
-    // Validasi input nama kategori tidak boleh kosong
-    if (!categoryName) {
-        showToast(translations.category_name_required, 'error');
-        input.focus();
-        return;
-    }
-
-    // Siapkan data formulir untuk dikirim ke API
-    const formData = new FormData();
-    formData.append('business_id', '<?= (int) $business_id ?>');
-    formData.append('category_name', categoryName);
-
-    // Nonaktifkan tombol dan ubah teks saat proses menyimpan
-    button.disabled = true;
-    button.textContent = translations.saving;
-
-    try {
-        // Kirim data kategori baru ke API backend
-        const response = await fetch('../api/create-category.php', {
-            method: 'POST',
-            body: formData
-        });
-
-        // Konversi respon server ke format JSON
-        const result = await response.json();
-
-        // Cek jika HTTP status gagal atau status respon bukan success
-        if (!response.ok || result.status !== 'success') {
-            showToast(result.message || <?= json_encode(__('category_save_failed')) ?>, 'error');
-            return;
-        }
-
-        // Ambil data kategori baru dan cari elemen dropdown kategori pada form produk
-        const category = result.category;
-        const categorySelect = document.querySelector(
-            '#productForm select[name="category_id"]'
-        );
-
-        // Buat dan tambahkan opsi kategori baru ke dalam dropdown
-        const option = document.createElement('option');
-        option.value = category.id;
-        option.textContent = category.category_name;
-
-        categorySelect.appendChild(option);
-        categorySelect.value = category.id;
-
-        // Kosongkan input dan sembunyikan kotak input kategori
-        input.value = '';
-        document.getElementById('newCategoryBox').style.display = 'none';
-
-        // Tampilkan pesan sukses dari server lewat Toast
-        showToast(result.message, 'success');
-    } catch (error) {
-        // Jika terjadi error koneksi atau sistem
-        console.error(error);
-        showToast(<?= json_encode(__('category_error')) ?>, 'error');
-    } finally {
-        // Kembalikan tombol ke status aktif setelah proses selesai
-        button.disabled = false;
-        button.textContent = translations.save_category;
-    }
-}
-
-// Bersihkan dan kembalikan semua isi form produk ke kondisi awal
-function resetProductForm(){
-    // Ambil elemen form utama produk
-    const form = document.getElementById('productForm');
-
-    // Kosongkan seluruh input bawaan di dalam form
-    form.reset();
-
-    // Kosongkan ID produk untuk memastikan form kembali ke mode Tambah
-    document.getElementById('product_id').value = "";
-
-    // Ambil elemen priview dan ikon upload
-    const preview = document.getElementById('productPreview');
-    const icon = document.getElementById('uploadIcon');
-
-    // Sembunyikan dan kosongkan preview jika elemennya ada
-    if(preview){
-        preview.src = "";
-        preview.style.display = "none";
-    }
-
-    // Tampilkan kembali ikon upload foto
-    if(icon){
-        icon.style.display = "block";
-    }
-
-    // Sembunyikan kotak input kategori baru jika sedang terbuka
-    const categoryBox = document.getElementById('newCategoryBox');
-    if(categoryBox){
-        categoryBox.style.display = "none";
-    }
-}
-
-// Buka modal formulir dalam mode Tambah Produk
-function openAddProduct(){
-    // Atur status ke mode tambah produk
-    editMode = false;
-
-    // Bersihkan seluruh isi formulir dari data sebelumnya
-    resetProductForm();
-
-    // Tampilkan jendela modal ke layar
-    document.getElementById('productModal').style.display='flex';
-
-    // Judul dan deskripsi sesuai translate
-    document.getElementById('productModalTitle').innerText = translations.add_product_title;
-    document.getElementById('productModalDescription').innerText = translations.add_product_description;
-
-    // Kosongkan bidang input kode produk
-    document.querySelector('[name="product_code"]').value = "";
-}
-
-// Isi form untuk mode Edit Produk
-function openEditProduct(id){
-    // Aktifkan flag mode edit produk
-    editMode = true;
-
-    // Ambil detail data produk dari server berdasarkan ID
-    fetch('../api/get-product.php?id=' + id)
-
-    .then(response => response.json())
-    
-    // Jika pengambilan data berhasil, masukkan data ke dalam bidang form
-    .then(result => {
-        if(result.status === 'success'){
-            const product = result.data;
-            document.getElementById('product_id').value = product.id;
-
-            // Buka tampilan form edit
-            openProductModal();
-
-            // Set judul dan isi value form dari data produk
-            document.getElementById('productModalTitle').innerText = translations.edit_product_title;
-            document.getElementById('productModalDescription').innerText = translations.edit_product_description;
-
-            // Isi setiap input formulir dengan data produk yang diperoleh
-            document.querySelector('[name="product_name"]').value = product.product_name;
-            document.querySelector('[name="product_code"]').value = product.product_code ?? "";
-            document.querySelector('#productForm select[name="category_id"]').value = product.category_id ?? "";
-            document.querySelector('[name="notes"]').value = product.notes ?? "";
-            document.querySelector('[name="purchase_price"]').value = product.purchase_price;
-            document.querySelector('[name="selling_price"]').value = product.selling_price;
-            document.querySelector('[name="initial_stock"]').value = product.initial_stock;
-            document.querySelector('[name="expiration_date"]').value = product.expiration_date ?? "";
-        }
-    });
-}
-
-// Mengambil jenis mata uang aktif
-const activeCurrency = <?= json_encode($business['currency']) ?>;
-// Membersihkan dan memformat input harga agar hanya berisi angka dan desimal yang valid
-function normalizePriceInput(input) {
-    // Ambil nilai input dan hapus spasi di awal/akhir
-    let value = input.value.trim();
-
-    // Hapus seluruh karakter selain angka, titik, dan koma
-    value = value.replace(/[^0-9.,]/g, '');
-
-    // Cari posisi pemisah desimal terakhir (titik atau koma)
-    const separatorIndex = Math.max(
-        value.lastIndexOf('.'),
-        value.lastIndexOf(',')
-    );
-
-    // Pisahkan bagian angka bulat dan desimal jika pemisah ditemukan
-    if (separatorIndex !== -1) {
-        // Ambil bagian angka bulat dan bersihkan pemisah tambahan
-        const integerPart = value
-            .slice(0, separatorIndex)
-            .replace(/[.,]/g, '');
-
-        // Ambil maksimal 2 digit angka desimal di belakang koma/titik
-        const decimalPart = value
-            .slice(separatorIndex + 1)
-            .replace(/[.,]/g, '')
-            .slice(0, 2);
-
-        // Gabungkan kembali angka bulat dan desimal dengan pemisah titik
-        value = integerPart + '.' + decimalPart;
-    } else {
-        // Hapus pemisah jika tidak ada desimal yang valid
-        value = value.replace(/[.,]/g, '');
-    }
-
-    // Setel kembali nilai input yang sudah dibersihkan
-    input.value = value;
-}
-
-// Pasang penangan input pada seluruh elemen bertag currency-input untuk menormalisasi harga
-document.querySelectorAll('.currency-input').forEach(input => {
-    input.addEventListener('input', function () {
-        // Simpan posisi kursor sebelum teks dinormalisasi
-        const cursorPosition = this.selectionStart;
-        
-        // Bersihkan dan format ulang nilai harga yang diketik pengguna
-        normalizePriceInput(this);
-    });
-});
-
-// Menghapus data produk secara permanen dari database
-async function deleteProduct(productId) {
-    // Tampilkan modal konfirmasi kustom sesuai pilihan bahasa aktif
-    const confirmed = await showConfirm(
-        <?= json_encode(__('delete_product_confirm')) ?>,
-        <?= json_encode(__('delete')) ?>,
-        <?= json_encode(__('cancel')) ?>,
-        true // Parameter true untuk tombol berlatar merah (aksi hapus)
-    );
-
-    // Batal jalankan fungsi jika pengguna memilih batal
-    if (!confirmed) {
-        return;
-    }
-
-    // Siapkan data ID produk dan ID bisnis untuk dikirim ke API
-    const formData = new FormData();
-    formData.append('product_id', productId);
-    formData.append('business_id', <?= (int) $business_id ?>);
-
-    try {
-        // Kirim permintaan hapus produk via Fetch API
-        const response = await fetch('../api/delete-product.php', {
-            method: 'POST',
-            body: formData
-        });
-
-        // Konversi respons dari server ke format JSON
-        const result = await response.json();
-
-        // Cek jika status respons gagal atau bermasalah
-        if (!response.ok || result.status !== 'success') {
-            showToast(result.message || <?= json_encode(__('product_delete_failed')) ?>, 'error');
-            return;
-        }
-
-        // Tampilkan pesan sukses dan muat ulang halaman setelah jeda notifikasi
-        showToast(result.message, 'success');
-        setTimeout(() => {
-            window.location.reload();
-        }, 1000);
-    } catch (error) {
-        // Tangani jika terjadi error koneksi atau server
-        console.error(error);
-        showToast(<?= json_encode(__('product_delete_error')) ?>, 'error');
-    }
-}
+const CURRENT_BUSINESS_ID = <?= (int) $business_id ?>;
+const APP_TRANSLATIONS = {
+    add_product_title: <?= json_encode(__('add_product_title')) ?>,
+    add_product_description: <?= json_encode(__('add_product_description')) ?>,
+    edit_product_title: <?= json_encode(__('edit_product_title')) ?>,
+    edit_product_description: <?= json_encode(__('edit_product_description')) ?>,
+    save_category: <?= json_encode(__('save_category')) ?>,
+    saving: <?= json_encode(__('saving')) ?>,
+    category_name_required: <?= json_encode(__('category_name_required')) ?>,
+    category_save_failed: <?= json_encode(__('category_save_failed')) ?>,
+    category_error: <?= json_encode(__('category_error')) ?>,
+    product_save_error: <?= json_encode(__('product_save_error')) ?>,
+    delete_product_confirm: <?= json_encode(__('delete_product_confirm')) ?>,
+    delete: <?= json_encode(__('delete')) ?>,
+    cancel: <?= json_encode(__('cancel')) ?>,
+    product_delete_failed: <?= json_encode(__('product_delete_failed')) ?>,
+    product_delete_error: <?= json_encode(__('product_delete_error')) ?>,
+    connection_error: <?= json_encode(__('connection_error')) ?>
+};
 </script>
+<script src="../assets/js/products.js" defer></script>
 
 </body>
 </html>
