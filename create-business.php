@@ -54,7 +54,7 @@ require_once __DIR__ . '/includes/language.php';
 
                 <!-- BUSINESS NAME -->
                 <label style="display:block; font-size:13px; margin-bottom:7px;"><?= htmlspecialchars(__('store_name'), ENT_QUOTES, 'UTF-8') ?></label>
-                <input type="text" name="business_name" placeholder="<?= htmlspecialchars(__('store_name_placeholder'), ENT_QUOTES, 'UTF-8') ?>" style="width:100%; padding:12px; border:1px solid #E9E1D7; border-radius:9px; margin-bottom:18px; box-sizing:border-box;" required>
+                <input type="text" name="business_name" maxlength="40" placeholder="<?= htmlspecialchars(__('store_name_placeholder'), ENT_QUOTES, 'UTF-8') ?>" style="width:100%; padding:12px; border:1px solid #E9E1D7; border-radius:9px; margin-bottom:18px; box-sizing:border-box;" required>
 
                 <!-- CURRENCY -->
                 <label style="display:block; font-size:13px; margin-bottom:7px;"><?= htmlspecialchars(__('currency'), ENT_QUOTES, 'UTF-8') ?></label>
@@ -69,7 +69,8 @@ require_once __DIR__ . '/includes/language.php';
 
                 <!-- NOTES -->
                 <label style="display:block; font-size:13px; margin-bottom:7px;"><?= htmlspecialchars(__('notes_optional'), ENT_QUOTES, 'UTF-8') ?></label>
-                <textarea name="notes" placeholder="<?= htmlspecialchars(__('notes_business_placeholder'), ENT_QUOTES, 'UTF-8') ?>" style="width:100%; height:90px; padding:12px; border:1px solid #E9E1D7; border-radius:9px; resize:none; box-sizing:border-box; margin-bottom:25px;"></textarea>
+                <input type="text" name="notes" maxlength="30" placeholder="<?= htmlspecialchars(__('notes_business_placeholder'), ENT_QUOTES, 'UTF-8') ?>" 
+                style="width:100%; padding:10px 12px; border:1px solid #E9E1D7; border-radius:9px; box-sizing:border-box; margin-bottom:25px; outline-color:#B99A7D; font-size:14px;">
 
                 <!-- Tombol buat bisnis -->
                 <button type="submit" style="width:100%; padding:13px; background:#76553D; color:#FFFFFF; border:none; border-radius:9px; font-size:14px; font-weight:600; cursor:pointer;"><?= htmlspecialchars(__('create_business_title'), ENT_QUOTES, 'UTF-8') ?></button>

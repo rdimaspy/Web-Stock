@@ -155,7 +155,7 @@ $products = mysqli_stmt_get_result($stmt);
                     </span>
                 </label>
 
-                <input type="text" id="notes" name="notes" maxlength="30" placeholder="<?= htmlspecialchars(__('notes_placeholder'), ENT_QUOTES, 'UTF-8') ?>"
+                <input type="text" id="notes" name="notes" maxlength="40" placeholder="<?= htmlspecialchars(__('notes_placeholder'), ENT_QUOTES, 'UTF-8') ?>"
                     style="width:100%; padding:10px 12px; box-sizing:border-box; border:1px solid #E9E1D7; border-radius:8px; font-size:14px; outline-color:#B99A7D;">
 
                 <!-- Tombol save -->

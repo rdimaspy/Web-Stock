@@ -100,7 +100,7 @@ require_once __DIR__ . '/includes/language.php';
                         <?= htmlspecialchars(__('name_label'), ENT_QUOTES, 'UTF-8'); ?>
                     </label>
 
-                    <input type="text" name="name" class="input-field" 
+                    <input type="text" name="name" class="input-field" maxlength="50"
                         placeholder="<?= htmlspecialchars(__('name_placeholder'), ENT_QUOTES, 'UTF-8'); ?>" 
                         style="width: 100%; padding: 12px 14px; border: 1px solid #E9E1D7; border-radius: 10px; box-sizing: border-box; font-size: 14px; color: #302921;" required>
                 </div>
@@ -122,10 +122,20 @@ require_once __DIR__ . '/includes/language.php';
                         <?= htmlspecialchars(__('password_label'), ENT_QUOTES, 'UTF-8'); ?>
                     </label>
 
-                    <!-- Ketentuan password max 6 cahr -->
-                    <input type="password" name="password" class="input-field" minlength="6" maxlength="6" 
-                        placeholder="<?= htmlspecialchars(__('create_password_placeholder'), ENT_QUOTES, 'UTF-8'); ?>"
-                        style="width: 100%; padding: 12px 14px; border: 1px solid #E9E1D7; border-radius: 10px; box-sizing: border-box; font-size: 14px; color: #302921;" required>
+                    <!-- Kontainer untuk menempatkan tombol lihat sandi -->
+                    <div style="position:relative; width:100%;">
+                        <input type="password" id="registerPassword" name="password" class="input-field" minlength="6" maxlength="6" 
+                            placeholder="<?= htmlspecialchars(__('create_password_placeholder'), ENT_QUOTES, 'UTF-8'); ?>"
+                            style="width: 100%; padding: 12px 42px 12px 14px; border: 1px solid #E9E1D7; border-radius: 10px; box-sizing: border-box; font-size: 14px; color: #302921;" required>
+                        
+                        <!-- Tombol lihat kata sandi -->
+                        <button type="button" onclick="togglePasswordVisibility('registerPassword', this)" 
+                            style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; padding:0; cursor:pointer; color:#81776D; display:flex; align-items:center;"
+                            title="<?= htmlspecialchars(__('show_password'), ENT_QUOTES, 'UTF-8'); ?>"
+                            aria-label="<?= htmlspecialchars(__('show_password'), ENT_QUOTES, 'UTF-8'); ?>">
+                            <i data-lucide="eye" style="width:18px; height:18px;"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Tombol Submit Buat Akun -->
@@ -195,6 +205,33 @@ document.getElementById('registerForm')?.addEventListener('submit', async functi
         showToast(<?= json_encode(__('connection_error')) ?>, 'error');
     }
 });
+
+// Fungsi untuk mengubah visibilitas kata sandi (intip/sembunyikan)
+function togglePasswordVisibility(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    
+    // Cek status tipe input saat ini
+    const isPassword = input.type === 'password';
+    input.type = isPassword ? 'text' : 'password';
+    
+    // Ambil terjemahan tooltip berdasarkan status visibilitas
+    const showText = <?= json_encode(__('show_password')) ?>;
+    const hideText = <?= json_encode(__('hide_password')) ?>;
+    const titleText = isPassword ? hideText : showText;
+
+    // Perbarui atribut title dan aria-label
+    btn.setAttribute('title', titleText);
+    btn.setAttribute('aria-label', titleText);
+
+    // Ganti ikon mata terbuka / tertutup
+    btn.innerHTML = isPassword 
+        ? '<i data-lucide="eye-off" style="width:18px; height:18px;"></i>' 
+        : '<i data-lucide="eye" style="width:18px; height:18px;"></i>';
+        
+    // Re-render ikon Lucide agar tampilan ikon baru langsung tergambar
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+}
 </script>
 
 </body>

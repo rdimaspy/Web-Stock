@@ -111,28 +111,19 @@ $products = mysqli_stmt_get_result($stmt);
                 <!-- Dropdown filter berdasarkan kategori -->
                 <select name="category_id" style="min-width:180px; padding:12px; border:1px solid #E9E1D7; border-radius:8px; background:white; color:#49382D;">
                     <option value=""><?= htmlspecialchars(__('all_categories'), ENT_QUOTES, 'UTF-8') ?></option>
-                    <?php $stmtModalCategories = mysqli_prepare(
-                        $conn,
-                        "SELECT id, category_name
-                        FROM categories
-                        WHERE business_id = ?
-                        ORDER BY category_name ASC"
-                    );
-
-                    // Parameter ID bisnis ke query kategori, eksekusi, ambil kategori
+                    <?php 
+                    $stmtModalCategories = mysqli_prepare($conn, "SELECT id, category_name FROM categories WHERE business_id = ? ORDER BY category_name ASC");
                     mysqli_stmt_bind_param($stmtModalCategories, "i", $business_id);
                     mysqli_stmt_execute($stmtModalCategories);
                     $modalCategories = mysqli_stmt_get_result($stmtModalCategories);
                     ?>
-
-                    <!-- Mengambil baris nama kategori yang ada di database -->
                     <?php while ($category = mysqli_fetch_assoc($modalCategories)): ?>
-                        <option value="<?= (int) $category['id'] ?>" <?= $category_id === (int) $category['id'] ? 'selected' : '' ?>>
+                        <option value="<?= (int) $category['id'] ?>" <?= (int)$category_id === (int) $category['id'] ? 'selected' : '' ?>>
                             <?= htmlspecialchars($category['category_name'], ENT_QUOTES, 'UTF-8') ?>
                         </option>
                     <?php endwhile; ?>
                 </select>
-
+                
                 <!-- Dropdown Filter Urutan Kode Produk -->
                 <select name="sort_code" style="min-width:150px; padding:12px; border:1px solid #E9E1D7; border-radius:8px; background:white; color:#49382D;">
                     <option value=""><?= htmlspecialchars(__('sort_code'), ENT_QUOTES, 'UTF-8') ?></option>
@@ -160,11 +151,11 @@ $products = mysqli_stmt_get_result($stmt);
                             <th style="position:sticky; top:0; z-index:2; padding:12px; width:18%; background:#F5EFE8;"><?= htmlspecialchars(__('product_name'), ENT_QUOTES, 'UTF-8') ?></th>
                             <th style="position:sticky; top:0; z-index:2; padding:12px; width:12%; background:#F5EFE8;"><?= htmlspecialchars(__('product_code'), ENT_QUOTES, 'UTF-8') ?></th>
                             <th style="position:sticky; top:0; z-index:2; padding:12px; width:12%; background:#F5EFE8;"><?= htmlspecialchars(__('category'), ENT_QUOTES, 'UTF-8') ?></th>
-                            <th style="position:sticky; top:0; z-index:2; padding:12px; width:15%; background:#F5EFE8;"><?= htmlspecialchars(__('notes'), ENT_QUOTES, 'UTF-8') ?></th>
                             <th style="position:sticky; top:0; z-index:2; padding:12px; width:13%; background:#F5EFE8;"><?= htmlspecialchars(__('purchase_price'), ENT_QUOTES, 'UTF-8') ?></th>
                             <th style="position:sticky; top:0; z-index:2; padding:12px; width:13%; background:#F5EFE8;"><?= htmlspecialchars(__('selling_price'), ENT_QUOTES, 'UTF-8') ?></th>
                             <th style="position:sticky; top:0; z-index:2; padding:12px; width:7%; background:#F5EFE8;"><?= htmlspecialchars(__('stock'), ENT_QUOTES, 'UTF-8') ?></th>
                             <th style="position:sticky; top:0; z-index:2; padding:12px; width:12%; background:#F5EFE8;"><?= htmlspecialchars(__('expiration_date'), ENT_QUOTES, 'UTF-8') ?></th>
+                            <th style="position:sticky; top:0; z-index:2; padding:12px; width:15%; background:#F5EFE8;"><?= htmlspecialchars(__('notes'), ENT_QUOTES, 'UTF-8') ?></th>
                             <th style="position:sticky; top:0; z-index:2; padding:12px; width:10%; background:#F5EFE8;"><?= htmlspecialchars(__('action'), ENT_QUOTES, 'UTF-8') ?></th>
                         </tr>
                     </thead>
@@ -184,23 +175,15 @@ $products = mysqli_stmt_get_result($stmt);
                                             <?php else: ?>
                                                 <div style="width:50px; height:50px; min-width:50px; flex-shrink:0; border-radius:10px; background:#F5EFE8; display:flex; align-items:center; justify-content:center;"><i data-lucide="image" style="width:22px;color:#76553D;"></i></div>
                                             <?php endif; ?>
-                                            <span style="font-weight:600; display:block; max-width:180px; word-break:break-word; overflow-wrap:anywhere;"><?= htmlspecialchars($product['product_name'], ENT_QUOTES, 'UTF-8') ?></span>
+                                            <span style="font-weight:600; display:block; min-width:140px; max-width:220px; white-space:normal; word-break:break-word; overflow-wrap:break-word;"><?= htmlspecialchars($product['product_name'], ENT_QUOTES, 'UTF-8') ?></span>
                                         </div>
                                     </td>
                                     <!-- Kode Produk -->
-                                    <td style="padding:10px 12px; color:#49382D; font-size:13px; font-weight:600;">
+                                    <td style="padding:10px 12px; color:#49382D; font-size:13px; font-weight:600; min-width:80px; max-width:80px; white-space: normal; overflow-wrap:anywhere; word-break:break-word;">
                                         <?= htmlspecialchars($product['product_code'], ENT_QUOTES, 'UTF-8') ?>
                                     </td>
                                     <!-- Kategori-->
-                                    <td style="padding:10px 12px; color:#81776D; font-size:13px"><?= htmlspecialchars($product['category_name'] ?? __('uncategorized'), ENT_QUOTES, 'UTF-8') ?></td>
-                                    <!-- Catatam -->
-                                    <td style="padding:10px 12px; color:#81776D; font-size:13px; max-width:180px; overflow-wrap:anywhere; word-break:break-word;">
-                                        <?php if (!empty(trim($row['notes'] ?? ''))): ?>
-                                            <?= htmlspecialchars($row['notes'], ENT_QUOTES, 'UTF-8') ?>
-                                        <?php else: ?>
-                                            <span style="color:#B8B0A6;">—</span>
-                                        <?php endif; ?>
-                                    </td>
+                                    <td style="padding:10px 12px; color:#81776D; font-size:13px font-weight:600; min-width: 100px; max-width: 100px; white-space: normal; overflow-wrap:anywhere; word-break:break-word;"><?= htmlspecialchars($product['category_name'] ?? __('uncategorized'), ENT_QUOTES, 'UTF-8') ?></td>
                                     <!-- Harga beli -->
                                     <td style="padding:10px 12px; white-space:nowrap;"><?= htmlspecialchars(formatMoneyPHP($product['purchase_price'], $business['currency']), ENT_QUOTES, 'UTF-8') ?></td>
                                     <!-- Harga Jual -->
@@ -238,6 +221,14 @@ $products = mysqli_stmt_get_result($stmt);
 
                                         <?php else: ?>
                                             <span style="color:#81776D;">-</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <!-- Catatam -->
+                                    <td style="padding:10px 12px; color:#81776D; font-size:13px; min-width:160px; max-width:180px; white-space: normal; overflow-wrap:anywhere; word-break:break-word;">
+                                        <?php if (!empty(trim($product['notes'] ?? ''))): ?>
+                                            <?= htmlspecialchars($product['notes'], ENT_QUOTES, 'UTF-8') ?>
+                                        <?php else: ?>
+                                            <span style="color:#B8B0A6;">—</span>
                                         <?php endif; ?>
                                     </td>
                                     <!-- Tombol edit & hapus -->

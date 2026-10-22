@@ -89,7 +89,7 @@ $userProfile = mysqli_fetch_assoc(mysqli_stmt_get_result($stmtUser));
                     <!-- Input Nama Bisnis -->
                     <div style="margin-bottom:16px;">
                         <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;"><?= htmlspecialchars(__('business_name_label'), ENT_QUOTES, 'UTF-8') ?></label>
-                        <input type="text" name="business_name" value="<?= htmlspecialchars($business['business_name'], ENT_QUOTES, 'UTF-8') ?>" required style="width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
+                        <input type="text" name="business_name" maxlength="40" value="<?= htmlspecialchars($business['business_name'], ENT_QUOTES, 'UTF-8') ?>" required style="width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
                     </div>
 
                     <!-- Input Catatan Bisnis (Notes) -->
@@ -97,7 +97,7 @@ $userProfile = mysqli_fetch_assoc(mysqli_stmt_get_result($stmtUser));
                         <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;">
                             <?= htmlspecialchars(__('business_notes_label'), ENT_QUOTES, 'UTF-8') ?>
                         </label>
-                        <input type="text" name="notes" maxlength="20" 
+                        <input type="text" name="notes" maxlength="30" 
                             value="<?= htmlspecialchars($business['notes'] ?? '', ENT_QUOTES, 'UTF-8') ?>" 
                             placeholder="<?= htmlspecialchars(__('business_notes_placeholder'), ENT_QUOTES, 'UTF-8') ?>" 
                             style="width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
@@ -108,7 +108,7 @@ $userProfile = mysqli_fetch_assoc(mysqli_stmt_get_result($stmtUser));
                     <!-- Input Nama Pengguna -->
                     <div style="margin-bottom:16px;">
                         <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;"><?= htmlspecialchars(__('account_name_label'), ENT_QUOTES, 'UTF-8') ?></label>
-                        <input type="text" name="name" value="<?= htmlspecialchars($userProfile['name'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required style="width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
+                        <input type="text" name="name" maxlength="40" value="<?= htmlspecialchars($userProfile['name'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required style="width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
                     </div>
 
                     <!-- Email Pengguna (Hanya baca / disabled) -->
@@ -129,30 +129,55 @@ $userProfile = mysqli_fetch_assoc(mysqli_stmt_get_result($stmtUser));
                         </p>
                     </div>
 
-                    <!-- Kata Sandi Saat Ini -->
+                    <!-- Input Kata Sandi Saat Ini -->
                     <div style="margin-bottom:16px;">
                         <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;">
                             <?= htmlspecialchars(__('current_password_label'), ENT_QUOTES, 'UTF-8') ?>
                         </label>
-                        <input type="password" name="current_password" maxlength="6" placeholder="<?= htmlspecialchars(__('current_password_place'), ENT_QUOTES, 'UTF-8') ?>" 
-                            style="width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
+                        <div style="position:relative; width:100%;">
+                            <input type="password" id="currentPassword" name="current_password" maxlength="6" placeholder="<?= htmlspecialchars(__('current_password_place'), ENT_QUOTES, 'UTF-8') ?>" 
+                                style="width:100%; box-sizing:border-box; padding:10px 40px 10px 12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
+                            <button type="button" onclick="togglePasswordVisibility('currentPassword', this)" 
+                                style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; padding:0; cursor:pointer; color:#81776D; display:flex; align-items:center;"
+                                title="<?= htmlspecialchars(__('show_password'), ENT_QUOTES, 'UTF-8'); ?>"
+                                aria-label="<?= htmlspecialchars(__('show_password'), ENT_QUOTES, 'UTF-8'); ?>">
+                                <i data-lucide="eye" style="width:18px; height:18px;"></i>
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- Kata Sandi Baru -->
+                    <!-- Input Kata Sandi Baru -->
                     <div style="margin-bottom:16px;">
                         <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;">
                             <?= htmlspecialchars(__('new_password_label'), ENT_QUOTES, 'UTF-8') ?>
                         </label>
-                        <input type="password" name="new_password" maxlength="6" placeholder="<?= htmlspecialchars(__('new_password_place'), ENT_QUOTES, 'UTF-8') ?>" 
-                            style="width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
+                        <div style="position:relative; width:100%;">
+                            <input type="password" id="newPassword" name="new_password" maxlength="6" placeholder="<?= htmlspecialchars(__('new_password_place'), ENT_QUOTES, 'UTF-8') ?>" 
+                                style="width:100%; box-sizing:border-box; padding:10px 40px 10px 12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
+                            <button type="button" onclick="togglePasswordVisibility('newPassword', this)" 
+                                style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; padding:0; cursor:pointer; color:#81776D; display:flex; align-items:center;"
+                                title="<?= htmlspecialchars(__('show_password'), ENT_QUOTES, 'UTF-8'); ?>"
+                                aria-label="<?= htmlspecialchars(__('show_password'), ENT_QUOTES, 'UTF-8'); ?>">
+                                <i data-lucide="eye" style="width:18px; height:18px;"></i>
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- Konfirmasi Kata Sandi Baru -->
+                    <!-- Input Konfirmasi Kata Sandi Baru -->
                     <div style="margin-bottom:20px;">
                         <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;">
                             <?= htmlspecialchars(__('confirm_password_label'), ENT_QUOTES, 'UTF-8') ?>
                         </label>
-                        <input type="password" name="confirm_password" maxlength="6" placeholder="<?= htmlspecialchars(__('confirm_password_place'), ENT_QUOTES, 'UTF-8') ?>" style="width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
+                        <div style="position:relative; width:100%;">
+                            <input type="password" id="confirmPassword" name="confirm_password" maxlength="6" placeholder="<?= htmlspecialchars(__('confirm_password_place'), ENT_QUOTES, 'UTF-8') ?>" 
+                                style="width:100%; box-sizing:border-box; padding:10px 40px 10px 12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
+                            <button type="button" onclick="togglePasswordVisibility('confirmPassword', this)" 
+                                style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; padding:0; cursor:pointer; color:#81776D; display:flex; align-items:center;"
+                                title="<?= htmlspecialchars(__('show_password'), ENT_QUOTES, 'UTF-8'); ?>"
+                                aria-label="<?= htmlspecialchars(__('show_password'), ENT_QUOTES, 'UTF-8'); ?>">
+                                <i data-lucide="eye" style="width:18px; height:18px;"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Tombol Simpan Perubahan Pengaturan -->
@@ -295,6 +320,33 @@ document.getElementById('btnDeleteBusiness').addEventListener('click', async fun
         showToast(<?= json_encode(__('connection_error')) ?>, 'error');
     }
 });
+
+// Fungsi untuk mengubah visibilitas kata sandi (intip/sembunyikan)
+function togglePasswordVisibility(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    
+    // Cek status tipe input saat ini
+    const isPassword = input.type === 'password';
+    input.type = isPassword ? 'text' : 'password';
+    
+    // Ambil terjemahan tooltip berdasarkan status visibilitas
+    const showText = <?= json_encode(__('show_password')) ?>;
+    const hideText = <?= json_encode(__('hide_password')) ?>;
+    const titleText = isPassword ? hideText : showText;
+
+    // Perbarui atribut title dan aria-label
+    btn.setAttribute('title', titleText);
+    btn.setAttribute('aria-label', titleText);
+
+    // Ganti ikon mata terbuka / tertutup
+    btn.innerHTML = isPassword 
+        ? '<i data-lucide="eye-off" style="width:18px; height:18px;"></i>' 
+        : '<i data-lucide="eye" style="width:18px; height:18px;"></i>';
+        
+    // Re-render ikon Lucide agar tampilan ikon baru langsung tergambar
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+}
 </script>
 
 </body>

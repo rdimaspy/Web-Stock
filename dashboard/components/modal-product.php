@@ -28,13 +28,13 @@
                 <!-- Nama Produk -->
                 <div style="margin-bottom:18px;">
                     <label style="display:block; margin-bottom:8px; font-weight:600;"><?= htmlspecialchars(__('product_name'), ENT_QUOTES, 'UTF-8') ?><span style="color:red;"> *</span></label>
-                    <input type="text" name="product_name" placeholder="<?= htmlspecialchars(__('product_name_placeholder'), ENT_QUOTES, 'UTF-8') ?>" style="width:100%; box-sizing:border-box; padding:12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
+                    <input type="text" name="product_name" maxlength="50" placeholder="<?= htmlspecialchars(__('product_name_placeholder'), ENT_QUOTES, 'UTF-8') ?>" style="width:100%; box-sizing:border-box; padding:12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
                 </div>
 
                 <!-- Kode Produk -->
                 <div style="margin-bottom:18px;">
                     <label style="display:block; margin-bottom:8px; font-weight:600;"><?= htmlspecialchars(__('product_code'), ENT_QUOTES, 'UTF-8') ?> <span style="color:red;">*</span></label>
-                    <input type="text" name="product_code" required placeholder="<?= htmlspecialchars(__('product_code_placeholder'), ENT_QUOTES, 'UTF-8') ?>" style="width:100%; box-sizing:border-box; padding:12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
+                    <input type="text" name="product_code" required maxlength="20" placeholder="<?= htmlspecialchars(__('product_code_placeholder'), ENT_QUOTES, 'UTF-8') ?>" style="width:100%; box-sizing:border-box; padding:12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
                 </div>
 
                 <!-- Kategori -->
@@ -52,7 +52,7 @@
                 <!-- Tambah kategori baru -->
                 <div id="newCategoryBox" style="display:none; background:#FAF7F2; padding:15px; border-radius:10px; margin-bottom:18px;">
                     <label style="display:block; margin-bottom:8px; font-weight:600;"><?= htmlspecialchars(__('new_category_name'), ENT_QUOTES, 'UTF-8') ?></label>
-                    <input type="text" id="newCategoryInput" name="new_category" placeholder="<?= htmlspecialchars(__('new_category_name'), ENT_QUOTES, 'UTF-8') ?>" style="width:100%; box-sizing:border-box; padding:12px; border:1px solid #E9E1D7; border-radius:8px;">
+                    <input type="text" id="newCategoryInput" name="new_category" maxlength="40" placeholder="<?= htmlspecialchars(__('new_category_name'), ENT_QUOTES, 'UTF-8') ?>" style="width:100%; box-sizing:border-box; padding:12px; border:1px solid #E9E1D7; border-radius:8px;">
                     <button type="button" id="saveCategoryButton" onclick="saveNewCategory()" style="margin-top:12px; padding:10px 16px; border:0; border-radius:8px; background:#76553D; color:white; font-weight:600; cursor:pointer;">
                         <?= htmlspecialchars(__('save_category'), ENT_QUOTES, 'UTF-8') ?>
                     </button>
@@ -85,7 +85,7 @@
                 <!-- Notes Produk -->
                 <div style="margin-bottom:18px;">
                     <label style="display:block; margin-bottom:8px; font-weight:600; font-size:14px;"><?= htmlspecialchars(__('notes'), ENT_QUOTES, 'UTF-8') ?></label>
-                    <input type="text" name="notes" maxlength="30" placeholder="<?= htmlspecialchars(__('notes_placeholder'), ENT_QUOTES, 'UTF-8') ?>" style="width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #E9E1D7; border-radius:8px; font-size:14px; outline-color:#B99A7D;">
+                    <input type="text" name="notes" maxlength="40" placeholder="<?= htmlspecialchars(__('notes_placeholder'), ENT_QUOTES, 'UTF-8') ?>" style="width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #E9E1D7; border-radius:8px; font-size:14px; outline-color:#B99A7D;">
                 </div>
 
                 <!-- Toombol Save -->

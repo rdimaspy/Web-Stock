@@ -1,5 +1,5 @@
 /*
-Komponen Toast Notification & Modal Konfirmasi Kustom untuk menggantikan alert() dan confirm() bawaan browser.
+Notification & Modal Konfirmasi Kustom buat gantikam alert() dan confirm() bawaan dr browser.
 */
 
 (function () {

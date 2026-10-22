@@ -265,7 +265,7 @@ function historyTypeBadge($type) {
                                             <?= $row['stock_after'] === null ? '—' : number_format((int) $row['stock_after']) ?>
                                         </td>
                                         <!-- Catatan -->
-                                        <td style="padding:10px 12px; color:#81776D; font-size:13px; max-width:200px; overflow-wrap:anywhere; word-break:break-word;">
+                                        <td style="padding:14px 16px; border-bottom:1px solid #F0EBE5; color:#81776D; font-size:13px; min-width:140px; max-width:220px; white-space:normal; word-break:break-word; overflow-wrap:break-word;">
                                             <?php if (!empty(trim($row['notes'] ?? ''))): ?>
                                                 <?= htmlspecialchars($row['notes'], ENT_QUOTES, 'UTF-8') ?>
                                             <?php else: ?>
