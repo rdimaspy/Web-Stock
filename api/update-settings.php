@@ -120,9 +120,9 @@ if ($update_password_flag) {
 
 // Penanganan unggah foto bisnis (jika ada file diunggah)
 if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
-    $fileTmpPath = $_FILES['photo']['tmp_name'];
-    $fileName    = $_FILES['photo']['name'];
-    $fileSize    = $_FILES['photo']['size'];
+    $fileTmpPath   = $_FILES['photo']['tmp_name'];
+    $fileName      = $_FILES['photo']['name'];
+    $fileSize      = $_FILES['photo']['size'];
     $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
     $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
@@ -131,6 +131,20 @@ if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
         $uploadDir = __DIR__ . '/../uploads/businesses/' . $business_id . '/';
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0755, true);
+        }
+
+        // Ambil nama foto lama dari database untuk dihapus
+        $stmtOldPhoto = mysqli_prepare($conn, "SELECT photo FROM businesses WHERE id = ? AND user_id = ? LIMIT 1");
+        mysqli_stmt_bind_param($stmtOldPhoto, "ii", $business_id, $user_id);
+        mysqli_stmt_execute($stmtOldPhoto);
+        $resOldPhoto = mysqli_stmt_get_result($stmtOldPhoto);
+        $oldPhotoRow = mysqli_fetch_assoc($resOldPhoto);
+
+        if ($oldPhotoRow && !empty($oldPhotoRow['photo'])) {
+            $oldFilePath = $uploadDir . $oldPhotoRow['photo'];
+            if (file_exists($oldFilePath)) {
+                @unlink($oldFilePath); // Hapus foto lama
+            }
         }
 
         $newFileName = 'logo_' . time() . '.' . $fileExtension;

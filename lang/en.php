@@ -175,6 +175,9 @@ return [
     'current_stock_label'        => 'Current stock: ',
     'failed_save_stock_in'       => 'Failed to save stock in.',
     'error_saving_stock_in'      => 'An error occurred while saving stock in.',
+    'filter_category'            => 'Category Filter',
+    'all_categories'             => 'All Categories',
+    'uncategorized'              => 'Uncategorized',
 
     // Product Out Page
     'stock_out_title'            => 'Stock Out',

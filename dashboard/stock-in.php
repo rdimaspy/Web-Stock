@@ -11,7 +11,7 @@ require_once __DIR__ . '/../includes/currency.php';
 // Ambil produk dari bisnis aktif
 $stmt = mysqli_prepare(
     $conn,
-    "SELECT id, product_name, product_code, current_stock
+    "SELECT id, product_name, product_code, current_stock, category_id
     FROM products
     WHERE business_id = ?
     ORDER BY product_name ASC"
@@ -23,6 +23,19 @@ mysqli_stmt_execute($stmt);
 $products = mysqli_stmt_get_result($stmt);
 // Hitung total jumlah baris produk yang ditemukan
 $productCount = mysqli_num_rows($products);
+
+// --- FITUR BARU: Ambil daftar kategori produk untuk filter ---
+$stmtCat = mysqli_prepare(
+    $conn,
+    "SELECT id, category_name 
+    FROM categories 
+    WHERE business_id = ? 
+    ORDER BY category_name ASC"
+);
+mysqli_stmt_bind_param($stmtCat, "i", $business_id);
+mysqli_stmt_execute($stmtCat);
+$categories = mysqli_stmt_get_result($stmtCat);
+// -----------------------------------------------------------
 ?>
 
 
@@ -107,6 +120,25 @@ $productCount = mysqli_num_rows($products);
                         <!-- ID bisnis tersembunyi sebagai parameter form -->
                         <input type="hidden" name="business_id" value="<?= (int) $business_id ?>">
 
+                        <!-- Filter Kategori -->
+                        <div style="margin-bottom:22px;">
+                            <label for="category_filter" style="display:block; margin-bottom:8px; font-weight:600;">
+                                <?= htmlspecialchars(__('filter_category'), ENT_QUOTES, 'UTF-8') ?>
+                            </label>
+                            <select id="category_filter" 
+                                    style="width:100%; box-sizing:border-box; padding:13px; border:1px solid #E9E1D7; border-radius:9px; background:white; color:#49382D; font-size: 15px;">
+                                <option value="ALL"><?= htmlspecialchars(__('all_categories'), ENT_QUOTES, 'UTF-8') ?></option>
+                                <option value="UNCATEGORIZED"><?= htmlspecialchars(__('uncategorized'), ENT_QUOTES, 'UTF-8') ?></option>
+                                
+                                <!-- Looping pilihan kategori dari database -->
+                                <?php while ($category = mysqli_fetch_assoc($categories)): ?>
+                                    <option value="<?= (int)$category['id'] ?>">
+                                        <?= htmlspecialchars($category['category_name'], ENT_QUOTES, 'UTF-8') ?>
+                                    </option>
+                                <?php endwhile; ?>
+                            </select>
+                        </div>
+
                         <!-- Input pilihan produk -->
                         <div style="margin-bottom:22px;">
                             <label for="product_id" style="display:block; margin-bottom:8px; font-weight:600;">
@@ -120,10 +152,11 @@ $productCount = mysqli_num_rows($products);
                                     <?= htmlspecialchars(__('select_product_placeholder'), ENT_QUOTES, 'UTF-8') ?>
                                 </option>
 
-                                <!-- Opsi daftar produk beserta sisa stoknya -->
+                                <!-- Opsi daftar produk (ditambahkan atribut data-category) -->
                                 <?php while ($product = mysqli_fetch_assoc($products)): ?>
                                     <option value="<?= (int) $product['id'] ?>"
-                                            data-stock="<?= (int) $product['current_stock'] ?>">
+                                            data-stock="<?= (int) $product['current_stock'] ?>"
+                                            data-category="<?= $product['category_id'] ?? 'UNCATEGORIZED' ?>">
                                         <?= htmlspecialchars($product['product_name'], ENT_QUOTES, 'UTF-8') ?>
                                     </option>
                                 <?php endwhile; ?>
@@ -181,53 +214,119 @@ $productCount = mysqli_num_rows($products);
 <script src="../assets/js/toast.js" defer></script>
 
 <script>
+// Merender ikon Lucide pada antarmuka halaman
 lucide.createIcons();
 
-// Dropdown produk dan teks info stok
+// Inisialisasi Elemen DOM Utama
 const productSelect = document.getElementById('product_id');
 const stockInfo = document.getElementById('currentStockInfo');
+const categoryFilter = document.getElementById('category_filter');
 
-// Update info stok saat pilihan produk berubah
-if (productSelect && stockInfo) {
-    productSelect.addEventListener('change', function () {
-        const option = this.options[this.selectedIndex];
+// Menyimpan Seluruh Opsi Produk Asli Beserta Datasets ke Array 
+let allProductOptions = [];
+if (productSelect) {
+    allProductOptions = Array.from(productSelect.options).map(opt => ({
+        value: opt.value,
+        text: opt.textContent,
+        stock: opt.getAttribute('data-stock') || opt.dataset.stock || 0,
+        category: opt.getAttribute('data-category') || opt.dataset.category || 'UNCATEGORIZED'
+    }));
+}
 
-        // Reset pesan petunjuk jika tidak ada produk yang dipilih
-        if (!this.value) {
-            stockInfo.textContent = <?= json_encode(__('current_stock_prompt')) ?>;
-            return;
-        }
-        // Tampilkan angka stok dari atribut data-stock opsi terpilih
-        const currentStock = Number(option.dataset.stock || 0);
+// Fungsi Memperbarui Teks Informasi Stok Produk Terpilih
+function updateStockDisplay() {
+    if (!productSelect || !stockInfo) return;
 
-        stockInfo.textContent = <?= json_encode(__('current_stock_label')) ?> + currentStock.toLocaleString();
+    // Ambil opsi produk yang sedang dipilih oleh pengguna
+    const selectedOption = productSelect.options[productSelect.selectedIndex];
+
+    // Reset teks informasi jika pengguna tidak memilih produk (opsi placeholder)
+    if (!productSelect.value || !selectedOption) {
+        stockInfo.textContent = <?= json_encode(__('current_stock_prompt')) ?>;
+        return;
+    }
+
+    // Ambil angka stok dari atribut kustom atau dataset opsi produk
+    const currentStock = Number(
+        selectedOption.getAttribute('data-stock') || selectedOption.dataset.stock || 0
+    );
+
+    // Tampilkan label dan angka stok terkini yang sudah diformat angka
+    stockInfo.textContent = <?= json_encode(__('current_stock_label')) ?> + currentStock.toLocaleString();
+}
+
+// Menjalankan fungsi updateStockDisplay saat pilihan produk diubah manual oleh pengguna
+if (productSelect) {
+    productSelect.addEventListener('change', updateStockDisplay);
+}
+
+// Logika Penyaringan (Filter) Produk Berdasarkan Kategori
+if (categoryFilter && productSelect) {
+    categoryFilter.addEventListener('change', function () {
+        const selectedCategory = this.value;
+
+        // Kosongkan seluruh opsi dropdown produk saat ini
+        productSelect.innerHTML = '';
+
+        // Looping dan filter ulang opsi produk berdasarkan kategori terpilih
+        allProductOptions.forEach(opt => {
+            // Opsi placeholder ("Pilih Produk") selalu dimasukkan kembali
+            if (!opt.value) {
+                const placeholderOpt = new Option(opt.text, opt.value);
+                productSelect.add(placeholderOpt);
+                return;
+            }
+
+            const productCategory = String(opt.category);
+            let isMatch = false;
+
+            // Memeriksa kesesuaian kategori yang dipilih
+            if (selectedCategory === 'ALL') {
+                isMatch = true;
+            } else if (selectedCategory === 'UNCATEGORIZED' && (!productCategory || productCategory === 'null' || productCategory === 'UNCATEGORIZED')) {
+                isMatch = true;
+            } else if (productCategory === selectedCategory) {
+                isMatch = true;
+            }
+
+            // Jika cocok, buat elemen option baru dan pasang kembali atribut dataset stok serta kategorinya
+            if (isMatch) {
+                const newOpt = new Option(opt.text, opt.value);
+                newOpt.setAttribute('data-stock', opt.stock);
+                newOpt.setAttribute('data-category', opt.category);
+                productSelect.add(newOpt);
+            }
+        });
+
+        // Reset dan perbarui tampilan informasi stok setelah penyaringan kategori
+        updateStockDisplay();
     });
 }
 
-// Hubungkan formulir ke API (form dan tombol submit stok masuk)
+// Menangani Simpan Data Transaksi Stok Masuk Secara Asinkron
 const stockInForm = document.getElementById('stockInForm');
 const stockInSubmitButton = document.getElementById('stockInSubmitButton');
 
-// Proses submit form stok masuk secara asinkron
 if (stockInForm && stockInSubmitButton) {
     stockInForm.addEventListener('submit', async function (event) {
-        // Mencegah reload halaman bawaan form
+        // Mencegah reload/refresh halaman bawaan dari browser saat submit
         event.preventDefault();
 
+        // Validasi kelengkapan form bawaan browser
         if (!stockInForm.reportValidity()) {
             return;
         }
 
         const originalButtonHTML = stockInSubmitButton.innerHTML;
 
-        // Ubah UI tombol ke status loading
+        // Ubah tampilan visual tombol ke status loading/menyimpan
         stockInSubmitButton.disabled = true;
         stockInSubmitButton.textContent = <?= json_encode(__('saving')) ?>;
         stockInSubmitButton.style.cursor = 'wait';
         stockInSubmitButton.style.opacity = '0.7';
 
         try {
-            // Kirim data formulir ke endpoint API penambahan stok
+            // Kirim data formulir ke endpoint API PHP penambahan stok masuk
             const response = await fetch('../api/create-stock-in.php', {
                 method: 'POST',
                 body: new FormData(stockInForm)
@@ -235,13 +334,13 @@ if (stockInForm && stockInSubmitButton) {
 
             const result = await response.json();
 
-            // Penanganan jika status respon gagal
+            // Penanganan jika respon API gagal atau tidak sukses
             if (!response.ok || result.status !== 'success') {
                 showToast(result.message || <?= json_encode(__('failed_save_stock_in')) ?>, 'error');
                 return;
             }
 
-            // Tampilkan toast sukses dan muat ulang halaman setelah jeda
+            // Tampilkan notifikasi Toast sukses dan refresh halaman otomatis setelah 1 detik
             showToast(result.message, 'success');
             setTimeout(() => {
                 window.location.reload();
@@ -250,19 +349,18 @@ if (stockInForm && stockInSubmitButton) {
         } catch (error) {
             console.error(error);
             showToast(<?= json_encode(__('error_saving_stock_in')) ?>, 'error');
-
         } finally {
-            // Kembalikan tombol ke kondisi semula
+            // Mengembalikan tombol simpan ke kondisi awal
             stockInSubmitButton.disabled = false;
             stockInSubmitButton.innerHTML = originalButtonHTML;
             stockInSubmitButton.style.cursor = 'pointer';
             stockInSubmitButton.style.opacity = '1';
-
+            
+            // Re-render ulang ikon Lucide pada tombol
             lucide.createIcons();
         }
     });
 }
-
 </script>
 
 </body>

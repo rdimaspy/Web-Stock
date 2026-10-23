@@ -175,6 +175,9 @@ return [
     'current_stock_label'        => 'Stok saat ini: ',
     'failed_save_stock_in'       => 'Gagal menyimpan stok masuk.',
     'error_saving_stock_in'      => 'Terjadi kesalahan saat menyimpan stok masuk.',
+    'filter_category'            => 'Filter Kategori',
+    'all_categories'             => 'Semua Kategori',
+    'uncategorized'              => 'Tanpa Kategori',
 
     // Halaman Produk Keluar
     'stock_out_title'            => 'Stok Keluar',

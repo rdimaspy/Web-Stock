@@ -171,10 +171,10 @@ $query = mysqli_stmt_get_result($stmt);
                         <!-- FOTO ATAU INISIAL BISNIS -->
                         <?php if (
                             !empty($business['photo']) &&
-                            file_exists(__DIR__ . '/uploads/businesses/' . $business['photo'])
+                            file_exists(__DIR__ . '/uploads/businesses/' . $business['id'] . '/' . $business['photo'])
                         ): ?>
-                            <!-- Tampilkan foto bisnis jika file ada di folder uploads/businesses/ -->
-                            <img src="uploads/businesses/<?= htmlspecialchars($business['photo'], ENT_QUOTES, 'UTF-8') ?>" alt="Foto bisnis"
+                            <!-- Tampilkan foto bisnis dari subfolder ID bisnis -->
+                            <img src="uploads/businesses/<?= (int)$business['id'] ?>/<?= htmlspecialchars($business['photo'], ENT_QUOTES, 'UTF-8') ?>" alt="Foto bisnis"
                                 style="width:56px; height:56px; flex-shrink:0; border-radius:10px; object-fit:cover;">
                         <?php else: ?>
                             <!-- Tampilkan inisial huruf jika tidak ada foto -->

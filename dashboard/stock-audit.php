@@ -11,22 +11,30 @@ require_once __DIR__ . '/../includes/currency.php';
 // Ambil produk untuk audit stok
 $stmt = mysqli_prepare(
     $conn,
-    "SELECT id, product_name, current_stock
+    "SELECT id, product_name, current_stock, category_id
     FROM products
     WHERE business_id = ?
     ORDER BY product_name ASC"
 );
 
 // Mengikat parameter ID bisnis ke statement query
-mysqli_stmt_bind_param(
-    $stmt,
-    "i",
-    $business_id
-);
+mysqli_stmt_bind_param($stmt, "i", $business_id);
 
 // Mengeksekusi query yang telah disiapkan dan Mengambil hasil query produk
 mysqli_stmt_execute($stmt);
 $products = mysqli_stmt_get_result($stmt);
+
+// Ambil daftar kategori produk untuk filte
+$stmtCat = mysqli_prepare(
+    $conn,
+    "SELECT id, category_name 
+    FROM categories 
+    WHERE business_id = ? 
+    ORDER BY category_name ASC"
+);
+mysqli_stmt_bind_param($stmtCat, "i", $business_id);
+mysqli_stmt_execute($stmtCat);
+$categories = mysqli_stmt_get_result($stmtCat);
 
 ?>
 
@@ -97,6 +105,25 @@ $products = mysqli_stmt_get_result($stmt);
                     </div>
                 </div>
 
+                <!-- Filter Kategori -->
+                <div style="margin-bottom:22px;">
+                    <label for="category_filter" style="display:block; font-weight:bold; margin-bottom:8px;">
+                        <?= htmlspecialchars(__('filter_category'), ENT_QUOTES, 'UTF-8') ?>
+                    </label>
+                    <select id="category_filter" 
+                            style="width:100%; box-sizing:border-box; padding:13px; border:1px solid #E9E1D7; border-radius:9px; background:white; color:#49382D; font-size:15px;">
+                        <option value="ALL"><?= htmlspecialchars(__('all_categories'), ENT_QUOTES, 'UTF-8') ?></option>
+                        <option value="UNCATEGORIZED"><?= htmlspecialchars(__('uncategorized'), ENT_QUOTES, 'UTF-8') ?></option>
+                        
+                        <!-- Looping opsi kategori dari database -->
+                        <?php while ($category = mysqli_fetch_assoc($categories)): ?>
+                            <option value="<?= (int)$category['id'] ?>">
+                                <?= htmlspecialchars($category['category_name'], ENT_QUOTES, 'UTF-8') ?>
+                            </option>
+                        <?php endwhile; ?>
+                    </select>
+                </div>
+
                 <!-- Pilih produk -->
                 <label style="display:block; font-weight:bold; margin-bottom:8px;">
                     <?= htmlspecialchars(__('product_name'), ENT_QUOTES, 'UTF-8') ?>
@@ -110,11 +137,12 @@ $products = mysqli_stmt_get_result($stmt);
 
                     <!-- Looping untuk menampilkan daftar opsi produk beserta data atribut stok dan harga -->
                     <?php while ($product = mysqli_fetch_assoc($products)): ?>
-                        <option value="<?= (int)$product['id'] ?>" data-stock="<?= (int)$product['current_stock'] ?>">
+                        <option value="<?= (int)$product['id'] ?>" 
+                                data-stock="<?= (int)$product['current_stock'] ?>"
+                                data-category="<?= $product['category_id'] ?? 'UNCATEGORIZED' ?>">
                             <?= htmlspecialchars($product['product_name'], ENT_QUOTES, 'UTF-8') ?>
                         </option>
                     <?php endwhile; ?>
-
                 </select>
 
                 <!-- Stok sistem -->
@@ -177,62 +205,126 @@ $products = mysqli_stmt_get_result($stmt);
 <script src="../assets/js/toast.js" defer></script>
 
 <script>
+// Rendernya ikon Lucide pada antarmuka
 lucide.createIcons();
 
-// Memperbarui tampilan stok sistem sesuai produk yang dipilih
-function updateAuditStock() {
-    // Ambil elemen dropdown produk dan opsi yang sedang dipilih
-    const select = document.getElementById('product_id');
-    const option = select.options[select.selectedIndex];
-    
-    // Ambil nilai stok dan gunakan karakter '-' jika kosong
-    const stock = option.dataset.stock || '-';
+// Inisialisasi Elemen DOM Utama
+const productSelect = document.getElementById('product_id');
+const categoryFilter = document.getElementById('category_filter');
 
-    // Tampilkan nilai stok
+// Menyimpan Seluruh Opsi Produk Asli Beserta Datasets ke Array (Client-Side Cache)
+let allProductOptions = [];
+if (productSelect) {
+    allProductOptions = Array.from(productSelect.options).map(opt => ({
+        value: opt.value,
+        text: opt.textContent,
+        stock: opt.getAttribute('data-stock') || opt.dataset.stock || 0,
+        category: opt.getAttribute('data-category') || opt.dataset.category || 'UNCATEGORIZED'
+    }));
+}
+
+// Memperbarui Tampilan Stok Sistem Sesuai Produk yang Dipilih
+function updateAuditStock() {
+    if (!productSelect) return;
+
+    // Ambil elemen opsi yang sedang dipilih dari dropdown produk
+    const selectedOption = productSelect.options[productSelect.selectedIndex];
+    
+    // Kembalikan ke tampilan default (-) jika tidak ada produk terpilih
+    if (!productSelect.value || !selectedOption) {
+        document.getElementById('system_stock').textContent = '-';
+        calculateDifference();
+        return;
+    }
+
+    // Ambil nilai stok dari atribut kustom atau dataset opsi produk
+    const stock = selectedOption.getAttribute('data-stock') || selectedOption.dataset.stock || '-';
     document.getElementById('system_stock').textContent = stock;
 
-    // Hitung ulang selisih stok secara otomatis
+    // Hitung ulang selisih stok setelah stok sistem diperbarui
     calculateDifference();
 }
 
-// Menghitung selisih antara stok fisik dan stok sistem
+// Menjalankan pembaruan stok sistem saat pilihan produk diubah manual oleh pengguna
+if (productSelect) {
+    productSelect.addEventListener('change', updateAuditStock);
+}
+
+// Menghitung Selisih Antara Stok Fisik dan Stok Sistem
 function calculateDifference() {
-    // Ambil nilai stok sistem dari teks elemen UI
-    const systemStock = parseInt(
-        document.getElementById('system_stock').textContent
-    );
-
-    // Ambil nilai stok fisik yang diinputkan oleh pengguna
-    const physicalStock = parseInt(
-        document.getElementById('physical_stock').value
-    );
-
-    // Ambil elemen penampung hasil selisih
+    // Membaca angka stok sistem dari teks elemen HTML
+    const systemStock = parseInt(document.getElementById('system_stock').textContent);
+    
+    // Membaca angka stok fisik yang diinputkan pengguna
+    const physicalStock = parseInt(document.getElementById('physical_stock').value);
+    
+    // Elemen penampung hasil selisih
     const result = document.getElementById('difference');
 
-    // Kembalikan ke tampilan default jika input stok belum berupa angka
+    // Kosongkan tampilan selisih jika input angka belum valid
     if (isNaN(systemStock) || isNaN(physicalStock)) {
         result.textContent = '-';
         return;
     }
 
-    // Hitung hasil pengurangan stok fisik dengan stok sistem
+    // Rumus selisih = stok fisik dikurangi stok sistem
     const difference = physicalStock - systemStock;
-
-    // Tampilkan angka selisih beserta tanda plus (+) jika bernilai positif
-    result.textContent = difference > 0 
-        ? '+' + difference 
-        : difference;
+    
+    // Tampilkan tanda + jika hasil selisih bernilai positif
+    result.textContent = difference > 0 ? '+' + difference : difference;
 }
 
-// Menangani proses penyimpanan data audit stok secara asinkron
+// Logika Penyaringan (Filter) Produk Berdasarkan Kategori
+if (categoryFilter && productSelect) {
+    categoryFilter.addEventListener('change', function () {
+        const selectedCategory = this.value;
+
+        // Kosongkan seluruh opsi dropdown produk saat ini
+        productSelect.innerHTML = '';
+
+        // Looping dan filter ulang opsi produk berdasarkan kategori terpilih
+        allProductOptions.forEach(opt => {
+            // Opsi placeholder ("Pilih Produk") selalu dimasukkan kembali
+            if (!opt.value) {
+                const placeholderOpt = new Option(opt.text, opt.value);
+                productSelect.add(placeholderOpt);
+                return;
+            }
+
+            const productCategory = String(opt.category);
+            let isMatch = false;
+
+            // Kondisi pencocokan kategori
+            if (selectedCategory === 'ALL') {
+                isMatch = true;
+            } else if (selectedCategory === 'UNCATEGORIZED' && (!productCategory || productCategory === 'null' || productCategory === 'UNCATEGORIZED')) {
+                isMatch = true;
+            } else if (productCategory === selectedCategory) {
+                isMatch = true;
+            }
+
+            // Buat elemen option baru dan pasang kembali atribut datasetnya jika cocok
+            if (isMatch) {
+                const newOpt = new Option(opt.text, opt.value);
+                newOpt.setAttribute('data-stock', opt.stock);
+                newOpt.setAttribute('data-category', opt.category);
+                productSelect.add(newOpt);
+            }
+        });
+
+        // Reset detail stok sistem setelah daftar produk disaring
+        updateAuditStock();
+    });
+}
+
+// Menangani Simpan Data Audit Stok Secara Asinkron (Fetch API)
 async function saveAudit() {
-    const productId = document.getElementById('product_id').value;
+    const productId = productSelect.value;
     const physicalStock = document.getElementById('physical_stock').value;
     const notes = document.getElementById('notes').value.trim();
     const saveButton = document.querySelector('button[onclick="saveAudit()"]');
 
-    // Validasi pemilihan produk sebelum dikirim
+    // Validasi pemilihan produk
     if (!productId) {
         showToast(<?= json_encode(__('select_product_first')) ?>, 'error');
         return;
@@ -244,11 +336,12 @@ async function saveAudit() {
         return;
     }
 
-    // Ubah UI tombol saat proses menyimpan
+    // Ubah status visual tombol saat proses menyimpan berlangsung
     const originalButtonHTML = saveButton.innerHTML;
     saveButton.disabled = true;
     saveButton.style.opacity = '0.7';
 
+    // Menyusun payload FormData untuk dikirimkan ke server backend
     const formData = new FormData();
     formData.append('business_id', <?= (int)$business_id ?>);
     formData.append('product_id', productId);
@@ -256,7 +349,7 @@ async function saveAudit() {
     formData.append('notes', notes);
 
     try {
-        // Kirim permintaan pencatatan audit stok via Fetch API
+        // Mengirimkan data audit ke endpoint API PHP
         const response = await fetch('../api/create-stock-audit.php', {
             method: 'POST',
             body: formData
@@ -264,6 +357,7 @@ async function saveAudit() {
 
         const result = await response.json();
 
+        // Tampilkan pesan respons server via notifikasi Toast
         if (result.success) {
             showToast(result.message, 'success');
             setTimeout(() => {
@@ -276,13 +370,13 @@ async function saveAudit() {
         showToast(<?= json_encode(__('system_error')) ?>, 'error');
         console.error(error);
     } finally {
-        // Kembalikan tombol ke status aktif semula
+        // Kembalikan kondisi tombol simpan ke keadaan semula
         saveButton.disabled = false;
         saveButton.style.opacity = '1';
         saveButton.innerHTML = originalButtonHTML;
+        lucide.createIcons();
     }
 }
-
 </script>
 
 </body>
