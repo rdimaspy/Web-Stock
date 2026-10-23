@@ -56,8 +56,8 @@ return [
     'create_account_btn'         => 'Create Account',
     'already_have_account'       => 'Already have an account?',
     'login_success'              => 'Login Succes',
-    'eye_show'                   => 'Show password',
-    'eye_hide'                  => 'Hide password',
+    'show_password'              => 'Show password',
+    'hide_password'              => 'Hide password',
 
     // Businesses 
     'hello'                  => 'Hello,',

@@ -56,8 +56,8 @@ return [
     'create_account_btn'         => 'Buat Akun',
     'already_have_account'       => 'Sudah punya akun?',
     'login_success'              => 'Login Berhasil',
-    'eye_show'                   => 'Tampilkan kata sandi',
-    'eye_hide'                   => 'Sembunyikan kata sandi',
+    'show_password'              => 'Tampilkan kata sandi',
+    'hide_password'              => 'Sembunyikan kata sandi',
 
     // Bisnis 
     'hello'                  => 'Halo,',
