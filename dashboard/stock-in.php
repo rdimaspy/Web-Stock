@@ -35,7 +35,6 @@ $stmtCat = mysqli_prepare(
 mysqli_stmt_bind_param($stmtCat, "i", $business_id);
 mysqli_stmt_execute($stmtCat);
 $categories = mysqli_stmt_get_result($stmtCat);
-// -----------------------------------------------------------
 ?>
 
 

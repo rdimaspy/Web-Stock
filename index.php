@@ -31,8 +31,8 @@ require_once __DIR__ . '/includes/language.php';
 
         /* Efek saat kursor diarahkan ke kartu fitur (hover) */
         .feature-card:hover {
-            transform: translateY(-6px); /* Mengangkat kartu sedikit ke atas */
-            border-color: #B99A7D !important; /* Mengubah warna garis tepi menjadi aksen cokelat */
+            transform: translateY(-6px); 
+            border-color: #B99A7D !important;
             box-shadow: 0 12px 30px rgba(118, 85, 61, 0.12); /* Memberikan bayangan lembut */
         }
     </style>

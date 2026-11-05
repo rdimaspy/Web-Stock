@@ -1,7 +1,4 @@
-/*
-Notification & Modal Konfirmasi Kustom buat gantikam alert() dan confirm() bawaan dr browser.
-*/
-
+//Notification & Modal Konfirmasi Kustom buat gantikam alert() dan confirm() bawaan dr browser.
 (function () {
     // Memeriksa dan menyuntikkan gaya CSS kustom jika elemen gaya belum ditambahkan ke tag head
     if (!document.getElementById('custom-ui-styles')) {

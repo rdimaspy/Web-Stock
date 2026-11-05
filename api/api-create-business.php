@@ -64,7 +64,7 @@ if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
         $photo_name = time() . "." . $extension;
 
         // Menentukan lokasi folder penyimpanan foto bisnis
-        $uploadDir = __DIR__ . "/../uploads/businesses/";
+        $uploadDir = __DIR__ . "/../uploads/businesses/" . $business_id . "/";
 
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0777, true);

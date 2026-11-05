@@ -4,7 +4,7 @@ session_start();
 
 // Memastikan permintaan dikirim khusus menggunakan metode POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header("Location: index.html");
+    header("Location: index.php");
     exit;
 }
 
@@ -20,7 +20,7 @@ if (!in_array($lang, ['id', 'en'], true)) {
 $_SESSION['language'] = $lang;
 
 // Menangkap URL halaman asal untuk proses pengalihan kembali
-$redirect = $_POST['redirect'] ?? 'index.html';
+$redirect = $_POST['redirect'] ?? 'index.php';
 
 // Memvalidasi URL redirect untuk mencegah serangan Open Redirect ke situs luar
 if (
@@ -30,7 +30,7 @@ if (
     str_contains($redirect, "\n") ||
     str_contains($redirect, "\r")
 ) {
-    $redirect = 'index.html';
+    $redirect = 'index.php';
 }
 
 // Mengalihkan kembali pengguna ke halaman sebelumnya

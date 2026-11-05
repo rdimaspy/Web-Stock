@@ -10,7 +10,7 @@ if (!in_array($lang, ['id', 'en'], true)) {
 
 // Memeriksa autentikasi; mengarahkan ke halaman login jika belum terautentikasi
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.html");
+    header("Location: login.php");
     exit;
 }
 
@@ -111,7 +111,6 @@ $query = mysqli_stmt_get_result($stmt);
                                 English
                             </button>
                         </form>
-
                     </div>
                 </div>
 

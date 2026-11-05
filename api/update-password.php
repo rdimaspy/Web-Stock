@@ -100,17 +100,17 @@ if (!empty($current_password) || !empty($new_password) || !empty($confirm_passwo
     $update_password_flag = true;
 }
 
-// 1. Update data profil pengguna
+// Update data profil pengguna
 $stmtUser = mysqli_prepare($conn, "UPDATE users SET name = ? WHERE id = ?");
 mysqli_stmt_bind_param($stmtUser, "si", $name, $user_id);
 mysqli_stmt_execute($stmtUser);
 
-// 2. Update data bisnis
+// Update data bisnis
 $stmtUpdateBiz = mysqli_prepare($conn, "UPDATE businesses SET business_name = ?, notes = ? WHERE id = ? AND user_id = ?");
 mysqli_stmt_bind_param($stmtUpdateBiz, "ssii", $business_name, $notes, $business_id, $user_id);
 mysqli_stmt_execute($stmtUpdateBiz);
 
-// 3. Update kata sandi pengguna (jika diisi dan valid)
+// Update kata sandi pengguna (jika diisi dan valid)
 if ($update_password_flag) {
     $new_hash = password_hash($new_password, PASSWORD_DEFAULT);
     $stmtUpPass = mysqli_prepare($conn, "UPDATE users SET password = ? WHERE id = ?");
@@ -118,7 +118,7 @@ if ($update_password_flag) {
     mysqli_stmt_execute($stmtUpPass);
 }
 
-// 4. Penanganan unggah foto bisnis (jika ada file diunggah)
+// Penanganan unggah foto bisnis (jika ada file diunggah)
 if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
     $fileTmpPath = $_FILES['photo']['tmp_name'];
     $fileName    = $_FILES['photo']['name'];
