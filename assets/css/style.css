@@ -1,0 +1,457 @@
+/* ==========================================================================
+   1. VARIABEL TEMA & RESET DASAR
+   ========================================================================== */
+:root {
+    --bg-main: #FAF7F2;
+    --bg-card: #FFFFFF;
+    --bg-soft: #F5EFE8;
+    --bg-accent-soft: #F3E8DC;
+    --text-dark: #302921;
+    --text-main: #49382D;
+    --text-muted: #81776D;
+    --text-light: #948578;
+    --primary: #76553D;
+    --primary-light: #A77D5B;
+    --primary-border: #B99A7D;
+    --border: #E9E1D7;
+    --border-soft: #F0E8DF;
+    --success: #2E7D32;
+    --success-soft: #E8F5E9;
+    --green-muted: #6F8966;
+    --danger: #B45F5F;
+    --danger-soft: #FBECEC;
+    --warning: #B7791F;
+    --warning-soft: #FFF8E7;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg-main);
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--text-main);
+}
+body.landing-body { background: #FFFFFF; color: var(--text-dark); }
+body.auth-body { color: var(--text-dark); overflow-x: hidden; position: relative; }
+a { text-decoration: none; color: inherit; }
+
+/* ==========================================================================
+   2. KOMPONEN LOGO BRAND (StockIn)
+   ========================================================================== */
+.brand-logo {
+    display: inline-flex;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    font-weight: 800;
+    font-size: 24px;
+    letter-spacing: -0.5px;
+}
+.brand-logo-text { color: var(--text-main); }
+.brand-logo-box { position: relative; display: inline-block; margin-left: 6px; }
+.brand-logo-shadow {
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    width: 100%;
+    height: 100%;
+    background: var(--primary-border);
+    border-radius: 6px;
+    z-index: 1;
+}
+.brand-logo-in {
+    position: relative;
+    z-index: 2;
+    display: block;
+    background: var(--primary);
+    color: #FFFFFF;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 20px;
+    line-height: 1.2;
+}
+
+/* ==========================================================================
+   3. TOMBOL, FORM, DROPDOWN, & BADGE
+   ========================================================================== */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 18px;
+    border: none;
+    border-radius: 9px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, opacity 0.2s;
+    white-space: nowrap;
+}
+.btn-primary { background: var(--primary); color: #FFFFFF; }
+.btn-danger { background: var(--danger); color: #FFFFFF; }
+.btn-danger-soft { background: var(--danger-soft); color: var(--danger); border: 1px solid #F3C6C6; }
+.btn-outline { background: #FFFFFF; color: var(--primary); border: 1px solid var(--border); }
+.btn-soft { background: var(--bg-soft); color: var(--primary); }
+.btn-sm { padding: 8px 15px; font-size: 13px; border-radius: 8px; }
+.btn-lg { padding: 13px 24px; font-size: 14px; }
+.btn-block { width: 100%; padding: 13px; }
+
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-icon.edit { background: var(--bg-soft); color: var(--primary); }
+.btn-icon.delete { background: var(--danger-soft); color: var(--danger); }
+
+.form-group { margin-bottom: 18px; }
+.form-group-lg { margin-bottom: 22px; }
+.form-label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 7px; color: var(--text-main); }
+.form-label-lg { display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--text-main); }
+.label-optional { font-size: 12px; color: var(--text-light); font-weight: normal; }
+
+.input-field, .form-control {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    font-size: 14px;
+    color: var(--text-dark);
+    background: #FFFFFF;
+    transition: all 0.25s ease;
+}
+.input-field:focus, .form-control:focus {
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(167, 125, 91, 0.15);
+    outline: none;
+}
+.form-control[readonly], .form-control:disabled { background: var(--bg-soft); color: var(--text-muted); }
+
+.password-wrapper { position: relative; width: 100%; }
+.password-wrapper .input-field, .password-wrapper .form-control { padding-right: 42px; }
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+}
+
+.divider-dashed { border: 0; border-top: 1px dashed var(--border); margin: 20px 0; }
+
+/* Dropdown Menu */
+.dropdown-wrap { position: relative; display: inline-block; }
+.lang-trigger {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 6px 8px;
+    border-radius: 8px;
+}
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 40px;
+    width: 145px;
+    padding: 8px;
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(73, 56, 45, 0.10);
+    z-index: 100;
+}
+.dropdown-menu.wide { width: 180px; top: 48px; }
+.dropdown-option {
+    width: 100%;
+    padding: 10px 12px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    text-align: left;
+    color: var(--text-main);
+    cursor: pointer;
+    font-size: 13px;
+}
+.dropdown-option.active { background: var(--bg-soft); font-weight: 600; }
+
+/* Badge Status */
+.badge { display: inline-block; padding: 5px 10px; border-radius: 8px; font-size: 12px; font-weight: 600; }
+.badge-pill { border-radius: 20px; padding: 6px 12px; }
+.badge-success { background: var(--success-soft); color: var(--success); }
+.badge-danger { background: var(--danger-soft); color: var(--danger); }
+.badge-warning { background: var(--warning-soft); color: var(--warning); }
+.badge-neutral { background: var(--bg-soft); color: var(--primary); }
+
+/* ==========================================================================
+   4. LANDING PAGE (index.php)
+   ========================================================================== */
+.site-header { width: 100%; background: #FFFFFF; border-bottom: 2px solid var(--border); }
+.navbar-container {
+    max-width: 1160px;
+    height: 64px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.nav-actions { display: flex; align-items: center; gap: 16px; }
+.nav-login-link { color: var(--text-dark); font-size: 13px; font-weight: bold; }
+
+.hero-section { padding: 75px 24px; background: radial-gradient(ellipse at 85% 15%, #F5EBDD 0%, #FFFFFF 55%); }
+.hero-container {
+    max-width: 1160px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 45px;
+}
+.hero-text-col { flex: 1 1 300px; }
+.hero-title { margin: 0 0 22px; color: var(--text-dark); font-size: clamp(32px, 5vw, 58px); line-height: 1.15; letter-spacing: -1.5px; }
+.hero-title-accent { color: var(--primary-light); }
+.hero-desc { max-width: 455px; color: var(--text-muted); font-size: 15px; line-height: 1.8; }
+
+.hero-preview-col { flex: 1 1 300px; max-width: 475px; width: 100%; margin: 0 auto; }
+.preview-card { padding: 20px; background: #FFFFFF; border: 1px solid var(--border); border-radius: 18px; box-shadow: 0 20px 50px rgba(92, 69, 48, 0.12); }
+.preview-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.preview-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 16px 0; }
+.preview-stat-box { padding: 12px; border: 1px solid var(--border); border-radius: 11px; }
+.preview-sample-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid #F1EBE4; }
+.preview-sample-icon {
+    width: 36px; height: 36px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    background: var(--bg-accent-soft); color: var(--primary); border-radius: 9px; font-weight: 700;
+}
+.preview-sample-icon.alt { background: #E8EDE3; color: #657B5F; }
+
+.features-section { padding: 60px 24px; background: var(--bg-main); }
+.features-container { max-width: 1160px; margin: 0 auto; }
+.features-header { max-width: 600px; margin: 0 auto 38px; text-align: center; }
+.features-tag { color: var(--primary-light); font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin: 0; }
+.features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
+.feature-card {
+    padding: 22px; background: #FFFFFF; border: 1px solid var(--border); border-radius: 14px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease; cursor: pointer;
+}
+.feature-card:hover { transform: translateY(-6px); border-color: var(--primary-border); box-shadow: 0 12px 30px rgba(118, 85, 61, 0.12); }
+.feature-icon-box { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: var(--bg-accent-soft); color: var(--primary); border-radius: 11px; }
+
+.site-footer { background: #FFFFFF; border-top: 1px solid var(--border); padding: 24px 16px; }
+.footer-container { max-width: 1160px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+
+/* ==========================================================================
+   5. HALAMAN AUTENTIKASI & FORM TENGAH (login, register, create-business)
+   ========================================================================== */
+.bg-orb-1, .bg-orb-2 { position: absolute; border-radius: 50%; pointer-events: none; z-index: 1; }
+.bg-orb-1 { top: -10%; left: -5%; width: 420px; height: 420px; background: radial-gradient(circle, rgba(235, 218, 199, 0.6) 0%, rgba(250, 247, 242, 0) 70%); }
+.bg-orb-2 { bottom: -10%; right: -5%; width: 480px; height: 480px; background: radial-gradient(circle, rgba(216, 193, 171, 0.45) 0%, rgba(250, 247, 242, 0) 70%); }
+
+.center-page-wrapper { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 30px; position: relative; z-index: 5; }
+.auth-card { width: 100%; max-width: 420px; background: #FFFFFF; padding: 40px; border-radius: 20px; border: 1px solid var(--border); box-shadow: 0 20px 50px rgba(92, 69, 48, 0.07); }
+.auth-card.wide { max-width: 480px; padding: 35px; border-radius: 18px; }
+.auth-header { text-align: center; margin-bottom: 30px; }
+.auth-subtitle { margin-top: 10px; color: var(--text-muted); font-size: 14px; line-height: 1.5; }
+.auth-switch-text { text-align: center; margin-top: 28px; color: var(--text-muted); font-size: 13px; }
+.auth-switch-link { color: var(--primary); font-weight: 600; margin-left: 4px; }
+.auth-back-box { margin-top: 20px; padding-top: 16px; border-top: 1px dashed var(--border); text-align: center; }
+.auth-back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--text-muted); font-size: 13px; font-weight: 500; }
+
+.upload-box-sm, .upload-box-md, .upload-box-lg { display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; }
+.upload-box-sm { width: 72px; height: 72px; background: var(--bg-accent-soft); border-radius: 18px; color: var(--primary); position: relative; margin-bottom: 18px; }
+.upload-box-md { width: 80px; height: 80px; border-radius: 12px; background: var(--bg-soft); border: 1px solid var(--border); flex-shrink: 0; }
+.upload-box-lg { width: 100px; height: 100px; border-radius: 14px; background: var(--bg-soft); }
+.img-cover { width: 100%; height: 100%; object-fit: cover; }
+
+/* ==========================================================================
+   6. HALAMAN DAFTAR BISNIS (businesses.php)
+   ========================================================================== */
+.main-container { max-width: 1100px; margin: auto; padding: 30px; }
+.top-bar-flex { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; margin-bottom: 30px; }
+.header-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.settings-icon-btn {
+    display: flex; align-items: center; justify-content: center; width: 42px; height: 42px;
+    border: 1px solid var(--border); border-radius: 10px; background: #FFFFFF; color: var(--primary); cursor: pointer;
+}
+.business-wrapper { background: #FFFFFF; border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
+.business-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.business-card {
+    display: flex; align-items: center; gap: 14px; min-width: 0; padding: 16px;
+    background: var(--bg-main); border: 1.5px solid var(--border); border-radius: 14px;
+    color: var(--text-dark); transition: all 0.25s ease; cursor: pointer;
+}
+.business-card:hover { transform: translateY(-3px); border-color: var(--primary-light); box-shadow: 0 10px 24px rgba(118, 85, 61, 0.12); background: #FFFFFF; }
+.business-card .arrow-icon { width: 18px; height: 18px; flex-shrink: 0; color: var(--text-light); transition: transform 0.25s ease, color 0.25s ease; }
+.business-card:hover .arrow-icon { transform: translateX(4px); color: var(--primary); }
+.business-avatar {
+    width: 56px; height: 56px; flex-shrink: 0; border-radius: 10px; object-fit: cover;
+    background: var(--primary); color: #FFFFFF; display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: bold;
+}
+
+/* ==========================================================================
+   7. LAYOUT DASHBOARD, SIDEBAR, & HEADER
+   ========================================================================== */
+.dashboard-layout { display: flex; min-height: 100vh; }
+.sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0; width: 230px; overflow-y: auto;
+    background: #FFFFFF; border-right: 1px solid var(--border); padding: 25px 18px; z-index: 200;
+}
+.sidebar-label { font-size: 11px; color: #A3978A; font-weight: bold; letter-spacing: 1px; }
+.sidebar-link {
+    display: flex; align-items: center; gap: 12px; padding: 12px; margin-bottom: 7px;
+    border-radius: 9px; background: #FFFFFF; color: #6F6257; font-weight: bold;
+}
+.sidebar-link.active { background: var(--primary); color: #FFFFFF; }
+.sidebar-submenu { padding-left: 15px; margin-top: 5px; }
+.sidebar-sublink { display: flex; align-items: center; gap: 10px; padding: 10px 12px; margin-bottom: 4px; border-radius: 7px; color: var(--text-muted); font-size: 13px; }
+.sidebar-sublink.active { background: var(--bg-soft); color: var(--primary); font-weight: bold; }
+.sidebar-footer { margin-top: 35px; padding-top: 18px; border-top: 1px solid var(--border); }
+
+.dashboard-main { margin-left: 230px; flex: 1; min-width: 0; min-height: 100vh; display: flex; flex-direction: column; }
+.top-header {
+    position: sticky; top: 0; z-index: 100; min-height: 75px; background: #FFFFFF;
+    border-bottom: 1px solid var(--border); display: flex; align-items: center;
+    justify-content: space-between; gap: 20px; padding: 14px 32px;
+}
+.page-section { padding: 32px; }
+.page-section.max-800 { max-width: 800px; }
+.page-section.max-650 { max-width: 650px; }
+.page-header { margin-bottom: 25px; }
+.page-header-flex { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 25px; }
+.page-title { margin: 0; font-size: 29px; }
+.page-desc { color: var(--text-muted); margin: 10px 0 0; line-height: 1.6; }
+
+/* ==========================================================================
+   8. KARTU, FORM TRANSAKSI, & TABEL DASHBOARD
+   ========================================================================== */
+.card { background: #FFFFFF; border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
+.card-overview { padding: 24px; background: #FFFFFF; border: 1px solid var(--border); border-radius: 18px; box-shadow: 0 15px 40px rgba(92, 69, 48, 0.06); }
+.card-form { background: #FFFFFF; border: 1px solid var(--border); border-radius: 12px; padding: 28px; max-width: 900px; }
+.card-form-header { display: flex; align-items: center; gap: 14px; margin-bottom: 25px; }
+.card-form-icon { width: 55px; height: 55px; border-radius: 12px; background: var(--bg-soft); display: flex; align-items: center; justify-content: center; color: var(--primary); }
+
+.stats-grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 20px 0; }
+.stats-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 25px; }
+.stat-box-soft { padding: 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg-main); }
+.stat-box-white { background: #FFFFFF; border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+.span-2 { grid-column: span 2; }
+
+.top-product-row { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-top: 1px solid #F1EBE4; }
+.product-thumb-sm { width: 40px; height: 40px; flex-shrink: 0; border-radius: 10px; object-fit: cover; border: 1px solid var(--border); }
+.product-thumb-md { width: 50px; height: 50px; min-width: 50px; flex-shrink: 0; border-radius: 10px; object-fit: cover; border: 1px solid var(--border); }
+.product-initial-sm {
+    width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    background: var(--bg-accent-soft); color: var(--primary); border-radius: 10px; font-weight: 700; font-size: 15px;
+}
+.product-placeholder-md {
+    width: 50px; height: 50px; min-width: 50px; flex-shrink: 0; border-radius: 10px;
+    background: var(--bg-soft); display: flex; align-items: center; justify-content: center; color: var(--primary);
+}
+
+.filter-bar {
+    display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px;
+    background: #FFFFFF; border: 1.5px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 20px;
+}
+.search-box { flex: 1; min-width: 200px; position: relative; }
+.search-box i, .search-box svg { position: absolute; left: 12px; top: 13px; width: 18px; height: 18px; color: var(--text-light); }
+.search-box input { padding-left: 39px; }
+
+.table-wrapper { background: #FFFFFF; border: 1.5px solid var(--border); border-radius: 12px; overflow: hidden; }
+.table-top-bar { padding: 18px 20px; border-bottom: 1px solid var(--border); font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+.table-scroll { max-height: 500px; overflow: auto; position: relative; }
+.data-table { width: 100%; border-collapse: collapse; text-align: left; white-space: nowrap; }
+.data-table thead th {
+    position: sticky; top: 0; z-index: 2; padding: 13px 14px; font-size: 13px;
+    color: var(--primary); background: var(--bg-soft); border-bottom: 1px solid var(--border);
+}
+.data-table tbody td { padding: 12px 14px; border-bottom: 1px solid var(--border-soft); }
+.cell-wrap { white-space: normal; word-break: break-word; overflow-wrap: anywhere; }
+.empty-cell { padding: 35px !important; text-align: center; color: var(--text-muted); }
+
+/* ==========================================================================
+   9. MODAL DIALOG & TOAST NOTIFICATION
+   ========================================================================== */
+.modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(73, 56, 45, 0.35);
+    z-index: 999; align-items: center; justify-content: center; padding: 20px;
+}
+.modal-dialog { width: 520px; max-width: 100%; max-height: 85vh; background: #FFFFFF; border-radius: 16px; padding: 25px; display: flex; flex-direction: column; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.modal-close-btn { border: none; background: none; font-size: 22px; cursor: pointer; color: var(--primary); }
+.modal-scroll-body { overflow-y: auto; padding-right: 10px; flex: 1; }
+.modal-footer { display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
+
+#toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+.custom-toast {
+    pointer-events: auto; min-width: 280px; max-width: 380px; padding: 14px 18px; border-radius: 10px;
+    font-size: 14px; font-weight: 500; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); border: 1px solid var(--border);
+    transform: translateX(120%); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease; opacity: 0;
+}
+.custom-toast.show { transform: translateX(0); opacity: 1; }
+.custom-toast.success { background: #FFFFFF; color: var(--text-dark); border-left: 5px solid var(--green-muted); }
+.custom-toast.error { background: #FFFFFF; color: var(--danger); border-left: 5px solid var(--danger); }
+.custom-toast.info { background: #FFFFFF; color: var(--primary); border-left: 5px solid var(--primary); }
+.toast-close { background: none; border: none; font-size: 16px; cursor: pointer; color: var(--text-muted); padding: 0; line-height: 1; }
+
+#custom-confirm-backdrop {
+    position: fixed; inset: 0; background: rgba(48, 41, 33, 0.4); backdrop-filter: blur(2px);
+    z-index: 10000; display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
+}
+#custom-confirm-backdrop.active { opacity: 1; pointer-events: auto; }
+.custom-confirm-card {
+    background: #FFFFFF; border-radius: 14px; width: 90%; max-width: 400px; padding: 24px;
+    border: 1px solid var(--border); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    transform: scale(0.9); transition: transform 0.25s ease;
+}
+#custom-confirm-backdrop.active .custom-confirm-card { transform: scale(1); }
+
+/* ==========================================================================
+   10. CETAK / PRINT LAPORAN & PDF
+   ========================================================================== */
+.print-header { text-align: center; margin-bottom: 15px; display: none; }
+.chart-card { background: #FFFFFF; border: 1.5px solid var(--border); border-radius: 12px; padding: 20px; }
+.chart-box { position: relative; width: 100%; height: 350px; }
+
+body.pdf-print-body { background: #FFFFFF; color: #333333; margin: 20px; font-size: 12px; }
+.pdf-header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid var(--primary); padding-bottom: 10px; }
+.pdf-header h2 { margin: 0; color: var(--primary); }
+.pdf-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+.pdf-table th, .pdf-table td { border: 1px solid #CCCCCC; padding: 8px; text-align: left; }
+.pdf-table th { background: var(--bg-soft); color: var(--primary); }
+.pdf-summary-cell { padding: 10px; border: 1px solid #CCCCCC; background: #F9F9F9; }
+
+@media print {
+    body.pdf-print-body { margin: 0; }
+    .no-print { display: none !important; }
+    body.analytics-print-body * { visibility: hidden !important; }
+    body.analytics-print-body #reportContent, body.analytics-print-body #reportContent * { visibility: visible !important; }
+    body.analytics-print-body #reportContent { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
+    @page { size: A4 landscape; margin: 12mm; }
+    .print-header { display: block !important; }
+    .chart-container-print { page-break-inside: avoid !important; break-inside: avoid !important; border: 1px solid var(--border) !important; box-shadow: none !important; margin-bottom: 0 !important; }
+    .print-page-break { page-break-before: always !important; break-before: page !important; }
+    canvas { max-width: 100% !important; max-height: 320px !important; }
+}

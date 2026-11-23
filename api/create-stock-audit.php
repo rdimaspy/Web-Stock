@@ -1,149 +1,67 @@
 <?php
-// Memulai sesi login dan memuat konfigurasi koneksi database
+// Endpoint API Pencatatan Audit Stok (Stock Audit)
 session_start();
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/language.php';
+require_once __DIR__ . '/../includes/helpers.php';
 
-// Menentukan format respons berupa JSON
-header('Content-Type: application/json');
+requireApiAuth();
 
-// Memeriksa autentikasi pengguna; kembalikan pesan error jika belum login
-if (!isset($_SESSION['user_id'])) {
-    echo json_encode([
-        'success' => false,
-        'message' => __('unauthorized')
-    ]);
-    exit;
-}
-
-// Menangkap dan memvalidasi input parameter dari form audit
 $business_id    = filter_input(INPUT_POST, 'business_id', FILTER_VALIDATE_INT);
 $product_id     = filter_input(INPUT_POST, 'product_id', FILTER_VALIDATE_INT);
 $physical_stock = filter_input(INPUT_POST, 'physical_stock', FILTER_VALIDATE_INT);
 $notes          = trim($_POST['notes'] ?? '');
 
-// Memvalidasi agar nilai ID bisnis, ID produk, dan jumlah stok fisik valid
-if (
-    !$business_id ||
-    !$product_id ||
-    $physical_stock === false ||
-    $physical_stock === null ||
-    $physical_stock < 0
-) {
-    echo json_encode([
-        'success' => false,
-        'message' => __('invalid_data')
-    ]);
-    exit;
+if (!$business_id || !$product_id || $physical_stock === false || $physical_stock === null || $physical_stock < 0) {
+    jsonResponse('error', __('invalid_data'), 400);
 }
 
 try {
-    // Memulai transaksi database agar perubahan stok dan riwayat tersimpan secara sinkron
     mysqli_begin_transaction($conn);
 
-    // Menyiapkan query untuk mengambil data produk dan stok terkini
-    $stmt = mysqli_prepare(
-        $conn,
-        "SELECT id, product_name, current_stock
-        FROM products
-        WHERE id = ?
-        AND business_id = ?
-        LIMIT 1"
-    );
-
-    // Eksekusi prepared statement pencarian produk
+    $stmt = mysqli_prepare($conn, "SELECT id, product_name, current_stock FROM products WHERE id = ? AND business_id = ? LIMIT 1");
     mysqli_stmt_bind_param($stmt, "ii", $product_id, $business_id);
     mysqli_stmt_execute($stmt);
-
     $product = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
 
-    // Menangani kondisi jika data produk tidak ditemukan
     if (!$product) {
         throw new Exception(__('product_not_found'));
     }
 
-    // Mengambil nilai stok sebelum proses audit dilakukan
-    $stock_before = (int)$product['current_stock'];
+    $stock_before = (int) $product['current_stock'];
+    $difference   = $physical_stock - $stock_before;
 
-    // Menghitung selisih antara stok hasil perhitungan fisik dan stok sistem
-    $difference = $physical_stock - $stock_before;
-
-    // Jika tidak terdapat selisih angka, batalkan perubahan transaksi database
     if ($difference === 0) {
         mysqli_commit($conn);
-
-        echo json_encode([
-            'success' => true,
-            'message' => __('no_stock_change')
-        ]);
-        exit;
+        jsonResponse('success', __('no_stock_change'));
     }
 
-    // Menyiapkan query untuk memperbarui stok produk sesuai jumlah fisik terkini
-    $stmt = mysqli_prepare(
-        $conn,
-        "UPDATE products
-        SET current_stock = ?
-        WHERE id = ?
-        AND business_id = ?"
-    );
-
-    // Eksekusi pembaruan jumlah stok produk
+    // Sesuaikan stok sistem dengan hasil audit fisik
+    $stmt = mysqli_prepare($conn, "UPDATE products SET current_stock = ? WHERE id = ? AND business_id = ?");
     mysqli_stmt_bind_param($stmt, "iii", $physical_stock, $product_id, $business_id);
-
     if (!mysqli_stmt_execute($stmt)) {
         throw new Exception(__('stock_update_failed'));
     }
 
-    // Menyiapkan query untuk mencatat transaksi penyesuaian audit ke riwayat
+    // Catat riwayat transaksi audit stok
     $stmt = mysqli_prepare(
         $conn,
         "INSERT INTO inventory_transactions
-        (
-            business_id,
-            product_id,
-            product_name,
-            transaction_type,
-            quantity,
-            stock_before,
-            stock_after,
-            notes
-        )
-        VALUES
-        (?, ?, ?, 'stock_audit', ?, ?, ?, ?)"
+            (business_id, product_id, product_name, transaction_type, quantity, stock_before, stock_after, notes)
+         VALUES (?, ?, ?, 'stock_audit', ?, ?, ?, ?)"
     );
-
-    // Eksekusi penyimpanan catatan riwayat transaksi audit
     mysqli_stmt_bind_param(
-        $stmt,
-        "iisiiis",
-        $business_id,
-        $product_id,
-        $product['product_name'],
-        $difference,
-        $stock_before,
-        $physical_stock,
-        $notes
+        $stmt, "iisiiis",
+        $business_id, $product_id, $product['product_name'],
+        $difference, $stock_before, $physical_stock, $notes
     );
-
     if (!mysqli_stmt_execute($stmt)) {
         throw new Exception(__('audit_save_failed'));
     }
 
-    // Konfirmasi dan simpan seluruh perubahan transaksi database jika berhasil
     mysqli_commit($conn);
-
-    echo json_encode([
-        'success' => true,
-        'message' => __('audit_save_success')
-    ]);
-
+    jsonResponse('success', __('audit_save_success'));
 } catch (Exception $e) {
-    // Batalkan seluruh perubahan database (rollback) jika terjadi kesalahan/error
     mysqli_rollback($conn);
-
-    echo json_encode([
-        'success' => false,
-        'message' => $e->getMessage()
-    ]);
+    jsonResponse('error', $e->getMessage(), 500);
 }

@@ -1,0 +1,59 @@
+services:
+  db:
+    image: docker.io/library/mysql:8.0
+    container_name: webstock-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: stock_management
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ../database/stock_management.sql:/docker-entrypoint-initdb.d/01-stock_management.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  web:
+    build:
+      context: .
+      dockerfile: Containerfile
+    container_name: webstock-web
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_USER: root
+      DB_PASS: ""
+      DB_NAME: stock_management
+    ports:
+      - "8080:8080"
+    volumes:
+      - ..:/var/www/html
+      - ./database.php:/var/www/html/config/database.php:ro
+    userns_mode: "keep-id:uid=33,gid=33"
+
+  phpmyadmin:
+    image: docker.io/library/phpmyadmin:latest
+    container_name: webstock-phpmyadmin
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: ""
+    ports:
+      - "8081:80"
+
+volumes:
+  mysql_data:
+

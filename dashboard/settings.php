@@ -1,84 +1,66 @@
 <?php
-// Validasi autentikasi user dan akses bisnis aktif
+// Validasi sesi, akses bisnis aktif, bahasa, & mata uang
 require_once __DIR__ . '/../includes/auth_business.php';
-
-// Pengaturan bahasa
-require_once __DIR__ . '/../includes/language.php';
 
 // Ambil data profil pengguna aktif
 $stmtUser = mysqli_prepare($conn, "SELECT name, email FROM users WHERE id = ? LIMIT 1");
 mysqli_stmt_bind_param($stmtUser, "i", $_SESSION['user_id']);
 mysqli_stmt_execute($stmtUser);
 $userProfile = mysqli_fetch_assoc(mysqli_stmt_get_result($stmtUser));
+
+// Daftar field input kata sandi untuk efisiensi render
+$passwordFields = [
+    ['currentPassword', 'current_password', 'current_password_label', 'current_password_place'],
+    ['newPassword', 'new_password', 'new_password_label', 'new_password_place'],
+    ['confirmPassword', 'confirm_password', 'confirm_password_label', 'confirm_password_place'],
+];
+
+$currentPage = 'settings.php';
 ?>
-
-
-
 <!DOCTYPE html>
-<!-- Set bahasa -->
 <html lang="<?= htmlspecialchars($lang, ENT_QUOTES, 'UTF-8') ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars(__('settings_title'), ENT_QUOTES, 'UTF-8') ?> - StockIn</title>
+    <link rel="stylesheet" href="../assets/css/style.css?v=3">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../assets/js/toast.js?v=3" defer></script>
+    <script src="../assets/js/app.js?v=3" defer></script>
 </head>
+<body>
 
-<!-- Styling utama layout dan warna latar halaman -->
-<body style="margin:0; min-height:100vh; background:#FAF7F2; font-family:Arial,sans-serif; color:#49382D;">
-
-<!-- Menentukan halaman aktif untuk sidebar -->
-<?php $currentPage = 'settings.php'; ?>
-
-<!-- Layout utama halaman pengaturan-->
-<div style="display:flex; min-height:100vh;">
-
-    <!-- SIDEBAR -->
+<div class="dashboard-layout">
     <?php require __DIR__ . '/components/sidebar.php'; ?>
 
-    <!-- KONTEN UTAMA -->
-    <main style="margin-left:230px; flex:1; min-width:0;">
-        
-        <!-- HEADER -->
+    <main class="dashboard-main">
         <?php require __DIR__ . '/components/header.php'; ?>
 
-        <!-- HALAMAN SETTING -->
-        <section style="padding:32px; max-width:650px;">
-            <div style="margin-bottom:20px;">
-                <!-- Judul halaman -->
+        <section class="page-section max-650">
+            <div class="page-header" style="margin-bottom:20px;">
                 <h1 style="margin:0; font-size:26px;"><?= htmlspecialchars(__('settings_title'), ENT_QUOTES, 'UTF-8') ?></h1>
-                <!-- Deskripsi -->
                 <p style="color:#81776D; margin-top:6px; font-size:14px;">
                     <?= htmlspecialchars(__('settings_description'), ENT_QUOTES, 'UTF-8') ?>
                 </p>
             </div>
 
-            <!-- Form Pengaturan -->
-            <div style="background:white; border:1px solid #E9E1D7; border-radius:12px; padding:24px;">
+            <div class="card">
                 <form id="settingsForm" enctype="multipart/form-data">
-                    <!-- ID bisnis tersembunyi sebagai parameter acuan update data -->
-                    <input type="hidden" name="business_id" value="<?= (int)$business_id ?>">
+                    <input type="hidden" name="business_id" value="<?= (int) $business_id ?>">
 
-                    <!-- Input Foto Toko / Bisnis -->
-                    <div style="margin-bottom:20px;">
-                        <label style="display:block; margin-bottom:8px; font-weight:600; font-size:14px;">
-                            <?= htmlspecialchars(__('business_logo_photo'), ENT_QUOTES, 'UTF-8') ?>
-                        </label>
-                        
+                    <!-- Foto / Logo Toko -->
+                    <div class="form-group">
+                        <label class="form-label-lg"><?= htmlspecialchars(__('business_logo_photo'), ENT_QUOTES, 'UTF-8') ?></label>
                         <div style="display:flex; align-items:center; gap:16px;">
-                            <!-- Area Preview -->
-                            <label for="businessPhoto" style="width:80px; height:80px; border-radius:12px; background:#F5EFE8; border:1px solid #E9E1D7; display:flex; align-items:center; justify-content:center; cursor:pointer; overflow:hidden; flex-shrink:0;">
-                                <img id="businessPreview" src="" style="width:100%; height:100%; object-fit:cover; display:none;">
+                            <label for="businessPhoto" class="upload-box-md">
+                                <img id="businessPreview" src="" class="img-cover" style="display:none;" alt="Preview">
                                 <i id="businessUploadIcon" data-lucide="camera" style="width:28px; height:28px; color:#76553D;"></i>
                             </label>
-
-                            <!-- Tombol dan Keterangan -->
                             <div>
                                 <input type="file" id="businessPhoto" name="photo" accept="image/*" style="display:none;">
-                                
-                                <label for="businessPhoto" style="display:inline-block; padding:8px 14px; background:#F5EFE8; color:#76553D; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer;">
+                                <label for="businessPhoto" class="btn btn-soft btn-sm">
                                     <?= htmlspecialchars(__('change_photo'), ENT_QUOTES, 'UTF-8') ?>
                                 </label>
-                                
                                 <p style="margin:6px 0 0; color:#81776D; font-size:12px;">
                                     <?= htmlspecialchars(__('photo_hint'), ENT_QUOTES, 'UTF-8') ?>
                                 </p>
@@ -86,122 +68,70 @@ $userProfile = mysqli_fetch_assoc(mysqli_stmt_get_result($stmtUser));
                         </div>
                     </div>
 
-                    <!-- Input Nama Bisnis -->
-                    <div style="margin-bottom:16px;">
-                        <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;"><?= htmlspecialchars(__('business_name_label'), ENT_QUOTES, 'UTF-8') ?></label>
-                        <input type="text" name="business_name" maxlength="40" value="<?= htmlspecialchars($business['business_name'], ENT_QUOTES, 'UTF-8') ?>" required style="width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
+                    <!-- Informasi Bisnis -->
+                    <div class="form-group">
+                        <label class="form-label-lg"><?= htmlspecialchars(__('business_name_label'), ENT_QUOTES, 'UTF-8') ?></label>
+                        <input type="text" name="business_name" maxlength="40" class="form-control" required
+                            value="<?= htmlspecialchars($business['business_name'], ENT_QUOTES, 'UTF-8') ?>">
                     </div>
 
-                    <!-- Input Catatan Bisnis (Notes) -->
-                    <div style="margin-bottom:16px;">
-                        <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;">
-                            <?= htmlspecialchars(__('business_notes_label'), ENT_QUOTES, 'UTF-8') ?>
-                        </label>
-                        <input type="text" name="notes" maxlength="30" 
-                            value="<?= htmlspecialchars($business['notes'] ?? '', ENT_QUOTES, 'UTF-8') ?>" 
-                            placeholder="<?= htmlspecialchars(__('business_notes_placeholder'), ENT_QUOTES, 'UTF-8') ?>" 
-                            style="width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
+                    <div class="form-group">
+                        <label class="form-label-lg"><?= htmlspecialchars(__('business_notes_label'), ENT_QUOTES, 'UTF-8') ?></label>
+                        <input type="text" name="notes" maxlength="30" class="form-control"
+                            value="<?= htmlspecialchars($business['notes'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
+                            placeholder="<?= htmlspecialchars(__('business_notes_placeholder'), ENT_QUOTES, 'UTF-8') ?>">
                     </div>
 
-                    <hr style="border:0; border-top:1px dashed #E9E1D7; margin:20px 0;">
+                    <hr class="divider-dashed">
 
-                    <!-- Input Nama Pengguna -->
-                    <div style="margin-bottom:16px;">
-                        <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;"><?= htmlspecialchars(__('account_name_label'), ENT_QUOTES, 'UTF-8') ?></label>
-                        <input type="text" name="name" maxlength="40" value="<?= htmlspecialchars($userProfile['name'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required style="width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
+                    <!-- Informasi Akun Pengguna -->
+                    <div class="form-group">
+                        <label class="form-label-lg"><?= htmlspecialchars(__('account_name_label'), ENT_QUOTES, 'UTF-8') ?></label>
+                        <input type="text" name="name" maxlength="40" class="form-control" required
+                            value="<?= htmlspecialchars($userProfile['name'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
                     </div>
 
-                    <!-- Email Pengguna (Hanya baca / disabled) -->
-                    <div style="margin-bottom:20px;">
-                        <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;"><?= htmlspecialchars(__('email_address_label'), ENT_QUOTES, 'UTF-8') ?></label>
-                        <input type="email" value="<?= htmlspecialchars($userProfile['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>" disabled style="width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #E9E1D7; border-radius:8px; background:#F5EFE8; color:#81776D;">
+                    <div class="form-group">
+                        <label class="form-label-lg"><?= htmlspecialchars(__('email_address_label'), ENT_QUOTES, 'UTF-8') ?></label>
+                        <input type="email" class="form-control" disabled
+                            value="<?= htmlspecialchars($userProfile['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
                     </div>
 
-                    <hr style="border:0; border-top:1px dashed #E9E1D7; margin:20px 0;">
+                    <hr class="divider-dashed">
 
                     <!-- Bagian Ubah Kata Sandi (Opsional) -->
                     <div style="margin-bottom:16px;">
-                        <h4 style="margin:0 0 6px; font-size:15px; color:#49382D;">
-                            <?= htmlspecialchars(__('change_password_section'), ENT_QUOTES, 'UTF-8') ?>
-                        </h4>
-                        <p style="margin:0 0 14px; font-size:12px; color:#81776D;">
-                            <?= htmlspecialchars(__('change_password_desc'), ENT_QUOTES, 'UTF-8') ?>
-                        </p>
+                        <h4 style="margin:0 0 6px; font-size:15px;"><?= htmlspecialchars(__('change_password_section'), ENT_QUOTES, 'UTF-8') ?></h4>
+                        <p style="margin:0 0 14px; font-size:12px; color:#81776D;"><?= htmlspecialchars(__('change_password_desc'), ENT_QUOTES, 'UTF-8') ?></p>
                     </div>
 
-                    <!-- Input Kata Sandi Saat Ini -->
-                    <div style="margin-bottom:16px;">
-                        <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;">
-                            <?= htmlspecialchars(__('current_password_label'), ENT_QUOTES, 'UTF-8') ?>
-                        </label>
-                        <div style="position:relative; width:100%;">
-                            <input type="password" id="currentPassword" name="current_password" maxlength="6" placeholder="<?= htmlspecialchars(__('current_password_place'), ENT_QUOTES, 'UTF-8') ?>" 
-                                style="width:100%; box-sizing:border-box; padding:10px 40px 10px 12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
-                            <button type="button" onclick="togglePasswordVisibility('currentPassword', this)" 
-                                style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; padding:0; cursor:pointer; color:#81776D; display:flex; align-items:center;"
-                                title="<?= htmlspecialchars(__('show_password'), ENT_QUOTES, 'UTF-8'); ?>"
-                                aria-label="<?= htmlspecialchars(__('show_password'), ENT_QUOTES, 'UTF-8'); ?>">
-                                <i data-lucide="eye" style="width:18px; height:18px;"></i>
-                            </button>
+                    <?php foreach ($passwordFields as [$id, $name, $labelKey, $placeKey]): ?>
+                        <div class="form-group">
+                            <label class="form-label-lg"><?= htmlspecialchars(__($labelKey), ENT_QUOTES, 'UTF-8') ?></label>
+                            <div class="password-wrapper">
+                                <input type="password" id="<?= $id ?>" name="<?= $name ?>" maxlength="6" class="form-control"
+                                    placeholder="<?= htmlspecialchars(__($placeKey), ENT_QUOTES, 'UTF-8') ?>">
+                                <button type="button" class="password-toggle"
+                                    onclick="togglePasswordVisibility('<?= $id ?>', this)"
+                                    title="<?= htmlspecialchars(__('show_password'), ENT_QUOTES, 'UTF-8') ?>">
+                                    <i data-lucide="eye" style="width:18px; height:18px;"></i>
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    <?php endforeach; ?>
 
-                    <!-- Input Kata Sandi Baru -->
-                    <div style="margin-bottom:16px;">
-                        <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;">
-                            <?= htmlspecialchars(__('new_password_label'), ENT_QUOTES, 'UTF-8') ?>
-                        </label>
-                        <div style="position:relative; width:100%;">
-                            <input type="password" id="newPassword" name="new_password" maxlength="6" placeholder="<?= htmlspecialchars(__('new_password_place'), ENT_QUOTES, 'UTF-8') ?>" 
-                                style="width:100%; box-sizing:border-box; padding:10px 40px 10px 12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
-                            <button type="button" onclick="togglePasswordVisibility('newPassword', this)" 
-                                style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; padding:0; cursor:pointer; color:#81776D; display:flex; align-items:center;"
-                                title="<?= htmlspecialchars(__('show_password'), ENT_QUOTES, 'UTF-8'); ?>"
-                                aria-label="<?= htmlspecialchars(__('show_password'), ENT_QUOTES, 'UTF-8'); ?>">
-                                <i data-lucide="eye" style="width:18px; height:18px;"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Input Konfirmasi Kata Sandi Baru -->
-                    <div style="margin-bottom:20px;">
-                        <label style="display:block; margin-bottom:6px; font-weight:600; font-size:14px;">
-                            <?= htmlspecialchars(__('confirm_password_label'), ENT_QUOTES, 'UTF-8') ?>
-                        </label>
-                        <div style="position:relative; width:100%;">
-                            <input type="password" id="confirmPassword" name="confirm_password" maxlength="6" placeholder="<?= htmlspecialchars(__('confirm_password_place'), ENT_QUOTES, 'UTF-8') ?>" 
-                                style="width:100%; box-sizing:border-box; padding:10px 40px 10px 12px; border:1px solid #E9E1D7; border-radius:8px; outline-color:#B99A7D;">
-                            <button type="button" onclick="togglePasswordVisibility('confirmPassword', this)" 
-                                style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; padding:0; cursor:pointer; color:#81776D; display:flex; align-items:center;"
-                                title="<?= htmlspecialchars(__('show_password'), ENT_QUOTES, 'UTF-8'); ?>"
-                                aria-label="<?= htmlspecialchars(__('show_password'), ENT_QUOTES, 'UTF-8'); ?>">
-                                <i data-lucide="eye" style="width:18px; height:18px;"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Tombol Simpan Perubahan Pengaturan -->
-                    <button type="submit" style="padding:11px 22px; background:#76553D; color:white; border:none; border-radius:8px; font-weight:600; cursor:pointer;">
+                    <button type="submit" class="btn btn-primary">
                         <?= htmlspecialchars(__('save_changes'), ENT_QUOTES, 'UTF-8') ?>
                     </button>
                 </form>
             </div>
 
-            <!-- Bagian Zona Berbahaya / Hapus Toko -->
-            <hr style="border:0; border-top:1px dashed #E9E1D7; margin:24px 0;">
+            <!-- Zona Berbahaya / Hapus Toko -->
+            <hr class="divider-dashed" style="margin:24px 0;">
             <div>
-                <!-- Judul -->
-                <h3 style="margin:0 0 6px; font-size:15px; color:#B45F5F;">
-                    <?= htmlspecialchars(__('danger_zone'), ENT_QUOTES, 'UTF-8') ?>
-                </h3>
-
-                <!-- Deskripsi -->
-                <p style="margin:0 0 14px; font-size:13px; color:#81776D;">
-                    <?= htmlspecialchars(__('delete_business_desc'), ENT_QUOTES, 'UTF-8') ?>
-                </p>
-
-                <!-- Tombol hapus toko -->
-                <button type="button" id="btnDeleteBusiness" style="padding:10px 18px; background:#FBECEC; color:#B45F5F; border:1px solid #F3C6C6; border-radius:8px; font-weight:600; cursor:pointer; font-size:13px;">
+                <h3 style="margin:0 0 6px; font-size:15px; color:#B45F5F;"><?= htmlspecialchars(__('danger_zone'), ENT_QUOTES, 'UTF-8') ?></h3>
+                <p style="margin:0 0 14px; font-size:13px; color:#81776D;"><?= htmlspecialchars(__('delete_business_desc'), ENT_QUOTES, 'UTF-8') ?></p>
+                <button type="button" id="btnDeleteBusiness" onclick="deleteActiveBusiness()" class="btn btn-danger-soft btn-sm">
                     <?= htmlspecialchars(__('delete_business_btn'), ENT_QUOTES, 'UTF-8') ?>
                 </button>
             </div>
@@ -209,145 +139,20 @@ $userProfile = mysqli_fetch_assoc(mysqli_stmt_get_result($stmtUser));
     </main>
 </div>
 
-<!-- Library Ikon & Notifikasi UI Kustom -->
-<script src="https://unpkg.com/lucide@latest"></script>
-<script src="../assets/js/toast.js" defer></script>
-
 <script>
-lucide.createIcons();
-
-// Preview foto baru, jika file dipilih
-document.getElementById('businessPhoto').addEventListener('change', function() {
-    const file = this.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const preview = document.getElementById('businessPreview');
-            const icon = document.getElementById('businessUploadIcon');
-            
-            preview.src = e.target.result;
-            preview.style.display = 'block';
-            if (icon) icon.style.display = 'none';
-        };
-        reader.readAsDataURL(file);
-    }
+window.APP_CONFIG = {
+    businessId: <?= (int) $business_id ?>,
+    showPassword: <?= json_encode(__('show_password')) ?>,
+    hidePassword: <?= json_encode(__('hide_password')) ?>,
+    confirmDeleteBusiness: <?= json_encode(__('confirm_delete_business')) ?>,
+    deleteBusinessBtn: <?= json_encode(__('delete_business_btn')) ?>,
+    cancelBtn: <?= json_encode(__('btn_cancel')) ?>,
+    connectionError: <?= json_encode(__('connection_error')) ?>
+};
+document.addEventListener('DOMContentLoaded', () => {
+    setupImagePreview('businessPhoto', 'businessPreview', 'businessUploadIcon');
+    bindAsyncForm('settingsForm', (fd) => '../api/update-settings.php?business_id=' + fd.get('business_id'), { reload: true, delay: 1200 });
 });
-
-// Menangani pengiriman form pengaturan secara asinkron via Fetch API
-document.getElementById('settingsForm').addEventListener('submit', async function(e) {
-    // Mencegah perilaku default pengiriman form halaman
-    e.preventDefault();
-    
-    // Membaca seluruh data input dari form
-    const formData = new FormData(this);
-    const businessId = formData.get('business_id');
-
-    try {
-        // Mengirimkan permintaan pembaruan data ke API backend
-        const response = await fetch('../api/update-settings.php?business_id=' + businessId, {
-            method: 'POST',
-            body: formData
-        });
-        
-        const result = await response.json();
-        
-        // Menampilkan notifikasi toast berdasarkan status respon server
-        if (result.status === 'success') {
-            showToast(result.message, 'success');
-            
-            // Memberikan jeda waktu sebentar agar toast terlihat sebelum halaman dimuat ulang
-            setTimeout(() => {
-                location.reload();
-            }, 1200);
-        } else {
-            showToast(result.message, 'error');
-        }
-    } catch (err) {
-        console.error(err);
-        // Menampilkan toast error jika koneksi terputus atau server mengembalikan respon tidak valid
-        showToast(<?= json_encode(__('connection_error')) ?>, 'error');
-    }
-});
-
-// Menangani proses penghapusan toko saat tombol hapus toko diklik
-document.getElementById('btnDeleteBusiness').addEventListener('click', async function() {
-    // Memunculkan dialog modal konfirmasi kustom
-    const confirmDelete = await showConfirm(
-        <?= json_encode(__('confirm_delete_business')) ?>,
-        <?= json_encode(__('delete_business_btn')) ?>,
-        <?= json_encode(__('btn_cancel')) ?>,
-        true // Parameter true untuk mewarnai tombol konfirmasi menjadi merah (danger)
-    );
-
-    // Menghentikan eksekusi jika pengguna memilih batal
-    if (!confirmDelete) return;
-
-    // Menyusun parameter ID bisnis yang akan dihapus
-    const formData = new FormData();
-    formData.append('business_id', '<?= (int)$business_id ?>');
-
-    try {
-        // Mengirimkan permintaan penghapusan toko ke API backend
-        const response = await fetch('../api/delete-business.php', {
-            method: 'POST',
-            body: formData
-        });
-
-        const textText = await response.text();
-        
-        // Melakukan parsing data respon ke format JSON
-        let result;
-        try {
-            result = JSON.parse(textText);
-        } catch (e) {
-            console.error('Server mengembalikan HTML alih-alih JSON:', textText);
-            showToast(<?= json_encode(__('server_error')) ?>, 'error');
-            return;
-        }
-
-        // Menampilkan hasil pemrosesan dan mengarahkan halaman jika sukses
-        if (result.status === 'success') {
-            showToast(result.message, 'success');
-            
-            setTimeout(() => {
-                window.location.href = '../businesses.php';
-            }, 1200);
-        } else {
-            showToast(result.message, 'error');
-        }
-    } catch (err) {
-        console.error(err);
-        showToast(<?= json_encode(__('connection_error')) ?>, 'error');
-    }
-});
-
-// Fungsi untuk mengubah visibilitas kata sandi (intip/sembunyikan)
-function togglePasswordVisibility(inputId, btn) {
-    const input = document.getElementById(inputId);
-    if (!input) return;
-    
-    // Cek status tipe input saat ini
-    const isPassword = input.type === 'password';
-    input.type = isPassword ? 'text' : 'password';
-    
-    // Ambil terjemahan tooltip berdasarkan status visibilitas
-    const showText = <?= json_encode(__('show_password')) ?>;
-    const hideText = <?= json_encode(__('hide_password')) ?>;
-    const titleText = isPassword ? hideText : showText;
-
-    // Perbarui atribut title dan aria-label
-    btn.setAttribute('title', titleText);
-    btn.setAttribute('aria-label', titleText);
-
-    // Ganti ikon mata terbuka / tertutup
-    btn.innerHTML = isPassword 
-        ? '<i data-lucide="eye-off" style="width:18px; height:18px;"></i>' 
-        : '<i data-lucide="eye" style="width:18px; height:18px;"></i>';
-        
-    // Re-render ikon Lucide agar tampilan ikon baru langsung tergambar
-    if (typeof lucide !== 'undefined') lucide.createIcons();
-}
 </script>
-
 </body>
 </html>

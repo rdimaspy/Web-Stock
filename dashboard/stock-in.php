@@ -1,367 +1,132 @@
 <?php
-// Validasi autentikasi user dan akses bisnis aktif
+// Validasi sesi, akses bisnis aktif, bahasa, & mata uang
 require_once __DIR__ . '/../includes/auth_business.php';
 
-// Pengaturan bahasa
-require_once __DIR__ . '/../includes/language.php';
-
-// Formatter mata uang
-require_once __DIR__ . '/../includes/currency.php';
-
-// Ambil produk dari bisnis aktif
-$stmt = mysqli_prepare(
-    $conn,
-    "SELECT id, product_name, product_code, current_stock, category_id
-    FROM products
-    WHERE business_id = ?
-    ORDER BY product_name ASC"
-);
-
-// Parameter ID bisnis ke query produk, eksekusi dan ambil hasil data produk
-mysqli_stmt_bind_param($stmt, "i", $business_id);
-mysqli_stmt_execute($stmt);
-$products = mysqli_stmt_get_result($stmt);
-// Hitung total jumlah baris produk yang ditemukan
+$products = getBusinessProducts($conn, $business_id);
 $productCount = mysqli_num_rows($products);
+$categories = getBusinessCategories($conn, $business_id);
 
-// --- FITUR BARU: Ambil daftar kategori produk untuk filter ---
-$stmtCat = mysqli_prepare(
-    $conn,
-    "SELECT id, category_name 
-    FROM categories 
-    WHERE business_id = ? 
-    ORDER BY category_name ASC"
-);
-mysqli_stmt_bind_param($stmtCat, "i", $business_id);
-mysqli_stmt_execute($stmtCat);
-$categories = mysqli_stmt_get_result($stmtCat);
-// -----------------------------------------------------------
+$currentPage = 'stock-in.php';
 ?>
-
-
-
 <!DOCTYPE html>
-<!-- Set bahasa -->
 <html lang="<?= htmlspecialchars($lang, ENT_QUOTES, 'UTF-8') ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars(__('stock_in'), ENT_QUOTES, 'UTF-8') ?> - StockIn</title>
+    <link rel="stylesheet" href="../assets/css/style.css?v=2">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="../assets/js/toast.js?v=2" defer></script>
+    <script src="../assets/js/app.js?v=2" defer></script>
+    <script src="../assets/js/stock.js?v=2" defer></script>
 </head>
+<body>
 
-<!-- Styling utama layout dan warna latar halaman -->
-<body style="margin:0; min-height:100vh; background:#FAF7F2; font-family:Arial,sans-serif; color:#49382D;">
-
-<!-- Menentukan halaman aktif untuk sidebar -->
-<?php $currentPage = 'stock-in.php';?>
-
-<!-- Layout utama halaman Produk -->
-<div style="display:flex; min-height:100vh;">
-
-    <!-- SIDEBAR -->
+<div class="dashboard-layout">
     <?php require __DIR__ . '/components/sidebar.php'; ?>
 
-    <!-- KONTEN UTAMA -->
-    <main style="margin-left:230px; flex:1; min-width:0;">
-
-        <!-- HEADER -->
+    <main class="dashboard-main">
         <?php require __DIR__ . '/components/header.php'; ?>
 
-        <!-- HALAMAN STOCK IN -->
-        <section style="padding:32px;">
-            <!-- Judul dan deskripsi -->
-            <div style="margin-bottom:25px;">
-                <h1 style="margin:0; font-size:29px;">
-                    <?= htmlspecialchars(__('stock_in'), ENT_QUOTES, 'UTF-8') ?>
-                </h1>
-
-                <p style="color:#81776D; margin-top:10px; line-height:1.6;">
-                    <?= htmlspecialchars(__('stock_in_desc'), ENT_QUOTES, 'UTF-8') ?>
-                </p>
+        <section class="page-section">
+            <div class="page-header">
+                <h1 class="page-title"><?= htmlspecialchars(__('stock_in'), ENT_QUOTES, 'UTF-8') ?></h1>
+                <p class="page-desc"><?= htmlspecialchars(__('stock_in_desc'), ENT_QUOTES, 'UTF-8') ?></p>
             </div>
 
-            <!-- FORM STOK MASUK -->
-            <!-- Container form utama pencatatan stok masuk -->
-            <div style="background:white; border:1px solid #E9E1D7; border-radius:12px; padding:28px; max-width:900px;">
-
-                <!-- Header form -->
-                <div style="display:flex; align-items:center; gap:12px; margin-bottom:25px;">
-                    <div style="width:55px; height:55px; border-radius:12px; background:#F5EFE8; display:flex; align-items:center; justify-content:center; color:#76553D;">
+            <div class="card-form">
+                <div class="card-form-header">
+                    <div class="card-form-icon">
                         <i data-lucide="package-plus" style="width:28px;"></i>
                     </div>
-
-                    <!-- Judul form -->
                     <div>
-                        <h2 style="font-size:22px; margin:0;">
-                            <?= htmlspecialchars(__('new_stock_in'), ENT_QUOTES, 'UTF-8') ?>
-                        </h2>
-                        <p style="font-size:13px; color:#81776D; margin:5px 0 0;">
-                            <?= htmlspecialchars(__('new_stock_in_desc'), ENT_QUOTES, 'UTF-8') ?>
-                        </p>
+                        <h2 style="font-size:22px; margin:0;"><?= htmlspecialchars(__('new_stock_in'), ENT_QUOTES, 'UTF-8') ?></h2>
+                        <p style="font-size:13px; color:#81776D; margin:5px 0 0;"><?= htmlspecialchars(__('new_stock_in_desc'), ENT_QUOTES, 'UTF-8') ?></p>
                     </div>
                 </div>
 
-                <!-- Cek jika belum ada produk terdaftar di database -->
                 <?php if ($productCount === 0): ?>
-                    <!-- Jika State kosong, akan memberi tombol navigasi ke halaman produk -->
                     <div style="padding:22px; text-align:center; background:#FAF7F2; border-radius:10px; color:#81776D; line-height:1.7;">
                         <?= htmlspecialchars(__('no_products_stock_in'), ENT_QUOTES, 'UTF-8') ?>
-
                         <div style="margin-top:15px;">
-                            <a href="products.php?business_id=<?= (int) $business_id ?>" style="color:#76553D; font-weight:600; text-decoration:none;">
+                            <a href="products.php?business_id=<?= (int) $business_id ?>" style="color:#76553D; font-weight:600;">
                                 <?= htmlspecialchars(__('go_to_products'), ENT_QUOTES, 'UTF-8') ?>
                             </a>
                         </div>
-                    </div>  
-
-                <!-- Tampilkan form input stok jika produk sudah tersedia -->
+                    </div>
                 <?php else: ?>
                     <form id="stockInForm" method="POST">
-                        <!-- ID bisnis tersembunyi sebagai parameter form -->
                         <input type="hidden" name="business_id" value="<?= (int) $business_id ?>">
 
                         <!-- Filter Kategori -->
-                        <div style="margin-bottom:22px;">
-                            <label for="category_filter" style="display:block; margin-bottom:8px; font-weight:600;">
-                                <?= htmlspecialchars(__('filter_category'), ENT_QUOTES, 'UTF-8') ?>
-                            </label>
-                            <select id="category_filter" 
-                                    style="width:100%; box-sizing:border-box; padding:13px; border:1px solid #E9E1D7; border-radius:9px; background:white; color:#49382D; font-size: 15px;">
+                        <div class="form-group-lg">
+                            <label for="category_filter" class="form-label-lg"><?= htmlspecialchars(__('filter_category'), ENT_QUOTES, 'UTF-8') ?></label>
+                            <select id="category_filter" class="form-control">
                                 <option value="ALL"><?= htmlspecialchars(__('all_categories'), ENT_QUOTES, 'UTF-8') ?></option>
                                 <option value="UNCATEGORIZED"><?= htmlspecialchars(__('uncategorized'), ENT_QUOTES, 'UTF-8') ?></option>
-                                
-                                <!-- Looping pilihan kategori dari database -->
-                                <?php while ($category = mysqli_fetch_assoc($categories)): ?>
-                                    <option value="<?= (int)$category['id'] ?>">
-                                        <?= htmlspecialchars($category['category_name'], ENT_QUOTES, 'UTF-8') ?>
-                                    </option>
+                                <?php while ($cat = mysqli_fetch_assoc($categories)): ?>
+                                    <option value="<?= (int) $cat['id'] ?>"><?= htmlspecialchars($cat['category_name'], ENT_QUOTES, 'UTF-8') ?></option>
                                 <?php endwhile; ?>
                             </select>
                         </div>
 
-                        <!-- Input pilihan produk -->
-                        <div style="margin-bottom:22px;">
-                            <label for="product_id" style="display:block; margin-bottom:8px; font-weight:600;">
-                                <?= htmlspecialchars(__('product_name'), ENT_QUOTES, 'UTF-8') ?>
-                            </label>
-
-                            <select id="product_id" name="product_id" required
-                                    style="width:100%; box-sizing:border-box; padding:13px; border:1px solid #E9E1D7; border-radius:9px; background:white; color:#49382D; font-size: 15px;">
-
-                                <option value="">
-                                    <?= htmlspecialchars(__('select_product_placeholder'), ENT_QUOTES, 'UTF-8') ?>
-                                </option>
-
-                                <!-- Opsi daftar produk (ditambahkan atribut data-category) -->
-                                <?php while ($product = mysqli_fetch_assoc($products)): ?>
-                                    <option value="<?= (int) $product['id'] ?>"
-                                            data-stock="<?= (int) $product['current_stock'] ?>"
-                                            data-category="<?= $product['category_id'] ?? 'UNCATEGORIZED' ?>">
-                                        <?= htmlspecialchars($product['product_name'], ENT_QUOTES, 'UTF-8') ?>
+                        <!-- Pilih Produk -->
+                        <div class="form-group-lg">
+                            <label for="product_id" class="form-label-lg"><?= htmlspecialchars(__('product_name'), ENT_QUOTES, 'UTF-8') ?></label>
+                            <select id="product_id" name="product_id" class="form-control" required>
+                                <option value=""><?= htmlspecialchars(__('select_product_placeholder'), ENT_QUOTES, 'UTF-8') ?></option>
+                                <?php while ($p = mysqli_fetch_assoc($products)): ?>
+                                    <option value="<?= (int) $p['id'] ?>"
+                                            data-stock="<?= (int) $p['current_stock'] ?>"
+                                            data-category="<?= $p['category_id'] ?? 'UNCATEGORIZED' ?>">
+                                        <?= htmlspecialchars($p['product_name'], ENT_QUOTES, 'UTF-8') ?>
                                     </option>
                                 <?php endwhile; ?>
                             </select>
-
-                            <!-- Teks penjelas stok -->
                             <p id="currentStockInfo" style="font-size:13px; color:#81776D; margin:8px 0 0;">
                                 <?= htmlspecialchars(__('current_stock_prompt'), ENT_QUOTES, 'UTF-8') ?>
                             </p>
                         </div>
 
-                        <!-- Input jumlah stok masuk -->
-                        <div style="margin-bottom:22px;">
-                            <label for="quantity" style="display:block; margin-bottom:8px; font-weight:600;">
-                                <?= htmlspecialchars(__('quantity_received'), ENT_QUOTES, 'UTF-8') ?>
-                            </label>
-
-                            <input type="number" id="quantity" name="quantity" min="1" step="1" required placeholder="<?= htmlspecialchars(__('enter_quantity_placeholder'), ENT_QUOTES, 'UTF-8') ?>"
-                                style="width:100%; box-sizing:border-box; padding:13px; border:1px solid #E9E1D7; border-radius:9px; outline-color:#B99A7D; font-size: 15px;">
+                        <!-- Jumlah Barang Masuk -->
+                        <div class="form-group-lg">
+                            <label for="quantity" class="form-label-lg"><?= htmlspecialchars(__('quantity_received'), ENT_QUOTES, 'UTF-8') ?></label>
+                            <input type="number" id="quantity" name="quantity" min="1" step="1" required class="form-control"
+                                placeholder="<?= htmlspecialchars(__('enter_quantity_placeholder'), ENT_QUOTES, 'UTF-8') ?>">
                         </div>
 
-                        <!-- Input catatan tambahan (opsional) -->
-                        <div style="margin-bottom:25px;">
-                            <label for="notes" style="display:block; margin-bottom:8px; font-weight:600;">
+                        <!-- Catatan -->
+                        <div class="form-group-lg">
+                            <label for="notes" class="form-label-lg">
                                 <?= htmlspecialchars(__('notes'), ENT_QUOTES, 'UTF-8') ?>
-                                <span style="font-size:12px; color:#948578; font-weight:normal;">
-                                    (<?= htmlspecialchars(__('optional'), ENT_QUOTES, 'UTF-8') ?>)
-                                </span>
+                                <span class="label-optional">(<?= htmlspecialchars(__('optional'), ENT_QUOTES, 'UTF-8') ?>)</span>
                             </label>
-
-                            <!-- Catatan -->
-                            <input type="text" id="notes" name="notes" maxlength="40" placeholder="<?= htmlspecialchars(__('notes_placeholder'), ENT_QUOTES, 'UTF-8') ?>"
-                            style="width:100%; padding:10px 12px; box-sizing:border-box; border:1px solid #E9E1D7; border-radius:8px; font-size:14px; outline-color:#B99A7D;">
+                            <input type="text" id="notes" name="notes" maxlength="40" class="form-control"
+                                placeholder="<?= htmlspecialchars(__('notes_placeholder'), ENT_QUOTES, 'UTF-8') ?>">
                         </div>
-                        
-                        <!-- Tombol Save -->
-                        <div style="padding-top:20px; display:flex; justify-content:flex-end;">
-                            <button type="submit" id="stockInSubmitButton" style="display:flex; align-items:center; gap:8px; padding:12px 19px; border:0; border-radius:9px; background:#76553D; color:white; font-weight:600; cursor:pointer;">
-                                <i data-lucide="save" style="width:18px;height:18px;"></i>
+
+                        <div style="padding-top:10px; display:flex; justify-content:flex-end;">
+                            <button type="submit" id="stockInSubmitButton" class="btn btn-primary">
+                                <i data-lucide="save" style="width:18px; height:18px;"></i>
                                 <?= htmlspecialchars(__('save_stock_in'), ENT_QUOTES, 'UTF-8') ?>
                             </button>
                         </div>
-
                     </form>
-
                 <?php endif; ?>
-
             </div>
         </section>
     </main>
 </div>
 
-<!-- Library Ikon & Notifikasi UI Kustom -->
-<script src="https://unpkg.com/lucide@latest"></script>
-<script src="../assets/js/toast.js" defer></script>
-
 <script>
-// Merender ikon Lucide pada antarmuka halaman
-lucide.createIcons();
-
-// Inisialisasi Elemen DOM Utama
-const productSelect = document.getElementById('product_id');
-const stockInfo = document.getElementById('currentStockInfo');
-const categoryFilter = document.getElementById('category_filter');
-
-// Menyimpan Seluruh Opsi Produk Asli Beserta Datasets ke Array 
-let allProductOptions = [];
-if (productSelect) {
-    allProductOptions = Array.from(productSelect.options).map(opt => ({
-        value: opt.value,
-        text: opt.textContent,
-        stock: opt.getAttribute('data-stock') || opt.dataset.stock || 0,
-        category: opt.getAttribute('data-category') || opt.dataset.category || 'UNCATEGORIZED'
-    }));
-}
-
-// Fungsi Memperbarui Teks Informasi Stok Produk Terpilih
-function updateStockDisplay() {
-    if (!productSelect || !stockInfo) return;
-
-    // Ambil opsi produk yang sedang dipilih oleh pengguna
-    const selectedOption = productSelect.options[productSelect.selectedIndex];
-
-    // Reset teks informasi jika pengguna tidak memilih produk (opsi placeholder)
-    if (!productSelect.value || !selectedOption) {
-        stockInfo.textContent = <?= json_encode(__('current_stock_prompt')) ?>;
-        return;
-    }
-
-    // Ambil angka stok dari atribut kustom atau dataset opsi produk
-    const currentStock = Number(
-        selectedOption.getAttribute('data-stock') || selectedOption.dataset.stock || 0
-    );
-
-    // Tampilkan label dan angka stok terkini yang sudah diformat angka
-    stockInfo.textContent = <?= json_encode(__('current_stock_label')) ?> + currentStock.toLocaleString();
-}
-
-// Menjalankan fungsi updateStockDisplay saat pilihan produk diubah manual oleh pengguna
-if (productSelect) {
-    productSelect.addEventListener('change', updateStockDisplay);
-}
-
-// Logika Penyaringan (Filter) Produk Berdasarkan Kategori
-if (categoryFilter && productSelect) {
-    categoryFilter.addEventListener('change', function () {
-        const selectedCategory = this.value;
-
-        // Kosongkan seluruh opsi dropdown produk saat ini
-        productSelect.innerHTML = '';
-
-        // Looping dan filter ulang opsi produk berdasarkan kategori terpilih
-        allProductOptions.forEach(opt => {
-            // Opsi placeholder ("Pilih Produk") selalu dimasukkan kembali
-            if (!opt.value) {
-                const placeholderOpt = new Option(opt.text, opt.value);
-                productSelect.add(placeholderOpt);
-                return;
-            }
-
-            const productCategory = String(opt.category);
-            let isMatch = false;
-
-            // Memeriksa kesesuaian kategori yang dipilih
-            if (selectedCategory === 'ALL') {
-                isMatch = true;
-            } else if (selectedCategory === 'UNCATEGORIZED' && (!productCategory || productCategory === 'null' || productCategory === 'UNCATEGORIZED')) {
-                isMatch = true;
-            } else if (productCategory === selectedCategory) {
-                isMatch = true;
-            }
-
-            // Jika cocok, buat elemen option baru dan pasang kembali atribut dataset stok serta kategorinya
-            if (isMatch) {
-                const newOpt = new Option(opt.text, opt.value);
-                newOpt.setAttribute('data-stock', opt.stock);
-                newOpt.setAttribute('data-category', opt.category);
-                productSelect.add(newOpt);
-            }
-        });
-
-        // Reset dan perbarui tampilan informasi stok setelah penyaringan kategori
-        updateStockDisplay();
-    });
-}
-
-// Menangani Simpan Data Transaksi Stok Masuk Secara Asinkron
-const stockInForm = document.getElementById('stockInForm');
-const stockInSubmitButton = document.getElementById('stockInSubmitButton');
-
-if (stockInForm && stockInSubmitButton) {
-    stockInForm.addEventListener('submit', async function (event) {
-        // Mencegah reload/refresh halaman bawaan dari browser saat submit
-        event.preventDefault();
-
-        // Validasi kelengkapan form bawaan browser
-        if (!stockInForm.reportValidity()) {
-            return;
-        }
-
-        const originalButtonHTML = stockInSubmitButton.innerHTML;
-
-        // Ubah tampilan visual tombol ke status loading/menyimpan
-        stockInSubmitButton.disabled = true;
-        stockInSubmitButton.textContent = <?= json_encode(__('saving')) ?>;
-        stockInSubmitButton.style.cursor = 'wait';
-        stockInSubmitButton.style.opacity = '0.7';
-
-        try {
-            // Kirim data formulir ke endpoint API PHP penambahan stok masuk
-            const response = await fetch('../api/create-stock-in.php', {
-                method: 'POST',
-                body: new FormData(stockInForm)
-            });
-
-            const result = await response.json();
-
-            // Penanganan jika respon API gagal atau tidak sukses
-            if (!response.ok || result.status !== 'success') {
-                showToast(result.message || <?= json_encode(__('failed_save_stock_in')) ?>, 'error');
-                return;
-            }
-
-            // Tampilkan notifikasi Toast sukses dan refresh halaman otomatis setelah 1 detik
-            showToast(result.message, 'success');
-            setTimeout(() => {
-                window.location.reload();
-            }, 1000);
-
-        } catch (error) {
-            console.error(error);
-            showToast(<?= json_encode(__('error_saving_stock_in')) ?>, 'error');
-        } finally {
-            // Mengembalikan tombol simpan ke kondisi awal
-            stockInSubmitButton.disabled = false;
-            stockInSubmitButton.innerHTML = originalButtonHTML;
-            stockInSubmitButton.style.cursor = 'pointer';
-            stockInSubmitButton.style.opacity = '1';
-            
-            // Re-render ulang ikon Lucide pada tombol
-            lucide.createIcons();
-        }
-    });
-}
+window.STOCK_CONFIG = {
+    businessId: <?= (int) $business_id ?>,
+    currentStockPrompt: <?= json_encode(__('current_stock_prompt')) ?>,
+    currentStockLabel: <?= json_encode(__('current_stock_label')) ?>,
+    savingText: <?= json_encode(__('saving')) ?>,
+    failedMsg: <?= json_encode(__('failed_save_stock_in')) ?>,
+    errorMsg: <?= json_encode(__('error_saving_stock_in')) ?>
+};
 </script>
-
 </body>
 </html>

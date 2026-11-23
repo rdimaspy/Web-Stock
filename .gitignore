@@ -1,0 +1,39 @@
+# IDE and editor files
+.idea/
+.vscode/
+.commandcode/
+
+# PHP dependencies and caches
+/vendor/
+.phpunit.cache/
+
+# Node.js dependencies and caches
+/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+docker-compose.override.yml
+compose.override.yaml
+
+# Runtime uploads
+/uploads/businesses/*
+!/uploads/businesses/.gitkeep
+/uploads/products/*
+!/uploads/products/.gitkeep
+
+# Logs and temporary files
+*.log
+*.pid
+*.tmp
+*.bak
+*.swp
+*~
+
+# OS and editor metadata
+.DS_Store
+Thumbs.db

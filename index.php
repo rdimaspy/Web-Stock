@@ -1,362 +1,159 @@
 <?php
-// Memulai sesi login dan menentukan bahasa aktif
+// Memulai sesi dan memuat pengaturan bahasa aktif
 session_start();
 require_once __DIR__ . '/includes/language.php';
+
+// Daftar statistik dummy pada kartu pratinjau hero
+$previewStats = [
+    ['total_products', '128', 'registered_products'],
+    ['stock_in', '+24', 'units_received'],
+    ['stock_out', '-12', 'units_sold'],
+    ['revenue', 'Rp 2,4 jt', 'todays_sales'],
+];
+
+// Daftar kartu fitur unggulan aplikasi
+$features = [
+    ['package', 'feat_product_mgmt', 'feat_product_desc'],
+    ['arrow-down-up', 'feat_stock_move', 'feat_stock_desc'],
+    ['history', 'feat_history', 'feat_history_desc'],
+    ['chart-no-axes-combined', 'feat_stats', 'feat_stats_desc'],
+    ['file-spreadsheet', 'feat_reports', 'feat_reports_desc'],
+    ['store', 'feat_multistore', 'feat_multistore_desc'],
+];
 ?>
-
-
-
 <!DOCTYPE html>
-<html lang="<?= htmlspecialchars($lang); ?>">
+<html lang="<?= htmlspecialchars($lang, ENT_QUOTES, 'UTF-8') ?>">
 <head>
-    <!-- Pengaturan karakter dan viewport halaman agar responsif di HP -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Deskripsi meta untuk SEO -->
-    <meta name="description" content="Stock membantu pemilik bisnis mengelola produk, persediaan, penjualan, dan laporan stok.">
-
+    <meta name="description" content="StockIn membantu pemilik bisnis mengelola produk, persediaan, penjualan, dan laporan stok.">
     <title>StockIn | Stock Management</title>
-    <!-- Library ikon Lucide -->
+    <link rel="stylesheet" href="assets/css/style.css?v=3">
     <script src="https://unpkg.com/lucide@latest" defer></script>
-    <script src="assets/js/app.js" defer></script>
-
-    <!-- CSS Efek Hover Kartu Fitur -->
-    <style>
-        /* Efek transisi standar untuk kartu fitur */
-        .feature-card {
-            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-            cursor: pointer;
-        }
-
-        /* Efek saat kursor diarahkan ke kartu fitur (hover) */
-        .feature-card:hover {
-            transform: translateY(-6px); /* Mengangkat kartu sedikit ke atas */
-            border-color: #B99A7D !important; /* Mengubah warna garis tepi menjadi aksen cokelat */
-            box-shadow: 0 12px 30px rgba(118, 85, 61, 0.12); /* Memberikan bayangan lembut */
-        }
-    </style>
+    <script src="assets/js/app.js?v=3" defer></script>
 </head>
+<body class="landing-body">
 
-<!-- Body Utama Halaman -->
-<body>
-    <!-- Navigasi (Navbar) -->
-    <header style="width: 100%; background: #FFFFFF; border-bottom: 2px solid #E9E1D7;">
-        <div class="navbar-container" style="max-width: 1160px; height: 64px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+    <!-- Navigasi Utama (Navbar) -->
+    <header class="site-header">
+        <div class="navbar-container">
+            <?php renderLogo(); ?>
 
-            <!-- Logo StockIn -->
-            <div style="display:inline-flex; align-items:center; font-family:Arial, sans-serif; font-weight:800; font-size:24px; letter-spacing:-0.5px;">
-                <!-- Teks "Stock" -->
-                <span style="color:#49382D;">Stock</span>
-
-                <!-- Container Berlapis / Stacked Box -->
-                <div style="position:relative; display:inline-block; margin-left:6px;">
-                    <!-- Lapisan Bayangan Belakang (Dus Bawah) -->
-                    <span style="position:absolute; top:-3px; right:-3px; width:100%; height:100%; background:#B99A7D; border-radius:6px; z-index:1;"></span>
-                    
-                    <!-- Kotak Utas "In" (Dus Atas) -->
-                    <span style="position:relative; z-index:2; display:block; background:#76553D; color:white; padding:3px 8px; border-radius:6px; font-size:20px; line-height:1.2;">
-                        In
-                    </span>
-                </div>
-            </div>
-
-            <!-- Menu navigasi kanan -->
-            <div style="display: flex; align-items: center; gap: 16px;">
-
-                <!-- Form switcher bahasa -->
-                <div style="position: relative;">
-                    <button id="languageButton" style="display:flex; align-items:center; gap:5px; border:none; background:none; cursor:pointer; color:#81776D; padding:4px;">
+            <div class="nav-actions">
+                <!-- Dropdown Pilihan Bahasa -->
+                <div class="dropdown-wrap">
+                    <button id="languageButton" class="lang-trigger" type="button">
                         <i data-lucide="globe" style="width:16px; height:16px;"></i>
                         <i data-lucide="chevron-down" style="width:13px; height:13px;"></i>
                     </button>
 
-                    <!-- Form submit untuk ganti bahasa via set-language.php -->
-                    <div id="languageMenu" style="display:none; position:absolute; right:0; top:32px; width:140px; padding:8px; background:#FFFFFF; border:1px solid #E9E1D7; border-radius:10px; box-shadow:0 10px 25px rgba(0,0,0,0.08); z-index: 100;">
-                        <form action="set-language.php" method="POST" style="margin: 0; padding: 0;">
+                    <div id="languageMenu" class="dropdown-menu">
+                        <form action="set-language.php" method="POST" style="margin:0;">
                             <input type="hidden" name="redirect" value="index.php">
-                            
-                            <button type="submit" name="language" value="id" style="width:100%; padding:8px; border:none; background:<?= $lang === 'id' ? '#F5EEE5' : 'none'; ?>; border-radius:7px; text-align:left; cursor:pointer;">
-                                Indonesia
-                            </button>
-
-                            <button type="submit" name="language" value="en" style="width:100%; padding:8px; border:none; background:<?= $lang === 'en' ? '#F5EEE5' : 'none'; ?>; border-radius:7px; text-align:left; cursor:pointer;">
-                                English
-                            </button>
+                            <?php foreach (['id' => 'Indonesia', 'en' => 'English'] as $code => $label): ?>
+                                <button type="submit" name="language" value="<?= $code ?>" class="dropdown-option <?= $lang === $code ? 'active' : '' ?>">
+                                    <?= $label ?>
+                                </button>
+                            <?php endforeach; ?>
                         </form>
                     </div>
                 </div>
 
-                <!-- Tombol navigasi masuk -->
-                <a href="login.php" style="color:#302921; text-decoration:none; font-size:13px; font-weight:bold;">
-                    <?= htmlspecialchars(__('login'), ENT_QUOTES, 'UTF-8'); ?>
-                </a>
-
-                <!-- Tombol registrasi akun baru -->
-                <a href="register.php" style="padding:8px 15px; background:#76553D; color:#FFFFFF; border-radius:8px; text-decoration: none; font-size: 13px; font-weight:bold">
-                    <?= htmlspecialchars(__('signup'), ENT_QUOTES, 'UTF-8'); ?>
-                </a>
+                <a href="login.php" class="nav-login-link"><?= htmlspecialchars(__('login'), ENT_QUOTES, 'UTF-8') ?></a>
+                <a href="register.php" class="btn btn-primary btn-sm"><?= htmlspecialchars(__('signup'), ENT_QUOTES, 'UTF-8') ?></a>
             </div>
-
         </div>
     </header>
 
-    <!-- Bagian utama Hero Section -->
-    <section id="hero" class="hero-section" style="padding: 75px 24px; background: radial-gradient(ellipse at 85% 15%, #F5EBDD 0%, #FFFFFF 55%);">
-        <div class="hero-container" style="max-width: 1160px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 45px;">
-
-            <!-- Teks ajakan bertindak (Call to Action) -->
-            <div style="flex: 1 1 300px;">
-
-                <h1 style="margin: 0 0 22px; color: #302921; font-size: clamp(32px, 5vw, 58px); line-height: 1.15; letter-spacing: -1.5px;">
-                    <span><?= htmlspecialchars(__('hero_title_1'), ENT_QUOTES, 'UTF-8'); ?></span>
-                    <br>
-                    <span style="color: #A77D5B;"><?= htmlspecialchars(__('hero_title_2'), ENT_QUOTES, 'UTF-8'); ?></span>
+    <!-- Bagian Hero & Pratinjau Dashboard -->
+    <section id="hero" class="hero-section">
+        <div class="hero-container">
+            <div class="hero-text-col">
+                <h1 class="hero-title">
+                    <span><?= htmlspecialchars(__('hero_title_1'), ENT_QUOTES, 'UTF-8') ?></span><br>
+                    <span class="hero-title-accent"><?= htmlspecialchars(__('hero_title_2'), ENT_QUOTES, 'UTF-8') ?></span>
                 </h1>
-
-                <p style="max-width: 455px; color: #81776D; font-size: 15px; line-height: 1.8;">
-                    <?= htmlspecialchars(__('hero_desc'), ENT_QUOTES, 'UTF-8'); ?>
-                </p>
-
-                <div style="margin-top: 28px;">
-                    <a href="register.php"
-                    style="display: inline-block; padding: 13px 24px; background: #76553D; color: #FFFFFF; border-radius: 9px; text-decoration: none; font-size: 14px; font-weight: bold;">
-                        <span><?= htmlspecialchars(__('create_account'), ENT_QUOTES, 'UTF-8'); ?></span> →
+                <p class="hero-desc"><?= htmlspecialchars(__('hero_desc'), ENT_QUOTES, 'UTF-8') ?></p>
+                <div style="margin-top:28px;">
+                    <a href="register.php" class="btn btn-primary btn-lg">
+                        <span><?= htmlspecialchars(__('create_account'), ENT_QUOTES, 'UTF-8') ?></span> →
                     </a>
                 </div>
-
             </div>
 
-            <!-- Pratinjau visual kartu dashboard -->
-            <div style="flex: 1 1 300px; max-width: 475px; width: 100%; margin: 0 auto;">
-                <div style="padding: 20px; background: #FFFFFF; border: 1px solid #E9E1D7; border-radius: 18px; box-shadow: 0 20px 50px rgba(92, 69, 48, 0.12);">
-
-                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-bottom: 16px; border-bottom: 1px solid #E9E1D7;">
+            <!-- Kartu Pratinjau Visual Dashboard -->
+            <div class="hero-preview-col">
+                <div class="preview-card">
+                    <div class="preview-header">
                         <div>
-                            <h2 style="color: #302921; font-size: 15px; margin: 0;">
-                                <?= htmlspecialchars(__('business_overview'), ENT_QUOTES, 'UTF-8'); ?>
-                            </h2>
-                            <p style="margin: 4px 0 0; color: #81776D; font-size: 11px;">
-                                <?= htmlspecialchars(__('dashboard_preview'), ENT_QUOTES, 'UTF-8'); ?>
-                            </p>
+                            <h2 style="color:#302921; font-size:15px; margin:0;"><?= htmlspecialchars(__('business_overview'), ENT_QUOTES, 'UTF-8') ?></h2>
+                            <p style="margin:4px 0 0; color:#81776D; font-size:11px;"><?= htmlspecialchars(__('dashboard_preview'), ENT_QUOTES, 'UTF-8') ?></p>
                         </div>
-
-                        <span style="padding: 6px 10px; background: #FAF7F2; border-radius: 7px; color: #76553D; font-size: 11px;">
-                            <?= htmlspecialchars(__('today'), ENT_QUOTES, 'UTF-8'); ?>
-                        </span>
+                        <span class="badge badge-neutral" style="font-size:11px;"><?= htmlspecialchars(__('today'), ENT_QUOTES, 'UTF-8') ?></span>
                     </div>
 
-                    <!-- Grid ringkasan statistik dummy -->
-                    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 16px 0;">
-
-                        <div style="padding: 12px; border: 1px solid #E9E1D7; border-radius: 11px;">
-                            <p style="color: #81776D; font-size: 11px; margin: 0;"><?= htmlspecialchars(__('total_products'), ENT_QUOTES, 'UTF-8'); ?></p>
-                            <h3 style="margin: 6px 0 0; color: #302921; font-size: 22px;">128</h3>
-                            <p style="color: #6F8966; font-size: 10px; margin: 4px 0 0;"><?= htmlspecialchars(__('registered_products'), ENT_QUOTES, 'UTF-8'); ?></p>
-                        </div>
-
-                        <div style="padding: 12px; border: 1px solid #E9E1D7; border-radius: 11px;">
-                            <p style="color: #81776D; font-size: 11px; margin: 0;"><?= htmlspecialchars(__('stock_in'), ENT_QUOTES, 'UTF-8'); ?></p>
-                            <h3 style="margin: 6px 0 0; color: #302921; font-size: 22px;">+24</h3>
-                            <p style="color: #6F8966; font-size: 10px; margin: 4px 0 0;"><?= htmlspecialchars(__('units_received'), ENT_QUOTES, 'UTF-8'); ?></p>
-                        </div>
-
-                        <div style="padding: 12px; border: 1px solid #E9E1D7; border-radius: 11px;">
-                            <p style="color: #81776D; font-size: 11px; margin: 0;"><?= htmlspecialchars(__('stock_out'), ENT_QUOTES, 'UTF-8'); ?></p>
-                            <h3 style="margin: 6px 0 0; color: #302921; font-size: 22px;">-12</h3>
-                            <p style="color: #6F8966; font-size: 10px; margin: 4px 0 0;"><?= htmlspecialchars(__('units_sold'), ENT_QUOTES, 'UTF-8'); ?></p>
-                        </div>
-
-                        <div style="padding: 12px; border: 1px solid #E9E1D7; border-radius: 11px;">
-                            <p style="color: #81776D; font-size: 11px; margin: 0;"><?= htmlspecialchars(__('revenue'), ENT_QUOTES, 'UTF-8'); ?></p>
-                            <h3 style="margin: 6px 0 0; color: #302921; font-size: 20px;">Rp 2,4 jt</h3>
-                            <p style="color: #6F8966; font-size: 10px; margin: 4px 0 0;"><?= htmlspecialchars(__('todays_sales'), ENT_QUOTES, 'UTF-8'); ?></p>
-                        </div>
-
+                    <div class="preview-grid">
+                        <?php foreach ($previewStats as [$titleKey, $val, $subKey]): ?>
+                            <div class="preview-stat-box">
+                                <p style="color:#81776D; font-size:11px; margin:0;"><?= htmlspecialchars(__($titleKey), ENT_QUOTES, 'UTF-8') ?></p>
+                                <h3 style="margin:6px 0 0; color:#302921; font-size:21px;"><?= $val ?></h3>
+                                <p style="color:#6F8966; font-size:10px; margin:4px 0 0;"><?= htmlspecialchars(__($subKey), ENT_QUOTES, 'UTF-8') ?></p>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
 
-                    <!-- Daftar sampel produk pada pratinjau -->
-                    <h3 style="margin: 10px 0 8px; color: #302921; font-size: 13px;">
-                        <?= htmlspecialchars(__('sample_products'), ENT_QUOTES, 'UTF-8'); ?>
-                    </h3>
+                    <h3 style="margin:10px 0 8px; color:#302921; font-size:13px;"><?= htmlspecialchars(__('sample_products'), ENT_QUOTES, 'UTF-8') ?></h3>
 
-                    <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid #F1EBE4;">
-                        <div style="width: 36px; height: 36px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: #F3E8DC; color: #76553D; border-radius: 9px; font-weight: 700;">
-                            K
+                    <div class="preview-sample-row">
+                        <div class="preview-sample-icon">K</div>
+                        <div style="flex:1;">
+                            <p style="color:#302921; font-size:12px; font-weight:600; margin:0;">Kemeja Basic</p>
+                            <p style="color:#81776D; font-size:10px; margin:2px 0 0;"><?= htmlspecialchars(__('clothing'), ENT_QUOTES, 'UTF-8') ?></p>
                         </div>
-
-                        <div style="flex: 1;">
-                            <p style="color: #302921; font-size: 12px; font-weight: 600; margin: 0;">Kemeja Basic</p>
-                            <p style="color: #81776D; font-size: 10px; margin: 2px 0 0;"><?= htmlspecialchars(__('clothing'), ENT_QUOTES, 'UTF-8'); ?></p>
-                        </div>
-
-                        <strong style="color: #302921; font-size: 12px;">42 unit</strong>
+                        <strong style="color:#302921; font-size:12px;">42 unit</strong>
                     </div>
 
-                    <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid #F1EBE4;">
-                        <div style="width: 36px; height: 36px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: #E8EDE3; color: #657B5F; border-radius: 9px; font-weight: 700;">
-                            T
+                    <div class="preview-sample-row">
+                        <div class="preview-sample-icon alt">T</div>
+                        <div style="flex:1;">
+                            <p style="color:#302921; font-size:12px; font-weight:600; margin:0;">Tote Bag Canvas</p>
+                            <p style="color:#81776D; font-size:10px; margin:2px 0 0;"><?= htmlspecialchars(__('accessories'), ENT_QUOTES, 'UTF-8') ?></p>
                         </div>
-
-                        <div style="flex: 1;">
-                            <p style="color: #302921; font-size: 12px; font-weight: 600; margin: 0;">Tote Bag Canvas</p>
-                            <p style="color: #81776D; font-size: 10px; margin: 2px 0 0;"><?= htmlspecialchars(__('accessories'), ENT_QUOTES, 'UTF-8'); ?></p>
-                        </div>
-
-                        <strong style="color: #302921; font-size: 12px;">28 unit</strong>
+                        <strong style="color:#302921; font-size:12px;">28 unit</strong>
                     </div>
-
                 </div>
-            </div>
-
-        </div>
-    </section>
-
-    <!-- Bagian fitur  aplikasi -->
-    <section id="features" style="padding: 60px 24px; background: #FAF7F2;">
-
-        <div style="max-width: 1160px; margin: 0 auto;">
-
-            <!-- Header judul bagian fitur -->
-            <div style="max-width: 600px; margin: 0 auto 38px; text-align: center;">
-
-                <p style="color: #A77D5B; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin: 0;">
-                    <?= htmlspecialchars(__('features_tag'), ENT_QUOTES, 'UTF-8'); ?>
-                </p>
-
-                <h2 style="margin-top: 10px; color: #302921; font-size: 28px; line-height: 1.3;">
-                    <?= htmlspecialchars(__('features_title'), ENT_QUOTES, 'UTF-8'); ?>
-                </h2>
-
-                <p style="margin-top: 10px; color: #81776D; font-size: 14px; line-height: 1.7;">
-                    <?= htmlspecialchars(__('features_desc'), ENT_QUOTES, 'UTF-8'); ?>
-                </p>
-
-            </div>
-
-            <!-- Grid daftar kartu fitur unggulan -->
-            <div class="features-grid" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px;">
-                
-                <!-- Kartu Fitur 1: Manajemen Produk -->
-                <div class="feature-card" style="padding: 22px; background: #FFFFFF; border: 1px solid #E9E1D7; border-radius: 14px;">                       
-                    <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: #F3E8DC; color: #76553D; border-radius: 11px;">
-                        <i data-lucide="package" style="width: 23px; height: 23px;"></i>
-                    </div>
-
-                    <h3 style="margin-top: 16px; color: #302921; font-size: 16px;">
-                        <?= htmlspecialchars(__('feat_product_mgmt'), ENT_QUOTES, 'UTF-8'); ?>
-                    </h3>
-
-                    <p style="margin-top: 8px; color: #81776D; font-size: 13px; line-height: 1.7;">
-                        <?= htmlspecialchars(__('feat_product_desc'), ENT_QUOTES, 'UTF-8'); ?>
-                    </p>
-                </div>
-
-                <!-- Kartu Fitur 2: Pergerakan Stok -->
-                <div class="feature-card" style="padding: 22px; background: #FFFFFF; border: 1px solid #E9E1D7; border-radius: 14px;">
-                    <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: #F3E8DC; color: #76553D; border-radius: 11px;">
-                        <i data-lucide="arrow-down-up" style="width: 23px; height: 23px;"></i>
-                    </div>
-
-                    <h3 style="margin-top: 16px; color: #302921; font-size: 16px;">
-                        <?= htmlspecialchars(__('feat_stock_move'), ENT_QUOTES, 'UTF-8'); ?>
-                    </h3>
-
-                    <p style="margin-top: 8px; color: #81776D; font-size: 13px; line-height: 1.7;">
-                        <?= htmlspecialchars(__('feat_stock_desc'), ENT_QUOTES, 'UTF-8'); ?>
-                    </p>
-                </div>
-
-                <!-- Kartu Fitur 3: Riwayat Aktivitas -->
-                <div class="feature-card" style="padding: 22px; background: #FFFFFF; border: 1px solid #E9E1D7; border-radius: 14px;">        
-                    <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: #F3E8DC; color: #76553D; border-radius: 11px;">
-                        <i data-lucide="history" style="width: 23px; height: 23px;"></i>
-                    </div>
-
-                    <h3 style="margin-top: 16px; color: #302921; font-size: 16px;">
-                        <?= htmlspecialchars(__('feat_history'), ENT_QUOTES, 'UTF-8'); ?>
-                    </h3>
-
-                    <p style="margin-top: 8px; color: #81776D; font-size: 13px; line-height: 1.7;">
-                        <?= htmlspecialchars(__('feat_history_desc'), ENT_QUOTES, 'UTF-8'); ?>
-                    </p>
-                </div>
-
-                <!-- Kartu Fitur 4: Statistik Bisnis -->
-                <div class="feature-card" style="padding: 22px; background: #FFFFFF; border: 1px solid #E9E1D7; border-radius: 14px;">
-                    <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: #F3E8DC; color: #76553D; border-radius: 11px;">
-                        <i data-lucide="chart-no-axes-combined" style="width: 23px; height: 23px;"></i>
-                    </div>
-
-                    <h3 style="margin-top: 16px; color: #302921; font-size: 16px;">
-                        <?= htmlspecialchars(__('feat_stats'), ENT_QUOTES, 'UTF-8'); ?>
-                    </h3>
-
-                    <p style="margin-top: 8px; color: #81776D; font-size: 13px; line-height: 1.7;">
-                        <?= htmlspecialchars(__('feat_stats_desc'), ENT_QUOTES, 'UTF-8'); ?>
-                    </p>
-                </div>
-
-                <!-- Kartu Fitur 5: Laporan dan PDF/CSV -->
-                <div class="feature-card" style="padding: 22px; background: #FFFFFF; border: 1px solid #E9E1D7; border-radius: 14px;">
-                    <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: #F3E8DC; color: #76553D; border-radius: 11px;">
-                        <i data-lucide="file-spreadsheet" style="width: 23px; height: 23px;"></i>
-                    </div>
-
-                    <h3 style="margin-top: 16px; color: #302921; font-size: 16px;">
-                        <?= htmlspecialchars(__('feat_reports'), ENT_QUOTES, 'UTF-8'); ?>
-                    </h3>
-
-                    <p style="margin-top: 8px; color: #81776D; font-size: 13px; line-height: 1.7;">
-                        <?= htmlspecialchars(__('feat_reports_desc'), ENT_QUOTES, 'UTF-8'); ?>
-                    </p>
-                </div>
-
-                <!-- Kartu Fitur 6: Multi-Toko -->
-                <div class="feature-card" style="padding: 22px; background: #FFFFFF; border: 1px solid #E9E1D7; border-radius: 14px;">
-                    <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: #F3E8DC; color: #76553D; border-radius: 11px;">
-                        <i data-lucide="store" style="width: 23px; height: 23px;"></i>
-                    </div>
-
-                    <h3 style="margin-top: 16px; color: #302921; font-size: 16px;">
-                        <?= htmlspecialchars(__('feat_multistore'), ENT_QUOTES, 'UTF-8'); ?>
-                    </h3>
-
-                    <p style="margin-top: 8px; color: #81776D; font-size: 13px; line-height: 1.7;">
-                        <?= htmlspecialchars(__('feat_multistore_desc'), ENT_QUOTES, 'UTF-8'); ?>
-                    </p>
-                </div>
-
             </div>
         </div>
     </section>
 
-    <!-- Bagian Footer (Hak Cipta & Informasi) -->
-    <footer style="background: #FFFFFF; border-top: 1px solid #E9E1D7; padding: 24px 16px;">
-        <div class="footer-container" style="max-width: 1160px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
-
-            <!-- Logo brand pada footer -->
-            <div style="display:inline-flex; align-items:center; font-family:Arial, sans-serif; font-weight:800; font-size:24px; letter-spacing:-0.5px;">
-                <!-- Teks "Stock" -->
-                <span style="color:#49382D;">Stock</span>
-
-                <!-- Container Berlapis / Stacked Box -->
-                <div style="position:relative; display:inline-block; margin-left:6px;">
-                    <!-- Lapisan Bayangan Belakang (Dus Bawah) -->
-                    <span style="position:absolute; top:-3px; right:-3px; width:100%; height:100%; background:#B99A7D; border-radius:6px; z-index:1;"></span>
-                    
-                    <!-- Kotak Utas "In" (Dus Atas) -->
-                    <span style="position:relative; z-index:2; display:block; background:#76553D; color:white; padding:3px 8px; border-radius:6px; font-size:20px; line-height:1.2;">
-                        In
-                    </span>
-                </div>
+    <!-- Bagian Daftar Fitur Aplikasi -->
+    <section id="features" class="features-section">
+        <div class="features-container">
+            <div class="features-header">
+                <p class="features-tag"><?= htmlspecialchars(__('features_tag'), ENT_QUOTES, 'UTF-8') ?></p>
+                <h2 style="margin-top:10px; color:#302921; font-size:28px; line-height:1.3;"><?= htmlspecialchars(__('features_title'), ENT_QUOTES, 'UTF-8') ?></h2>
+                <p style="margin-top:10px; color:#81776D; font-size:14px; line-height:1.7;"><?= htmlspecialchars(__('features_desc'), ENT_QUOTES, 'UTF-8') ?></p>
             </div>
 
-            <!-- Informasi hak cipta -->
-            <p style="color: #A0988E; font-size: 11px; margin: 0;">
-                © 2026 StockIn. All rights reserved.
-            </p>
+            <div class="features-grid">
+                <?php foreach ($features as [$icon, $titleKey, $descKey]): ?>
+                    <div class="feature-card">
+                        <div class="feature-icon-box">
+                            <i data-lucide="<?= $icon ?>" style="width:23px; height:23px;"></i>
+                        </div>
+                        <h3 style="margin-top:16px; color:#302921; font-size:16px;"><?= htmlspecialchars(__($titleKey), ENT_QUOTES, 'UTF-8') ?></h3>
+                        <p style="margin-top:8px; color:#81776D; font-size:13px; line-height:1.7;"><?= htmlspecialchars(__($descKey), ENT_QUOTES, 'UTF-8') ?></p>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </section>
 
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <?php renderLogo(); ?>
+            <p style="color:#A0988E; font-size:11px; margin:0;">© 2026 StockIn. All rights reserved.</p>
         </div>
     </footer>
 

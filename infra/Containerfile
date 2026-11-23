@@ -1,0 +1,12 @@
+FROM docker.io/library/php:8.2-apache
+
+RUN docker-php-ext-install mysqli pdo_mysql \
+    && a2enmod rewrite \
+    && sed -ri -e 's/Listen 80/Listen 8080/g' /etc/apache2/ports.conf \
+    && sed -ri -e 's/<VirtualHost \*:80>/<VirtualHost *:8080>/g' /etc/apache2/sites-available/*.conf \
+    && echo "ServerName localhost" >> /etc/apache2/apache2.conf \
+    && chown -R www-data:www-data /var/run/apache2 /var/lock/apache2 /var/log/apache2
+
+EXPOSE 8080
+
+WORKDIR /var/www/html

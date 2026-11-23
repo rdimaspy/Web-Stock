@@ -1,43 +1,21 @@
 <?php
-// Menentukan format respons server sebagai JSON
-header('Content-Type: application/json');
-
-// memuat konfigurasi koneksi database daan bahasa
+// Endpoint API Ambil Detail Satu Produk (untuk Modal Edit)
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/language.php';
+require_once __DIR__ . '/../includes/helpers.php';
 
-// Memeriksa keberadaan parameter ID produk pada query string GET
 if (!isset($_GET['id'])) {
-    echo json_encode([
-        "status" => "error",
-        "message" => __('product_id_not_found')
-    ]);
-    exit;
+    jsonResponse('error', __('product_id_not_found'), 400);
 }
 
-// Konversi nilai ID produk ke tipe data integer
 $id = (int) $_GET['id'];
-
-// Mengambil data produk dari database menggunakan prepared statement demi keamanan
 $stmt = mysqli_prepare($conn, "SELECT * FROM products WHERE id = ? LIMIT 1");
 mysqli_stmt_bind_param($stmt, "i", $id);
 mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
+$product = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
 
-// Memeriksa apakah data produk ditemukan di database
-if (mysqli_num_rows($result) == 0) {
-    echo json_encode([
-        "status" => "error",
-        "message" => __('product_not_found')
-    ]);
-    exit;
+if (!$product) {
+    jsonResponse('error', __('product_not_found'), 404);
 }
 
-// Mengambil baris data produk sebagai array
-$product = mysqli_fetch_assoc($result);
-
-// Mengembalikan respons sukses beserta detail data produk
-echo json_encode([
-    "status" => "success",
-    "data" => $product
-]);
+jsonResponse('success', 'OK', 200, ['data' => $product]);

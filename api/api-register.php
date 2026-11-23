@@ -1,93 +1,45 @@
 <?php
-// Memulai sesi dan memuat file koneksi database & pengelola bahasa
+// Endpoint API Pendaftaran Akun Pengguna Baru
 session_start();
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/language.php';
+require_once __DIR__ . '/../includes/helpers.php';
 
-// Menentukan format respons berupa JSON UTF-8
-header('Content-Type: application/json; charset=utf-8');
-
-// Memastikan permintaan dikirimkan khusus melalui metode POST
-if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-    http_response_code(405);
-    echo json_encode([
-        'status'  => 'error',
-        'message' => __('method_not_allowed')
-    ]);
-    exit;
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    jsonResponse('error', __('method_not_allowed'), 405);
 }
 
-// Menangkap dan membersihkan input nama, email, serta password
-$name     = trim($_POST["name"] ?? "");
-$email    = trim($_POST["email"] ?? "");
-$password = $_POST["password"] ?? "";
+$name     = trim($_POST['name'] ?? '');
+$email    = trim($_POST['email'] ?? '');
+$password = $_POST['password'] ?? '';
 
-// Memvalidasi agar seluruh kolom terisi
-if ($name === "" || $email === "" || $password === "") {
-    http_response_code(400);
-    echo json_encode([
-        'status'  => 'error',
-        'message' => __('all_fields_required')
-    ]);
-    exit;
+if ($name === '' || $email === '' || $password === '') {
+    jsonResponse('error', __('all_fields_required'), 400);
 }
 
-// Memvalidasi kesesuaian format alamat email
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    http_response_code(400);
-    echo json_encode([
-        'status'  => 'error',
-        'message' => __('invalid_email_format')
-    ]);
-    exit;
+    jsonResponse('error', __('invalid_email_format'), 400);
 }
 
-// Validasi panjang password harus tepat 6 karakter
 if (strlen($password) !== 6) {
-    http_response_code(400);
-    echo json_encode([
-        'status'  => 'error',
-        'message' => __('password_exact_6')
-    ]);
-    exit;
+    jsonResponse('error', __('password_exact_6'), 400);
 }
 
-// Menyiapkan prepared statement pengecekan email
+// Pastikan email belum pernah terdaftar
 $stmt = mysqli_prepare($conn, "SELECT id FROM users WHERE email = ? LIMIT 1");
 mysqli_stmt_bind_param($stmt, "s", $email);
 mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
-
-// Menolak pendaftaran jika email sudah terdaftar
-if (mysqli_num_rows($result) > 0) {
-    http_response_code(400);
-    echo json_encode([
-        'status'  => 'error',
-        'message' => __('email_already_used')
-    ]);
-    exit;
+if (mysqli_num_rows(mysqli_stmt_get_result($stmt)) > 0) {
+    jsonResponse('error', __('email_already_used'), 400);
 }
 
-// Mengenkripsi password pengguna
+// Simpan pengguna baru dengan password terenkripsi
 $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-// Menyiapkan query simpan data pengguna baru
-$stmt = mysqli_prepare(
-    $conn,
-    "INSERT INTO users (name, email, password) VALUES (?, ?, ?)"
-);
+$stmt = mysqli_prepare($conn, "INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
 mysqli_stmt_bind_param($stmt, "sss", $name, $email, $hashedPassword);
 
-// Mengembalikan respon JSON berdasarkan status simpan
-if (mysqli_stmt_execute($stmt)) {
-    echo json_encode([
-        'status'  => 'success',
-        'message' => __('account_created')
-    ]);
-} else {
-    http_response_code(500);
-    echo json_encode([
-        'status'  => 'error',
-        'message' => __('account_create_failed')
-    ]);
+if (!mysqli_stmt_execute($stmt)) {
+    jsonResponse('error', __('account_create_failed'), 500);
 }
+
+jsonResponse('success', __('account_created'));
